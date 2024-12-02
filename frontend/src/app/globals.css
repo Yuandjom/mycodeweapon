@@ -6,6 +6,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Remove all default margin and padding */
+*,*::before,*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -68,5 +78,26 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+
+  .debugger{
+    @apply border-4 border-red-500
+  }
+
+  .flex_center{
+    @apply flex justify-center items-center 
+  }
+
+  .flex_between{
+    @apply flex justify-between items-center
+  }
+  .flex_col_center{
+    @apply flex flex-col justify-center items-center 
+  }
+  .flex_col_between{
+    @apply flex flex-col justify-between items-center
   }
 }
