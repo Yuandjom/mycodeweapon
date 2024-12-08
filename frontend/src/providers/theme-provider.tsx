@@ -1,6 +1,5 @@
 "use client"
  
-import * as React from "react"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { useState, useEffect } from "react"
  
@@ -9,14 +8,12 @@ export function ThemeProvider({
   ...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
 
+  // below code according to next-theme docs to avoid hydration errors
+  // https://github.com/pacocoursey/next-themes?tab=readme-ov-file#avoid-hydration-mismatch
   const [mounted, setMounted] = useState<boolean>(false)
-
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Render the children without any theme provider on the first render
-  // This ensures the initial HTML matches what the server rendered
   if (!mounted) {
     return <>{children}</>
   }
