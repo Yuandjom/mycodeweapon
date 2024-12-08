@@ -1,5 +1,6 @@
 "use client"
 
+import CodeEditor from "@/components/ui/code-edit"
 import {
     ResizableHandle,
     ResizablePanel,
@@ -22,13 +23,14 @@ const { problem, fetchError, isLoading } = useProblem(title);
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
                 Question: {problem?.title}
-
                 Description: {problem?.question}
             </ResizablePanel>
             <ResizableHandle withHandle/>
             <ResizablePanel>
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel>Code Editor</ResizablePanel>
+                    <ResizablePanel>
+                      <CodeEditor />
+                    </ResizablePanel>
                     <ResizableHandle withHandle/>
                     <ResizablePanel>Test Cases</ResizablePanel>
                 </ResizablePanelGroup>
