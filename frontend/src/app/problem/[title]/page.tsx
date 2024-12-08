@@ -1,3 +1,4 @@
+"use client"
 
 import {
     ResizableHandle,
@@ -5,14 +6,24 @@ import {
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
 
-type Props = {}
+import { useProblem } from "@/hooks/useProblem"
+import { use } from 'react'
 
-const ProblemPage = (props: Props) => {
+
+const ProblemPage = ({ params }: {
+  params: Promise<{ title: string }>
+}) => {
+  const { title } = use(params)
+
+const { problem, fetchError, isLoading } = useProblem(title);
+
   return (
     <div className="h-screen">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
-                Question
+                Question: {problem?.title}
+
+                Description: {problem?.question}
             </ResizablePanel>
             <ResizableHandle withHandle/>
             <ResizablePanel>
