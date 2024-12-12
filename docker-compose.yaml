@@ -6,7 +6,7 @@ services:
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:8080
+      - NEXT_PUBLIC_API_URL=http://backend:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -16,4 +16,9 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8080:8080"
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0

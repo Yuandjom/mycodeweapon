@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+# fix compatability issues with react-19
+RUN npm install --force
 
 # For prod
 # COPY . .
