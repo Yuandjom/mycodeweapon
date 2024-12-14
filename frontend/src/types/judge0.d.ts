@@ -20,3 +20,8 @@ export type CodeSubmissionRES = {
         description: string;
     }
 }
+
+export type AvailLanguage = {
+    "id": string;
+    "name": string; // "Go (1.13.5)"
+}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CodeSubmissionREQ, CodeSubmissionRES } from "@/types/judge0";
+import { CodeSubmissionREQ, CodeSubmissionRES, AvailLanguage } from "@/types/judge0";
 import { judge0_LanguageToLanguageIDMap, DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT } from "@/constants/judge0";
 
 export type submitCodeParams = {
@@ -81,10 +81,41 @@ export const useJudge0 = () => {
         setCodeTimeUsed(null);
     }
 
+    const getAvailableLanguages = async () : Promise<AvailLanguage[]> => {
+
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_JUDGE0_URL}/languages`,
+                {
+                    method: "GET",
+                    headers: {
+                        "api-token": "TODOAPITOKEN",
+                    }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP Error in request to Judge0, Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            return data;
+
+        
+        } catch(err) {
+            console.log("Error in fetching languages: ", err);
+        }
+
+        return [];
+        
+    }
+
     return {
         isSubmitting, error, codeOutput, codeError, codeMemoryUsed, codeTimeUsed,
         submitCode, // caller function
-        clearCodeSubmission
+        clearCodeSubmission,
+        getAvailableLanguages
     }
 
 }
