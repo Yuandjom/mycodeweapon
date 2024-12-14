@@ -22,8 +22,15 @@ const { problem, fetchError, isLoading } = useProblem(title);
     <div className="h-screen">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel>
-                Question: {problem?.title}
-                Description: {problem?.question}
+                <ResizablePanelGroup direction="vertical">
+                    <ResizablePanel>
+                        Question: {problem?.title}
+                        Description: {problem?.question}
+                    </ResizablePanel>
+                    <ResizableHandle withHandle/>
+                    <ResizablePanel>Test Cases</ResizablePanel>
+                </ResizablePanelGroup>
+                
             </ResizablePanel>
             <ResizableHandle withHandle/>
             <ResizablePanel>
@@ -32,7 +39,7 @@ const { problem, fetchError, isLoading } = useProblem(title);
                       <CodeEditor />
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
-                    <ResizablePanel>Test Cases</ResizablePanel>
+                    <ResizablePanel>Code Output</ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>
         </ResizablePanelGroup>

@@ -1,32 +1,37 @@
 "use client"
 
 import { supabase } from "@/lib/supabase";
-import { useEffect } from "react";
+import { useJudge0 } from "@/hooks/useJudge0";
 
 export default function TestPage(){
 
-    useEffect(() => {
-        const fetchData = async () => {
-            
-            let { data, error } = await supabase
-                .from('Problems')
-                .select('*')
-            console.log("Error: ", error);
-            console.log("Data: ", data);
-
-        }
-        
-        fetchData();
-    
-    }, [])
+    const {
+        isSubmitting, error, codeOutput, codeError, codeMemoryUsed, codeTimeUsed,
+        submitCode, clearCodeSubmission
+    } = useJudge0();
     
 
   
     return (
         <div>
-            <p>Test</p>
-            <p>{process.env.NEXT_PUBLIC_SUPABASE_URL}</p>
-            <p>{process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}</p>
+            <button onClick={ ()=> {
+                submitCode({
+                    source_code: "print('hello world!!!')",
+                    language: "python"
+                })
+            }}>
+                Run Code
+            </button>
+
+            <button onClick={clearCodeSubmission} className="px-4 text-red-500"> 
+                Clear Submission
+            </button>
+
+            {isSubmitting && <p className="text-white">Submitting Code...</p>}
+            {codeOutput && <p className="text-white">Code Output: {codeOutput}</p>}
+            {codeMemoryUsed && <p className="text-white">Code Mem Used: {codeMemoryUsed}</p>}
+            {codeTimeUsed && <p className="text-white">Code Time Used: {codeTimeUsed}</p>}
+
         </div>
     )
 
