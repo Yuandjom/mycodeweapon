@@ -22,6 +22,6 @@ export type CodeSubmissionRES = {
 }
 
 export type AvailLanguage = {
-    "id": string;
-    "name": string; // "Go (1.13.5)"
+    id: string;
+    name: string; // "Go (1.13.5)"
 }

@@ -17,7 +17,7 @@ export default function TestPage(){
             <button onClick={ ()=> {
                 submitCode({
                     source_code: "print('hello world!!!')",
-                    language: "python"
+                    language_id: "71"
                 })
             }}>
                 Run Code

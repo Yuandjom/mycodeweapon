@@ -21,13 +21,38 @@ const ProblemPage = ({ params }: {
   const { title } = use(params)
   const { problem, fetchError, isLoading } = useProblem(title);
 
+  // judge0 dependencies
+  // code dependencies
+  const { 
+    getAvailableLanguages, 
+    submitCode, 
+    isSubmitting, 
+    codeOutput, 
+    codeError,
+    codeMemoryUsed,
+    codeTimeUsed 
+  } = useJudge0();
 
   // code dependencies
-  const { getAvailableLanguages } = useJudge0();
   const [languages, setLanguages] = useState<AvailLanguage[]>([]);
   const [code, setCode] = useState<string>("// your code here");
-
+  const [codeLanguageId, setCodeLanguageId] = useState<string>("71") // by default python which is id: 71
   
+  const handleCodeChange = (value: string | undefined) => {
+    if (value) setCode(value);
+  }
+
+  const handleCodeLanguageIdChange = (langId: string) => {
+    setCodeLanguageId(langId);
+  }
+
+  const handleCodeSubmit = async () => {
+    await submitCode({
+      source_code: code,
+      language_id: codeLanguageId
+    })
+  }
+
 
   useEffect(()=> {
 
@@ -59,11 +84,20 @@ const ProblemPage = ({ params }: {
             <ResizablePanel>
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel>
-                      <CodeEditor languages={languages}/>
+                      <CodeEditor 
+                        languages={languages}
+                        languageId={codeLanguageId}
+                        onLanguageIdChange={handleCodeLanguageIdChange}
+                        code={code}
+                        onCodeChange={handleCodeChange}
+                        onSubmitCode={handleCodeSubmit}
+                      />
                     </ResizablePanel>
                     <ResizableHandle withHandle/>
                     <ResizablePanel>
-                      Code Output
+                      <p>Code Language Id: {codeLanguageId}</p>
+                      <p>Code: {code}</p>
+                      <p>Output: {codeOutput}</p>
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>

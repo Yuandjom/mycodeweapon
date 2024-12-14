@@ -22,12 +22,12 @@ import {
 
 export type comboBoxSelection = {
     value: string,
-    label: string
+    label: string,
 }
 
-export function Combobox({keyword, selections} : {keyword: string, selections: comboBoxSelection[]}) {
+export function Combobox({keyword, selections, onSelectChange} : {keyword: string, selections: comboBoxSelection[], onSelectChange: (value: string) => void;}) {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
+  const [label, setLabel] = React.useState("")
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -38,8 +38,8 @@ export function Combobox({keyword, selections} : {keyword: string, selections: c
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {value
-            ? selections.find((s) => s.value === value)?.label
+          {label
+            ? selections.find((s) => s.label === label)?.label
             : `Select ${keyword}...`}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -55,7 +55,8 @@ export function Combobox({keyword, selections} : {keyword: string, selections: c
                   key={s.value}
                   value={s.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
+                    onSelectChange(s.value);
+                    setLabel(currentValue === label ? "" : currentValue)
                     setOpen(false)
                   }}
                 >
@@ -63,7 +64,7 @@ export function Combobox({keyword, selections} : {keyword: string, selections: c
                   <Check
                     className={cn(
                       "ml-auto",
-                      value === s.value ? "opacity-100" : "opacity-0"
+                      label === s.label ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

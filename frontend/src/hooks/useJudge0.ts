@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { CodeSubmissionREQ, CodeSubmissionRES, AvailLanguage } from "@/types/judge0";
-import { judge0_LanguageToLanguageIDMap, DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT } from "@/constants/judge0";
+import { DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT } from "@/constants/judge0";
 
 export type submitCodeParams = {
     source_code: string;
-    language: string;
+    language_id: string;
 }
 
 
@@ -21,7 +21,7 @@ export const useJudge0 = () => {
     const [codeMemoryUsed, setCodeMemoryUsed] = useState<number | null>(null);
     const [codeTimeUsed, setCodeTimeUsed] = useState<string | null>(null);
 
-    const submitCode = async ({source_code, language} : submitCodeParams ) => {
+    const submitCode = async ({source_code, language_id} : submitCodeParams ) => {
 
         setIsSubmitting(true);
         setError(null);
@@ -29,8 +29,6 @@ export const useJudge0 = () => {
         setCodeError(null);
         setCodeMemoryUsed(null);
         setCodeTimeUsed(null);
-
-        const language_id = judge0_LanguageToLanguageIDMap[language]
 
         const submissionBody : CodeSubmissionREQ = {
             source_code,
@@ -99,7 +97,6 @@ export const useJudge0 = () => {
             }
 
             const data = await response.json();
-            
             return data;
 
         
