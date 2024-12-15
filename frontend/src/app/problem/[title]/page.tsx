@@ -67,23 +67,28 @@ const ProblemPage = ({ params }: {
   }, [])
 
   return (
-    <div className="h-screen">
-        <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel>
+    <div className="h-screen bg-slate-400 dark:bg-black">
+        <ResizablePanelGroup 
+          direction="horizontal"
+        >
+            <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel>
+                    <ResizablePanel className="mb-1 bg-background rounded-lg">
                         Question: {problem?.title}
                         Description: {problem?.question}
                     </ResizablePanel>
-                    <ResizableHandle withHandle/>
-                    <ResizablePanel>Test Cases</ResizablePanel>
+                    <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
+                    <ResizablePanel className="mt-1 bg-background rounded-lg">
+                      AI Chatbot
+                    </ResizablePanel>
                 </ResizablePanelGroup>
-                
             </ResizablePanel>
-            <ResizableHandle withHandle/>
-            <ResizablePanel>
+
+            <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
+
+            <ResizablePanel defaultSize={60} className="ml-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel>
+                    <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg">
                       <CodeEditor 
                         languages={languages}
                         languageId={codeLanguageId}
@@ -93,8 +98,8 @@ const ProblemPage = ({ params }: {
                         onSubmitCode={handleCodeSubmit}
                       />
                     </ResizablePanel>
-                    <ResizableHandle withHandle/>
-                    <ResizablePanel>
+                    <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
+                    <ResizablePanel defaultSize={25} className="mt-1 bg-background rounded-lg">
                       <p>Code Language Id: {codeLanguageId}</p>
                       <p>Code: {code}</p>
                       <p>Output: {codeOutput}</p>

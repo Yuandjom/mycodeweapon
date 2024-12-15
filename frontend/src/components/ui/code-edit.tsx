@@ -1,5 +1,6 @@
 
 import Editor from '@monaco-editor/react';
+import { useTheme } from 'next-themes'
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { AvailLanguage } from '@/types/judge0';
@@ -16,8 +17,7 @@ type Props = {
 }
 
 const CodeEditor = (props: Props) => {
-
-
+  const { theme } = useTheme();
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -38,7 +38,7 @@ const CodeEditor = (props: Props) => {
         defaultLanguage="python"
         defaultValue="# some comment"
         onChange={props.onCodeChange}
-        theme="vs-dark"
+        theme={`${theme === "light" ? "" : "vs-dark"}`}
       />
     </div>
   )
