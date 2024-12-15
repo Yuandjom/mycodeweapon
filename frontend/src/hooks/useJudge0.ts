@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { CodeSubmissionREQ, CodeSubmissionRES, AvailLanguage } from "@/types/judge0";
-import { DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT } from "@/constants/judge0";
+import { DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT, judge0ToMonacoMap } from "@/constants/judge0";
 
 export type submitCodeParams = {
     source_code: string;
@@ -97,7 +97,10 @@ export const useJudge0 = () => {
             }
 
             const data = await response.json();
-            return data;
+            
+            const filteredLangauges = data.filter((d : any) => d.id in judge0ToMonacoMap).sort();
+
+            return filteredLangauges;
 
         
         } catch(err) {

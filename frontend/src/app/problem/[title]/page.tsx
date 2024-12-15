@@ -73,12 +73,12 @@ const ProblemPage = ({ params }: {
         >
             <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel className="mb-1 bg-background rounded-lg">
+                    <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg">
                         Question: {problem?.title}
                         Description: {problem?.question}
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                    <ResizablePanel className="mt-1 bg-background rounded-lg">
+                    <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg">
                       AI Chatbot
                     </ResizablePanel>
                 </ResizablePanelGroup>
