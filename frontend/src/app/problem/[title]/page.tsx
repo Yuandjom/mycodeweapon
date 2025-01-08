@@ -37,7 +37,7 @@ const ProblemPage = ({ params }: {
 
   // code dependencies
   const [languages, setLanguages] = useState<AvailLanguage[]>([]);
-  const [code, setCode] = useState<string>("// your code here");
+  const [code, setCode] = useState<string>("# your code here");
   const [codeLanguageId, setCodeLanguageId] = useState<string>("71") // by default python which is id: 71
   
   const handleCodeChange = (value: string | undefined) => {
@@ -69,7 +69,7 @@ const ProblemPage = ({ params }: {
   }, [])
 
   return (
-    <div className="h-screen bg-slate-400 dark:bg-black">
+    <div className="h-full bg-slate-400 dark:bg-black">
         <ResizablePanelGroup 
           direction="horizontal"
         >
@@ -99,6 +99,7 @@ const ProblemPage = ({ params }: {
                         code={code}
                         onCodeChange={handleCodeChange}
                         onSubmitCode={handleCodeSubmit}
+                        isSubmitting={isSubmitting}
                       />
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>

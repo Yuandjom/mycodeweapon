@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { Navbar } from "@/components/utils/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,7 +24,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <div className="flex flex-col w-full h-screen">
+              <Navbar />
+              {children}
+            </div>
           </ThemeProvider>
       </body>
     </html>
