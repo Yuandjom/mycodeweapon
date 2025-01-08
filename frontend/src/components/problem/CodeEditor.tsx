@@ -24,9 +24,11 @@ const CodeEditor = (props: Props) => {
     <div className="w-full h-full flex flex-col">
       <div>
         <Combobox
-          keyword={"language"} selections={props.languages.map((lang)=> {
+          keyword={"language"}
+          selections={props.languages.map((lang)=> {
             return {value: lang.id, label: lang.name}})}
-            onSelectChange={props.onLanguageIdChange}  
+          defaultValue={props.languageId}
+          onSelectChange={props.onLanguageIdChange}  
         />
         <Button
           onClick={props.onSubmitCode}

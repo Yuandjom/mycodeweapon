@@ -25,9 +25,16 @@ export type comboBoxSelection = {
     label: string,
 }
 
-export function Combobox({keyword, selections, onSelectChange} : {keyword: string, selections: comboBoxSelection[], onSelectChange: (value: string) => void;}) {
+export function Combobox({defaultValue, keyword, selections, onSelectChange} : {defaultValue?: string, keyword: string, selections: comboBoxSelection[], onSelectChange: (value: string) => void;}) {
   const [open, setOpen] = React.useState(false)
   const [label, setLabel] = React.useState("")
+
+  React.useEffect(()=>{
+    if (defaultValue) {
+      const defaultSelection = selections.find(s => s.value == defaultValue)
+      setLabel(defaultSelection?.label || "")
+    }
+  }, [selections])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

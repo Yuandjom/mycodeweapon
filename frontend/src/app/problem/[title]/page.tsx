@@ -42,7 +42,6 @@ const ProblemPage = ({ params }: {
   
   const handleCodeChange = (value: string | undefined) => {
     if (value) setCode(value);
-    console.log('Raw code string:', JSON.stringify(value));
   }
 
   const handleCodeLanguageIdChange = (langId: string) => {
