@@ -32,6 +32,7 @@ const CodeEditor = (props: Props) => {
         />
         <Button
           onClick={props.onSubmitCode}
+          className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
         >
           Run
         </Button>
