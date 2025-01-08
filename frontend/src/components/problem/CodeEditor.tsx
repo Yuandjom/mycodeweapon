@@ -37,7 +37,7 @@ const CodeEditor = (props: Props) => {
       <Editor 
         height="100vh" 
         defaultLanguage={judge0ToMonacoMap[props.languageId]}
-        defaultValue="# your code here"
+        defaultValue="# your code"
         onChange={props.onCodeChange}
         theme={`${theme === "light" ? "" : "vs-dark"}`}
       />

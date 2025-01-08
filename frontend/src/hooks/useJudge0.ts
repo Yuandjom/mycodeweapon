@@ -17,7 +17,8 @@ export const useJudge0 = () => {
 
     // judge0 useful return values
     const [codeOutput, setCodeOutput] = useState<string | null>(null);
-    const [codeError, setCodeError] = useState<string | null>(null);
+    const [codeErrorId, setCodeErrorId] = useState<number>(-1);
+    const [codeErrorDesc, setCodeErrorDesc] = useState<string | null>(null);
     const [codeMemoryUsed, setCodeMemoryUsed] = useState<number | null>(null);
     const [codeTimeUsed, setCodeTimeUsed] = useState<string | null>(null);
 
@@ -26,7 +27,8 @@ export const useJudge0 = () => {
         setIsSubmitting(true);
         setError(null);
         setCodeOutput(null);
-        setCodeError(null);
+        setCodeErrorId(-1);
+        setCodeErrorDesc(null);
         setCodeMemoryUsed(null);
         setCodeTimeUsed(null);
 
@@ -57,7 +59,8 @@ export const useJudge0 = () => {
             const data: CodeSubmissionRES = await response.json();
 
             setCodeOutput(data.stdout);
-            setCodeError(data.stderr);
+            setCodeErrorId(data.status.id);
+            setCodeErrorDesc(data.stderr);
             setCodeMemoryUsed(data.memory);
             setCodeTimeUsed(data.time);
 
@@ -74,7 +77,8 @@ export const useJudge0 = () => {
         setIsSubmitting(false);
         setError(null);
         setCodeOutput(null);
-        setCodeError(null);
+        setCodeErrorId(-1);
+        setCodeErrorDesc(null);
         setCodeMemoryUsed(null);
         setCodeTimeUsed(null);
     }
@@ -98,7 +102,7 @@ export const useJudge0 = () => {
 
             const data = await response.json();
             
-            const filteredLangauges = data.filter((d : any) => d.id in judge0ToMonacoMap).sort();
+            const filteredLangauges = data.filter((d : any) => d.id.toString() in judge0ToMonacoMap).sort((a: any, b : any) => a.name.localeCompare(b.name));;
 
             return filteredLangauges;
 
@@ -112,7 +116,7 @@ export const useJudge0 = () => {
     }
 
     return {
-        isSubmitting, error, codeOutput, codeError, codeMemoryUsed, codeTimeUsed,
+        isSubmitting, error, codeOutput, codeErrorId, codeErrorDesc, codeMemoryUsed, codeTimeUsed,
         submitCode, // caller function
         clearCodeSubmission,
         getAvailableLanguages

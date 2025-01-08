@@ -1,6 +1,7 @@
 "use client"
 
-import CodeEditor from "@/components/ui/code-edit"
+import CodeEditor from "@/components/problem/CodeEditor"
+import CodeOutput from "@/components/problem/CodeOutput"
 import {
     ResizableHandle,
     ResizablePanel,
@@ -27,8 +28,9 @@ const ProblemPage = ({ params }: {
     getAvailableLanguages, 
     submitCode, 
     isSubmitting, 
-    codeOutput, 
-    codeError,
+    codeOutput,
+    codeErrorId,
+    codeErrorDesc,
     codeMemoryUsed,
     codeTimeUsed 
   } = useJudge0();
@@ -40,6 +42,7 @@ const ProblemPage = ({ params }: {
   
   const handleCodeChange = (value: string | undefined) => {
     if (value) setCode(value);
+    console.log('Raw code string:', JSON.stringify(value));
   }
 
   const handleCodeLanguageIdChange = (langId: string) => {
@@ -73,13 +76,14 @@ const ProblemPage = ({ params }: {
         >
             <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg">
-                        Question: {problem?.title}
-                        Description: {problem?.question}
+                    <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
+                        <p>TODO: Upload question image components</p>
+                        <p>Question: {problem?.title}</p>
+                        <p>Description: {problem?.question}</p>
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                    <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg">
-                      AI Chatbot
+                    <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
+                      <p>TODO AI chatbot integration</p>
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>
@@ -88,7 +92,7 @@ const ProblemPage = ({ params }: {
 
             <ResizablePanel defaultSize={60} className="ml-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
-                    <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg">
+                    <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg p-4">
                       <CodeEditor 
                         languages={languages}
                         languageId={codeLanguageId}
@@ -99,10 +103,15 @@ const ProblemPage = ({ params }: {
                       />
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                    <ResizablePanel defaultSize={25} className="mt-1 bg-background rounded-lg">
-                      <p>Code Language Id: {codeLanguageId}</p>
-                      <p>Code: {code}</p>
-                      <p>Output: {codeOutput}</p>
+                    <ResizablePanel defaultSize={25} className="mt-1 bg-background rounded-lg p-4">
+                      <CodeOutput
+                        isSubmitting={isSubmitting}
+                        codeOutput={codeOutput}
+                        codeErrorId={codeErrorId}
+                        codeErrorDesc={codeErrorDesc}
+                        codeMemoryUsed={codeMemoryUsed}
+                        codeTimeUsed={codeTimeUsed}
+                      />
                     </ResizablePanel>
                 </ResizablePanelGroup>
             </ResizablePanel>

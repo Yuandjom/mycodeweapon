@@ -40,3 +40,20 @@ export const judge0ToMonacoMap : {[key: string]: string}= {
     "83" : "swift",
 
 }
+
+export const statusIdToDescMap: {[key: number]: string} = {
+    1: "In Queue",
+    2: "Processing",
+    3: "Accepted",
+    4: "Wrong Answer",
+    5: "Time Limit Exceeded",
+    6: "Compilation Error",
+    7: "Runtime Error: Segmentation Fault",
+    8: "Runtime Error: File Size Limit Exceeded",
+    9: "Runtime Error: Floating Point Exception",
+    10: "Runtime Error: Abnormal Program Termination",
+    11: "Runtime Error: Non-Zero Exit Code",
+    12: "Runtime Error",
+    13: "Internal Error",
+    14: "Exec Format Error"
+};

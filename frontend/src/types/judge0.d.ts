@@ -9,8 +9,8 @@ export type CodeSubmissionREQ = {
 
 export type CodeSubmissionRES = {
     stdout: string;
-    time: string;
-    memory: number;
+    time: string; // in seconds
+    memory: number; // in KBs
     stderr: string | null;
     token: string;
     compile_output: string | null;
