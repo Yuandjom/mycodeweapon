@@ -2,7 +2,6 @@
 
 import CodeEditor from "@/components/problem/CodeEditor"
 import CodeOutput from "@/components/problem/CodeOutput"
-import UploadQuestion from "@/components/utils/workspace"
 import QuestionEditor from "@/components/problem/QuestionEditor"
 import {
     ResizableHandle,

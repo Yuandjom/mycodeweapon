@@ -18,6 +18,7 @@ export const useProblem = (title : string) => {
 
 			setFetchError(null);
 			setIsLoading(true);
+			setProblem(null);
 
 			if (processedTitle !== ""){
 				let { data, error  } = await supabase
@@ -26,8 +27,11 @@ export const useProblem = (title : string) => {
 					.eq("title", processedTitle);
 	
 				console.log("Received data: ", data);
-	
-				if (data && !fetchError) {
+				console.log("Error: ", error);
+				
+				if (!error && data?.length == 0) {
+					setFetchError(Error("No problem found"))
+				} else if (!error && data) {
 					setProblem(data[0])
 				} else {
 					setFetchError(error);
