@@ -1,10 +1,11 @@
 "use client";
+
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-
+import LightDarkToggle from "@/components/utils/LightDarkToggle";
 
 
 export const Navbar = () => {
@@ -25,7 +26,7 @@ export const Navbar = () => {
         setHovered(null);
       }}
       className=
-        "w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0 border-b-8 border-black"
+        "w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0 border-b-8 border-slate-400 dark:border-black"
     >
       <Logo />
       <div className="flex flex-row flex-1 items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
@@ -46,6 +47,7 @@ export const Navbar = () => {
           </Link>
         ))}
       </div>
+      <LightDarkToggle/>
     </motion.div>
   );
 };

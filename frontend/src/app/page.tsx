@@ -1,5 +1,4 @@
 import Image from "next/image";
-import LightDarkToggle from "@/components/utils/LightDarkToggle";
 
 export default function Home() {
   return (
@@ -15,7 +14,6 @@ export default function Home() {
           </li>
           <li>Save and see your changes instantly now!</li>
         </ol>
-        <LightDarkToggle/>
         
       </main>
 

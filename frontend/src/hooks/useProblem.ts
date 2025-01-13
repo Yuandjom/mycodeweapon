@@ -19,25 +19,31 @@ export const useProblem = (title : string) => {
 			setFetchError(null);
 			setIsLoading(true);
 
-			let { data, error  } = await supabase
-				.from('Problems')
-				.select('*')
-				.eq("title", processedTitle);
-
-			console.log("Received data: ", data);
-
-			if (data && !fetchError) {
-				setFetchError(null);
-				setProblem(data[0])
+			if (processedTitle !== ""){
+				let { data, error  } = await supabase
+					.from('Problems')
+					.select('*')
+					.eq("title", processedTitle);
+	
+				console.log("Received data: ", data);
+	
+				if (data && !fetchError) {
+					setProblem(data[0])
+				} else {
+					setFetchError(error);
+				}
 			} else {
-				setFetchError(error);
+				setProblem({
+					id: 1,
+					title: "",
+				})
 			}
 			setIsLoading(false);
 		}
 		
 		fetchProblem();
 
-	}, []);
+	}, [processedTitle]);
 
-	return { problem, fetchError, isLoading }
+	return { problem, setProblem, fetchError, isLoading }
 }

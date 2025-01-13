@@ -2,6 +2,8 @@
 
 import CodeEditor from "@/components/problem/CodeEditor"
 import CodeOutput from "@/components/problem/CodeOutput"
+import UploadQuestion from "@/components/utils/workspace"
+import QuestionEditor from "@/components/problem/QuestionEditor"
 import {
     ResizableHandle,
     ResizablePanel,
@@ -20,7 +22,7 @@ const ProblemPage = ({ params }: {
 
   // problem dependencies
   const { title } = use(params)
-  const { problem, fetchError, isLoading } = useProblem(title);
+  const { problem, setProblem, fetchError, isLoading } = useProblem(title);
 
   // judge0 dependencies
   // code dependencies
@@ -76,9 +78,7 @@ const ProblemPage = ({ params }: {
             <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
-                        <p>TODO: Upload question image components</p>
-                        <p>Question: {problem?.title}</p>
-                        <p>Description: {problem?.question}</p>
+                        <QuestionEditor problem={problem} setProblem={setProblem}/>
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
                     <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
