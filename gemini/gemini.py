@@ -9,34 +9,44 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get the API key from the .env file
-api_key = os.getenv('GEMINI_API_KEY')
+API_KEY = os.getenv('GEMINI_API_KEY')
 
-genai.configure(api_key=api_key)
+# Configure generation parameters
+GENERATION_CONFIG = {
+    "temperature": 0.3,  
+    "top_p": 0.8,
+    "top_k": 40,
+    "max_output_tokens": 2048,
+    "candidate_count": 1,
+    "stop_sequences": []
+}
+
+genai.configure(api_key=API_KEY)
 
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 # Create a detailed context for the image
 context_prompt = """
-This image shows a coding problem or technical question that requires analysis and solution. 
-The image will serve as our primary reference point for the following discussion.
+This image shows a coding problem or technical question submitted by a user. 
+The image will serve as the primary reference point.
 
 Key points to consider:
-1. This is a programming challenge that needs to be solved step by step
-2. The image contains important details about the problem requirements and constraints
-3. We'll need to carefully analyze the code or problem statement shown
-4. Any solution provided should address all aspects visible in the image
+1. This is a programming challenge that needs to be solved by code
+2. The image should contain important details about the problem requirements and constraints
+3. Carefully analyze the code, problem statement and constraints if any shown
+4. Any reply provided should address all aspects of the question and the user's prompt in a technical way
 5. Consider best practices and optimization opportunities in the solution
+6. Do not provide the complete solution unless explicitly requested by the user's prompt
 
 For all subsequent interactions:
-- Focus on providing detailed explanations of the solution approach
 - Reference specific parts of the image when discussing the problem
 - Consider edge cases and potential limitations
 - Suggest improvements or alternative approaches when applicable
-- Provide code examples that directly relate to the problem shown
+- Provide code examples that directly relate to the problem shown only if explicitly requested by the user's prompt
 
-The goal is to provide comprehensive assistance in understanding and solving this programming challenge while maintaining context throughout our interaction.
+The goal is to provide comprehensive assistance in understanding and solving this programming challenge without spoonfeeeding the answer/solution to the user unless explicitly request by the user.
 
-Please analyze the image and provide guidance based on these parameters.
+Please analyze the image and provide guidance based on the user prompt in a concise manner.
 """
 
 # Upload the image using the Files API
@@ -60,10 +70,12 @@ image_file = genai.upload_file(path="CodeQues1.png")
 # # Query the model
 # response = model.generate_content("Introduce to what type of data structure would I be expected to solve this coding problem efficiently")
 
-response = model.generate_content([
-    context_prompt,
-    "What type of data structure would be most efficient for solving this coding problem?",
-    image_file
-])
+
+
+# Apply to your generate_content call
+response = model.generate_content(
+    [context_prompt, image_file, "User Prompt:", "What are possible data structures I can use to solve this problem?"],
+    generation_config=GENERATION_CONFIG
+)
 
 print(response.text)
