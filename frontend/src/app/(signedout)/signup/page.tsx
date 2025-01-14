@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/auth-provider";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
   return (
@@ -16,14 +19,45 @@ export default function SignUpPage() {
 }
 
 function Form() {
+  const { signUp } = useAuth();
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsSigningUp(true);
+    setError("");
 
-    console.log("submitted form", e.currentTarget);
-    setTimeout(()=>{setIsSigningUp(false)}, 2000)
+    try {
+      const formData = new FormData(e.currentTarget);
+      const userData = {
+        username: formData.get('username') as string,
+        email: formData.get('email') as string,
+        password: formData.get('password') as string
+      };
+  
+      const result = await signUp(userData);
+      if (!result.success) {
+        throw new Error(result.error?.message || "Failed to create account");
+      }
 
+      toast.success("Account created successfully!");
+
+      // If email verification is required
+      if (result.data?.message?.includes("verification")) {
+        toast.info(result.data.message);
+      } else {
+        router.push("/");
+      }
+
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      toast.error(err instanceof Error ? err.message : "Failed to create account");
+    } finally {
+      setIsSigningUp(false);
+    }
+    
   }
 
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
@@ -51,6 +85,7 @@ function Form() {
                   </Label>
                   <Input
                     id="username"
+                    name="username"
                     placeholder="codegod"
                     type="text"
                     required
@@ -64,8 +99,9 @@ function Form() {
                   </Label>
                   <Input
                     id="email"
+                    name="email"
                     placeholder="codegod@gmail.com"
-                    type="text"
+                    type="email"
                     required
                     disabled={isSigningUp}
                   />
@@ -77,6 +113,7 @@ function Form() {
                   </Label>
                   <Input
                     id="password"
+                    name="password"
                     placeholder="••••••••••••"
                     type="password"
                     required

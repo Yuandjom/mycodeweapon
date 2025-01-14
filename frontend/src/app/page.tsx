@@ -26,8 +26,8 @@ export default function Home() {
         >
           <Image
             aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
+            src="/mycodeweapon.svg"
+            alt="logo"
             width={16}
             height={16}
           />

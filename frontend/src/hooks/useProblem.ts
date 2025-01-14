@@ -25,9 +25,6 @@ export const useProblem = (title : string) => {
 					.from('Problems')
 					.select('*')
 					.eq("title", processedTitle);
-	
-				console.log("Received data: ", data);
-				console.log("Error: ", error);
 				
 				if (!error && data?.length == 0) {
 					setFetchError(Error("No problem found"))

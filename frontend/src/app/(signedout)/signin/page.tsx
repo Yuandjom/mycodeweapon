@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/providers/auth-provider";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function SignInPage() {
   return (
@@ -17,16 +20,39 @@ export default function SignInPage() {
 
 function Form() {
 
+  const { signIn } = useAuth();
+  const router = useRouter();
+  const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setIsSigningUp(true);
+    setIsSigningIn(true);
 
-    console.log("submitted form", e.currentTarget);
-    setTimeout(()=>{setIsSigningUp(false)}, 2000)
+    try {
+      const formData = new FormData(e.currentTarget);
+      const userData = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string
+      }
 
+      const result = await signIn(userData);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || "Failed to sign in");
+      }
+
+      toast.success("Signed in successfully!");
+
+      router.push("/")
+
+    } catch(err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      toast.error(err instanceof Error ? err.message : "Failed to sign in");
+    } finally {
+      setIsSigningIn(false);
+    }
   }
-
-  const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
 
   return (
     <div className="bg-background">
@@ -51,10 +77,11 @@ function Form() {
                   </Label>
                   <Input
                     id="email"
+                    name="email"
                     placeholder="codegod@gmail.com"
-                    type="text"
+                    type="email"
                     required
-                    disabled={isSigningUp}
+                    disabled={isSigningIn}
                   />
                 </div>
 
@@ -64,10 +91,11 @@ function Form() {
                   </Label>
                   <Input
                     id="password"
+                    name="password"
                     placeholder="••••••••••••"
                     type="password"
                     required
-                    disabled={isSigningUp}
+                    disabled={isSigningIn}
                   />
                 </div>
 
@@ -75,9 +103,9 @@ function Form() {
                   <Button
                     type="submit"
                     className="px-4 py-2 rounded-xl w-[300px]"
-                    disabled={isSigningUp}
+                    disabled={isSigningIn}
                   >
-                    {isSigningUp ? "Creating account..." : "Create account"}
+                    {isSigningIn ? "Signing In..." : "Sign In"}
                   </Button>
                   <p className={cn("text-sm text-neutral-600 text-center mt-4 dark:text-neutral-400")}>
                     Do not have an account?{" "}

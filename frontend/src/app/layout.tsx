@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { AuthProvider } from "@/providers/auth-provider";
 import { Navbar } from "@/components/utils/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
@@ -19,7 +20,8 @@ export default function RootLayout({
       <body
         className={`antialiased min-h-screen`}
       >
-        <ThemeProvider
+        <AuthProvider>
+          <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
@@ -31,6 +33,7 @@ export default function RootLayout({
               <Toaster />
             </div>
           </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

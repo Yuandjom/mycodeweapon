@@ -70,7 +70,7 @@ const ProblemPage = ({ params }: {
   }, [])
 
   return (
-    <div className="h-full bg-slate-400 dark:bg-black">
+    <div className="h-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black">
         <ResizablePanelGroup 
           direction="horizontal"
         >

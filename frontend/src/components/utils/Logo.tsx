@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const Logo = ({withText, logoSize} : {withText: boolean, logoSize?: number}) => {
+const Logo = ({withText=false, logoSize} : {withText?: boolean, logoSize?: number}) => {
     return (
       <Link
         href="/"
