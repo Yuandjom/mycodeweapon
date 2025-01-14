@@ -1,6 +1,6 @@
 "use client"
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { Problem } from "@/types/supabasetable";
 
@@ -21,6 +21,7 @@ export const useProblem = (title : string) => {
 			setProblem(null);
 
 			if (processedTitle !== ""){
+				const supabase = await createClient();
 				let { data, error  } = await supabase
 					.from('Problems')
 					.select('*')

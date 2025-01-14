@@ -14,7 +14,6 @@ export default function Home() {
           </li>
           <li>Save and see your changes instantly now!</li>
         </ol>
-        
       </main>
 
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
@@ -26,7 +25,7 @@ export default function Home() {
         >
           <Image
             aria-hidden
-            src="/mycodeweapon.svg"
+            src="/mycodeweaponlogo.svg"
             alt="logo"
             width={16}
             height={16}

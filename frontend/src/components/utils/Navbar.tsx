@@ -30,10 +30,6 @@ export const Navbar = () => {
       name: "Problems",
       link: "#",
     },
-    {
-      name: "Contribute",
-      link: "#",
-    },
   ];
 
   const handleSignOut = async () => {

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 export default function SignInPage() {
@@ -22,6 +22,7 @@ function Form() {
 
   const { signIn } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
@@ -44,7 +45,12 @@ function Form() {
 
       toast.success("Signed in successfully!");
 
-      router.push("/")
+      const redirectPage = searchParams.get("next");
+      if (redirectPage) {
+        router.push(redirectPage)
+      } else {
+        router.push("/")
+      }
 
     } catch(err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");

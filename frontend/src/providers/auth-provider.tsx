@@ -2,16 +2,17 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session, AuthError, AuthResponse } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { signUp_SA, signIn_SA, signOut_SA } from "@/actions/auth";
 
-interface SignUpCredentials {
+export interface SignUpCredentials {
   email: string;
   password: string;
   username?: string;  // Optional if you want to store username
 }
 
-interface SignInCredentials {
+export interface SignInCredentials {
   email: string;
   password: string;
 }
@@ -25,7 +26,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-interface AuthResult {
+export interface AuthResult {
   success: boolean;
   error: AuthError | null;
   data: any | null;
@@ -56,6 +57,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log(`Updated session: ${session}`)
     }, [session])
   }
+
+  const supabase = createClient();
     
   useEffect(() => {
 
@@ -83,84 +86,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Invalid sign up credentials")
     }
 
-    try {
+    const { success, error, data } = await signUp_SA({email, password, username});
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-          }
-        }
-      })
-
-      if (error) {
-        return {
-          success: false,
-          error,
-          data: null
-        };
-      }
-
-      setSession(data.session);
-      setUser(data.user)
-
-      return {
-        success: true,
-        error: null,
-        data
-      }
-
-    } catch(err) {
+    if (error) {
       return {
         success: false,
-        error: err as AuthError,
+        error,
         data: null
-      }
+      };
     }
+
+    setSession(data.session);
+    setUser(data.user)
+
+    return {
+      success: true,
+      error: null,
+      data
+    }
+
   }
 
   const signIn = async ({ email, password }: SignInCredentials): Promise<AuthResult> => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    
+    console.log("[auth-provider] signing in")
+    const { success, error, data } = await signIn_SA({email, password});
 
-      if (error) {
-        console.log(`[auth-provider] signIn error: ${error}`)
-        return {
-          success: false,
-          error,
-          data: null
-        };
-      }
-
-      setSession(data.session);
-      setUser(data.user);
-
-      return {
-        success: true,
-        error: null,
-        data
-      };
-    } catch (err) {
+    if (error) {
       return {
         success: false,
-        error: err as AuthError,
+        error,
         data: null
       };
+    }
+
+    setSession(data.session);
+    setUser(data.user)
+
+    return {
+      success: true,
+      error: null,
+      data
     }
   };
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push("/signin");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
+    await signOut_SA();
+    router.push("/signin");
   };
 
   return (
@@ -190,7 +162,7 @@ export const useAuth = () => {
 
 
 
-const isValidSignUpCredentials = ({email, password, username}: SignUpCredentials) : boolean => {
+export const isValidSignUpCredentials = ({email, password, username}: SignUpCredentials) : boolean => {
     // Basic validation
     if (!email || !password || !username) {
       return false
