@@ -18,7 +18,6 @@ import {
 import { Button } from "../ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { useRouter } from "next/navigation";
-import { signOut } from "@/hooks/useUser";
 import { LogOut, User, Settings } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,6 +40,8 @@ export const Navbar = () => {
       console.error("Sign out error:", error);
     }
   };
+
+  console.log("[Navbar] user: ", user);
 
 
   return (

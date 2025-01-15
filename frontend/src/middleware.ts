@@ -9,7 +9,7 @@ const PUBLIC_ROUTES = [
 ]
 
 export async function middleware(request: NextRequest) {
-    // Create a response early so we can modify it
+
     let supabaseResponse = NextResponse.next({
         request,
     })

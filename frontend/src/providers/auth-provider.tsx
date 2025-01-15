@@ -62,6 +62,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
   useEffect(() => {
 
+    setAuthLoading(true);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log(`[auth-provider] Session: ${session}`)
       setSession(session);
@@ -132,7 +134,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await signOut_SA();
-    router.push("/signin");
+    setSession(null);
+    setUser(null)
+    router.push("/");
   };
 
   return (

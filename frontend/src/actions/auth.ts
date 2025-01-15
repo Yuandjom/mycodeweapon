@@ -4,9 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { AuthError } from "@supabase/supabase-js";
 import { SignUpCredentials,
     SignInCredentials,
-    AuthResult,
-    isValidSignUpCredentials }
-    from "@/providers/auth-provider";
+    AuthResult
+    } from "@/providers/auth-provider";
 
 // suffix of _SA to denote this function is a server action in auth-provider
 
