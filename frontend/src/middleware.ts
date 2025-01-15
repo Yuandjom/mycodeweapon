@@ -35,7 +35,6 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    // IMPORTANT: Get user right after creating the client
     const {
         data: { user },
         error,
