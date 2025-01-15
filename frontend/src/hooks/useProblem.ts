@@ -1,51 +1,126 @@
 "use client"
 
-import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { Problem } from "@/types/supabasetable";
+import { createClient } from "@/lib/supabase/client";
+import { ProblemActions, ProblemState } from "@/types/problem"
 
-export const useProblem = (title : string) => {
+export const useProblem = (title: string, userId: string) => {
 
-	const [problem, setProblem] = useState<Problem | null>(null);
-	const [fetchError, setFetchError] = useState<Error | null>(null);
+	const DEFAULT_PROBLEM_STATE : ProblemState = {
+		problemId: -1,
+		userId,
+		title: "untitled",
+		code: "# your code here", //TODO: make this dynamic based on languageId
+		languageId: "71", // python's language Id
+		questionImage: null,
+		imagePreview: ""
+	}
+
+	const [problemStates, setProblemStates] = useState<ProblemState>(DEFAULT_PROBLEM_STATE)
+
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [isSaving, setIsSaving] = useState<boolean>(false);
+	const [error, setError] = useState<Error | null>(null);
 
-	const processedTitle = title.replaceAll('-', ' ');
+	// utility function
+	const updateProblemStates = (newStates: Partial<ProblemState>) => {
+		
+		setProblemStates(prev => ({
+			...prev,
+			...newStates
+		}))
+	}
 
+	if (process.env.NODE_ENV==="development") {
+		useEffect(()=> {
+			console.table(problemStates);
+		}, [problemStates])
+	}
+
+	// init
 	useEffect(()=> {
 
 		const fetchProblem = async () => {
 
-			setFetchError(null);
 			setIsLoading(true);
-			setProblem(null);
+			setError(null);
+			const spacedTitle : string = title.replaceAll('-', ' ')
 
-			if (processedTitle !== ""){
-				const supabase = await createClient();
-				let { data, error  } = await supabase
-					.from('Problems')
-					.select('*')
-					.eq("title", processedTitle);
-				
-				if (!error && data?.length == 0) {
-					setFetchError(Error("No problem found"))
-				} else if (!error && data) {
-					setProblem(data[0])
-				} else {
-					setFetchError(error);
-				}
-			} else {
-				setProblem({
-					id: 1,
-					title: "",
-				})
+			if (spacedTitle.length === 0) {
+				return;
 			}
-			setIsLoading(false);
+
+			try {
+				const supabase = await createClient();
+				const { data, error : fetchError } = await supabase
+					.from("Problems")
+					.select("*")
+					.eq("title", spacedTitle)
+					.single()
+	
+				if (fetchError) {
+					setError(fetchError)
+					return;
+				}
+	
+				updateProblemStates({
+					problemId: data.id,
+					title: data.title,
+					code: data.code,
+					languageId: data.languageId,
+				})
+			} catch(err) {
+				setError(err instanceof Error ? err : new Error('Failed to fetch problem'));
+			} finally {
+				setIsLoading(false);
+			}
+
 		}
-		
-		fetchProblem();
 
-	}, [processedTitle]);
+		if (title!=="new") {
+			fetchProblem();
+		}
 
-	return { problem, setProblem, fetchError, isLoading }
+
+	}, [title, userId])
+
+	const setTitle = (title: string) => {
+		updateProblemStates({title: title.trim()})
+	}
+
+	const setQuestionImage = (questionImage: File | null) => {
+		updateProblemStates({questionImage})
+	}
+
+	const setCode = (code: string) => {
+		updateProblemStates({code})
+	}
+
+	const setLanguageId = (languageId : string) => {
+		updateProblemStates({languageId})
+	}
+
+	const saveProblem = async () => {
+		alert("TODO")
+	}
+
+	const resetProblem = () => {
+		updateProblemStates(DEFAULT_PROBLEM_STATE);
+	}
+
+	return {
+		problemStates,
+
+		setTitle,
+		setQuestionImage,
+		setCode,
+		setLanguageId,
+		saveProblem,
+		resetProblem,
+
+		isLoading,
+		isSaving,
+		error
+	}
+
 }

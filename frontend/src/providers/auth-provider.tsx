@@ -51,10 +51,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   if (process.env.NODE_ENV === "development") {
     useEffect(()=>{
-      console.log(`Updated user: ${user}`)
+      console.log("Updated user:")
+      console.log(user);
     }, [user])
     useEffect(()=>{
-      console.log(`Updated session: ${session}`)
+      console.log("Updated session:")
+      console.log(session);
     }, [session])
   }
 

@@ -8,23 +8,45 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
   } from "@/components/ui/resizable"
-
+import { useAuth } from "@/providers/auth-provider"
 import { useProblem } from "@/hooks/useProblem"
-import { AvailLanguage } from "@/types/judge0"
 import { useJudge0 } from "@/hooks/useJudge0"
+import { AvailLanguage } from "@/types/judge0"
 import { use, useState, useEffect } from 'react'
+import { redirect } from "next/navigation"
 
 
 const ProblemPage = ({ params }: {
   params: Promise<{ title: string }>
 }) => {
 
+  const { user, authLoading } = useAuth();
+
+  if (authLoading) {
+    return (<p>Loading...</p>)
+  } else if (!user) {
+    console.log("no user")
+    redirect("/signin")
+  }
+
+  const userId = user.id
+
   // problem dependencies
   const { title } = use(params)
-  const { problem, setProblem, fetchError, isLoading } = useProblem(title);
+  const { 
+    problemStates,
+		setTitle,
+		setQuestionImage,
+		setCode,
+		setLanguageId,
+		saveProblem,
+		resetProblem,
+		isLoading,
+		isSaving,
+		error
+   } = useProblem(title, userId);
 
   // judge0 dependencies
-  // code dependencies
   const { 
     getAvailableLanguages, 
     submitCode, 
@@ -38,21 +60,11 @@ const ProblemPage = ({ params }: {
 
   // code dependencies
   const [languages, setLanguages] = useState<AvailLanguage[]>([]);
-  const [code, setCode] = useState<string>("# your code here");
-  const [codeLanguageId, setCodeLanguageId] = useState<string>("71") // by default python which is id: 71
-  
-  const handleCodeChange = (value: string | undefined) => {
-    if (value) setCode(value);
-  }
-
-  const handleCodeLanguageIdChange = (langId: string) => {
-    setCodeLanguageId(langId);
-  }
 
   const handleCodeSubmit = async () => {
     await submitCode({
-      source_code: code,
-      language_id: codeLanguageId
+      source_code: problemStates.code,
+      language_id: problemStates.languageId
     })
   }
 
@@ -77,7 +89,7 @@ const ProblemPage = ({ params }: {
             <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
-                        <QuestionEditor problem={problem} setProblem={setProblem}/>
+                        <QuestionEditor title={problemStates.title} setTitle={setTitle} image={problemStates.questionImage} setImage={setQuestionImage}/>
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
                     <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
@@ -93,10 +105,10 @@ const ProblemPage = ({ params }: {
                     <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg p-4">
                       <CodeEditor 
                         languages={languages}
-                        languageId={codeLanguageId}
-                        onLanguageIdChange={handleCodeLanguageIdChange}
-                        code={code}
-                        onCodeChange={handleCodeChange}
+                        languageId={problemStates.languageId}
+                        onLanguageIdChange={setLanguageId}
+                        code={problemStates.code}
+                        onCodeChange={setCode}
                         onSubmitCode={handleCodeSubmit}
                         isSubmitting={isSubmitting}
                       />

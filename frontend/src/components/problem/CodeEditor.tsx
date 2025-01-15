@@ -14,13 +14,19 @@ type Props = {
 
   // functions
   onLanguageIdChange: (langId:string) => void;
-  onCodeChange: (value: string|undefined) => void;
+  onCodeChange: (value: string) => void;
   onSubmitCode: () => void;
   isSubmitting: boolean;
 }
 
 const CodeEditor = (props: Props) => {
   const { theme } = useTheme();
+
+  const handleCodeChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      props.onCodeChange(value);
+    }
+  }
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
@@ -52,8 +58,14 @@ const CodeEditor = (props: Props) => {
           height="100vh"
           defaultLanguage={judge0ToMonacoMap[props.languageId]}
           defaultValue={props.code}
-          onChange={props.onCodeChange}
-          theme={`${theme === "light" ? "" : "vs-dark"}`}
+          onChange={handleCodeChange}
+          theme={theme === "light" ? "light" : "vs-dark"}
+          options={{
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            tabSize: 2,
+          }}
         />
       </div>
     </div>
