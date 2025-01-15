@@ -11,25 +11,16 @@ import {
 import { useAuth } from "@/providers/auth-provider"
 import { useProblem } from "@/hooks/useProblem"
 import { useJudge0 } from "@/hooks/useJudge0"
-import { AvailLanguage } from "@/types/judge0"
-import { use, useState, useEffect } from 'react'
-import { redirect } from "next/navigation"
+import { use } from 'react'
 
 
 const ProblemPage = ({ params }: {
   params: Promise<{ title: string }>
 }) => {
 
-  const { user, authLoading } = useAuth();
+  const { user } = useAuth();
 
-  if (authLoading) {
-    return (<p>Loading...</p>)
-  } else if (!user) {
-    console.log("no user")
-    redirect("/signin")
-  }
-
-  const userId = user.id
+  const userId = user?.id || ""
 
   // problem dependencies
   const { title } = use(params)
@@ -48,7 +39,7 @@ const ProblemPage = ({ params }: {
 
   // judge0 dependencies
   const { 
-    getAvailableLanguages, 
+    languages, 
     submitCode, 
     isSubmitting, 
     codeOutput,
@@ -57,29 +48,6 @@ const ProblemPage = ({ params }: {
     codeMemoryUsed,
     codeTimeUsed 
   } = useJudge0();
-
-  // code dependencies
-  const [languages, setLanguages] = useState<AvailLanguage[]>([]);
-
-  const handleCodeSubmit = async () => {
-    await submitCode({
-      source_code: problemStates.code,
-      language_id: problemStates.languageId
-    })
-  }
-
-
-  useEffect(()=> {
-
-    const afterRender = async () => {
-
-      const availLanguages = await getAvailableLanguages();
-      setLanguages(availLanguages);
-    }
-
-    afterRender();
-
-  }, [])
 
   return (
     <div className="h-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black">
@@ -109,7 +77,7 @@ const ProblemPage = ({ params }: {
                         onLanguageIdChange={setLanguageId}
                         code={problemStates.code}
                         onCodeChange={setCode}
-                        onSubmitCode={handleCodeSubmit}
+                        onSubmitCode={submitCode}
                         isSubmitting={isSubmitting}
                       />
                     </ResizablePanel>

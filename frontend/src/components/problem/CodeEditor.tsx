@@ -6,6 +6,7 @@ import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { AvailLanguage } from '@/types/judge0';
 import { judge0ToMonacoMap } from '@/constants/judge0';
+import { submitCodeParams } from '@/hooks/useJudge0';
 
 type Props = {
   languages: AvailLanguage[]
@@ -15,7 +16,7 @@ type Props = {
   // functions
   onLanguageIdChange: (langId:string) => void;
   onCodeChange: (value: string) => void;
-  onSubmitCode: () => void;
+  onSubmitCode: ({source_code, language_id}: submitCodeParams) => void;
   isSubmitting: boolean;
 }
 
@@ -26,6 +27,13 @@ const CodeEditor = (props: Props) => {
     if (value !== undefined) {
       props.onCodeChange(value);
     }
+  }
+
+  const handleCodeSubmit = async () => {
+    await props.onSubmitCode({
+      source_code: props.code,
+      language_id: props.languageId
+    })
   }
 
   return (
@@ -39,7 +47,7 @@ const CodeEditor = (props: Props) => {
           onSelectChange={props.onLanguageIdChange}  
         />
         <Button
-          onClick={props.onSubmitCode}
+          onClick={handleCodeSubmit}
           className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
           disabled={props.isSubmitting}
         >
