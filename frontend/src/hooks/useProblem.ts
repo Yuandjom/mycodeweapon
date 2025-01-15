@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
 import { ProblemActions, ProblemState } from "@/types/problem"
 
-export const useProblem = (title: string, userId: string) => {
+export const useProblem = (title: string, user: User | null) => {
 
 	const DEFAULT_PROBLEM_STATE : ProblemState = {
 		problemId: -1,
-		userId,
+		userId: user?.id || "-",
 		title: "untitled",
 		code: "# your code here", //TODO: make this dynamic based on languageId
 		languageId: "71", // python's language Id
@@ -31,20 +32,18 @@ export const useProblem = (title: string, userId: string) => {
 		}))
 	}
 
-	if (process.env.NODE_ENV==="development") {
-		useEffect(()=> {
-			console.table(problemStates);
-		}, [problemStates])
-	}
-
 	// init
 	useEffect(()=> {
 
 		const fetchProblem = async () => {
 
+			if (!user) return;
+
 			setIsLoading(true);
 			setError(null);
+
 			const spacedTitle : string = title.replaceAll('-', ' ')
+			const userId : string = user.id;
 
 			if (spacedTitle.length === 0) {
 				return;
@@ -55,13 +54,16 @@ export const useProblem = (title: string, userId: string) => {
 				const { data, error : fetchError } = await supabase
 					.from("Problems")
 					.select("*")
+					.eq("userId", userId)
 					.eq("title", spacedTitle)
 					.single()
 	
 				if (fetchError) {
-					setError(fetchError)
-					return;
+					throw fetchError;
 				}
+
+				console.log("[useProblem] fetched data:")
+				console.table(data)
 	
 				updateProblemStates({
 					problemId: data.id,
@@ -70,6 +72,8 @@ export const useProblem = (title: string, userId: string) => {
 					languageId: data.languageId,
 				})
 			} catch(err) {
+				console.log("[useProblem] error:")
+				console.log(err);
 				setError(err instanceof Error ? err : new Error('Failed to fetch problem'));
 			} finally {
 				setIsLoading(false);
@@ -82,7 +86,7 @@ export const useProblem = (title: string, userId: string) => {
 		}
 
 
-	}, [title, userId])
+	}, [title, user])
 
 	const setTitle = (title: string) => {
 		updateProblemStates({title: title.trim()})
@@ -101,7 +105,72 @@ export const useProblem = (title: string, userId: string) => {
 	}
 
 	const saveProblem = async () => {
-		alert("TODO")
+
+		setIsSaving(true);
+		setError(null);
+
+		console.log(`[useProblem] Saving problem with userId: ${problemStates.userId}`)
+
+		try {
+
+			const supabase = createClient();
+
+			const toInsertData = {
+				title: problemStates.title,
+				userId: problemStates.userId,
+				code: problemStates.code,
+				languageId: problemStates.languageId
+			};
+
+			// new problem to insert
+			if (problemStates.problemId === -1) {
+
+				console.log("[useProblem] fresh insert")
+				console.log(toInsertData)
+
+				const { data, error: supaError } = await supabase
+					.from("Problems")
+					.insert(toInsertData)
+					.select("id")
+					.single();
+
+				if (supaError) {
+					throw supaError
+				}
+
+				const insertedProblemId = data.id
+				updateProblemStates({problemId : insertedProblemId})
+			
+			// update previously inserted problem
+			} else {
+
+				console.log("[useProblem] update")
+				console.log(toInsertData)
+
+				const { data, error: supaError } = await supabase
+					.from("Problems")
+					.update(toInsertData)
+					.eq("id", problemStates.problemId)	
+				
+				if (supaError) {
+					throw supaError
+				}
+			}
+			if (process.env.NODE_ENV==="development") {
+				console.log("[useProblem] problem data upserted to DB: ", problemStates.problemId)
+			}
+
+			// TODO: handle image upload to storage
+
+
+
+		} catch (err) {
+			console.log("[useProblem] error in saving problem:");
+			console.log(err);
+			setError(err instanceof Error ? err : new Error("Unexpected error occured") )
+		} finally {
+			setIsSaving(false);
+		}
 	}
 
 	const resetProblem = () => {

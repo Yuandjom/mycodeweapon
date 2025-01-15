@@ -1,12 +1,13 @@
 
 import Editor from '@monaco-editor/react';
-import { Play, Loader2 } from "lucide-react";
+import { Play, Loader2, Save } from "lucide-react";
 import { useTheme } from 'next-themes'
 import { Combobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { AvailLanguage } from '@/types/judge0';
 import { judge0ToMonacoMap } from '@/constants/judge0';
 import { submitCodeParams } from '@/hooks/useJudge0';
+import { useEffect } from 'react';
 
 type Props = {
   languages: AvailLanguage[]
@@ -18,6 +19,8 @@ type Props = {
   onCodeChange: (value: string) => void;
   onSubmitCode: ({source_code, language_id}: submitCodeParams) => void;
   isSubmitting: boolean;
+  onSaveProblem: () => void;
+  isSaving: boolean;
 }
 
 const CodeEditor = (props: Props) => {
@@ -48,16 +51,30 @@ const CodeEditor = (props: Props) => {
         />
         <Button
           onClick={handleCodeSubmit}
-          className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
+          className="bg-secondary hover:bg-secondary/80"
           disabled={props.isSubmitting}
         >
           <div className="flex_center gap-1.5">
             {props.isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="text-blue-600 hover:text-blue-500 h-4 w-4 animate-spin" />
             ) : (
-              <Play className="h-4 w-4" />
+              <Play className="text-green-600 hover:text-green-500 h-4 w-4" />
             )}
-            <span>{props.isSubmitting ? "Submitting..." : "Submit"}</span>
+            <span className="font-semibold text-green-600 hover:text-green-500">{props.isSubmitting ? "Running..." : "Run Code"}</span>
+          </div>
+        </Button>
+        <Button
+          onClick={props.onSaveProblem}
+          className="bg-secondary hover:bg-secondary/80"
+          disabled={props.isSaving}
+        >
+          <div className="flex_center gap-1.5">
+            {props.isSaving ? (
+              <Loader2 className="text-blue-600 hover:text-blue-500 h-4 w-4 animate-spin" />
+            ) : (
+              <Save className="text-blue-600 hover:text-blue-500 h-4 w-4" />
+            )}
+            <span className="font-semibold text-blue-600 hover:text-blue-500">{props.isSaving ? "Saving..." : "Save Problem"}</span>
           </div>
         </Button>
       </div>
@@ -65,7 +82,7 @@ const CodeEditor = (props: Props) => {
         <Editor 
           height="100vh"
           defaultLanguage={judge0ToMonacoMap[props.languageId]}
-          defaultValue={props.code}
+          value={props.code}
           onChange={handleCodeChange}
           theme={theme === "light" ? "light" : "vs-dark"}
           options={{

@@ -1,10 +1,12 @@
 import { useToast } from "@/hooks/use-toast";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Edit2, ImagePlus, Save, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import { Problem } from "@/types/supabasetable";
 
 interface QuestionEditorProps {
     title: string,
@@ -22,6 +24,9 @@ const QuestionEditor = ( {title, setTitle, image, setImage} : QuestionEditorProp
     const [tempTitle, setTempTitle] = useState<string>(title)
     const [preview, setPreview] = useState<string>('');
 
+    useEffect(()=>{
+        setTempTitle(title);
+    }, [title])
 
     const handleTitleSave = () => {
         setTitle(tempTitle.trim());

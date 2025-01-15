@@ -18,9 +18,15 @@ const ProblemPage = ({ params }: {
   params: Promise<{ title: string }>
 }) => {
 
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
 
-  const userId = user?.id || ""
+  if (authLoading) {
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  }
 
   // problem dependencies
   const { title } = use(params)
@@ -35,7 +41,7 @@ const ProblemPage = ({ params }: {
 		isLoading,
 		isSaving,
 		error
-   } = useProblem(title, userId);
+   } = useProblem(title, user);
 
   // judge0 dependencies
   const { 
@@ -57,7 +63,12 @@ const ProblemPage = ({ params }: {
             <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
-                        <QuestionEditor title={problemStates.title} setTitle={setTitle} image={problemStates.questionImage} setImage={setQuestionImage}/>
+                        <QuestionEditor
+                          title={problemStates.title}
+                          setTitle={setTitle}
+                          image={problemStates.questionImage}
+                          setImage={setQuestionImage}
+                        />
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
                     <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
@@ -79,6 +90,8 @@ const ProblemPage = ({ params }: {
                         onCodeChange={setCode}
                         onSubmitCode={submitCode}
                         isSubmitting={isSubmitting}
+                        onSaveProblem={saveProblem}
+                        isSaving={isSaving}
                       />
                     </ResizablePanel>
                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>

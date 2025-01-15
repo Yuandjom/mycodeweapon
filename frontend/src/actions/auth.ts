@@ -18,6 +18,8 @@ export async function signUp_SA({email, password, username} : SignUpCredentials)
     )
 
     if (error) {
+        console.log("[signUp_SA] error:");
+        console.log(error);
         return {
             success: false,
             error,
@@ -40,6 +42,8 @@ export async function signIn_SA({email, password} : SignInCredentials) : Promise
     const { data, error } = await supabase.auth.signInWithPassword({email, password})
 
     if (error) {
+        console.log("[signIn_SA] error:");
+        console.log(error);
         return {
             success: false,
             error,
