@@ -32,6 +32,9 @@ export const useProblem = (title: string, user: User | null) => {
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const [error, setError] = useState<Error | null>(null);
 
+	// use to assist in deleting redundant images
+	const [oldImagePath, setOldImagePath] = useState<string | null>(null);
+
 	// utility function
 	const updateProblemStates = (newStates: Partial<ProblemState>) => {
 		
@@ -74,6 +77,14 @@ export const useProblem = (title: string, user: User | null) => {
 				// fetch the image if such exist
 				if (data.imageUrl) {
 					try {
+						console.log(`[useProblem] fetchProblem() - imageUrl: ${data.imageUrl}`)
+
+						// cache this imageUrl's filepath
+						const storagePathRegex = data.imageUrl.match(/problemImages\/(.+)(\?.*|$)/)
+						const storagePath = storagePathRegex ? storagePathRegex[1] : null;
+						console.log(`[useProblem] fetchProblem() - storagePath: ${storagePath}`)
+						setOldImagePath(storagePath)
+
 						updateProblemStates({
 							imagePreview: data.imageUrl,
 							imageUrl: data.imageUrl
@@ -194,43 +205,58 @@ export const useProblem = (title: string, user: User | null) => {
 				console.log("[useProblem] problem data upserted to DB: ", problemStates.problemId)
 			}
 
-			// handle image upload to storage if any
-			if (!problemStates.questionImage) return;
+			// if there's images in storage, delete first
+			if (oldImagePath) {
 
-			console.log("[useProblem] saveProblem() - Saving to storage bucket")
-
-			const fileExt = problemStates.questionImage.name.split('.').pop();
-
-			const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`
-			
-			await supabase.storage
-				.from("problemImages")
-				.remove([fileStorePath]);
-			
-			const { error : UploadError } = await supabase.storage
-				.from("problemImages")
-				.upload(fileStorePath, problemStates.questionImage, {
-					cacheControl: '3600',
-					upsert: true
-				});
-			
-				if (UploadError) {
-					throw UploadError
+				const { error: deleteError } = await supabase.storage
+					.from("problemImages")
+					.remove([oldImagePath])
+				
+				if (deleteError) {
+					throw deleteError;
 				}
-
-			const { data: { publicUrl } } = supabase.storage
-				.from("problemImages")
-				.getPublicUrl(fileStorePath);
-
-			const { error: imageUrlUpdateError } = await supabase
-				.from("Problems")
-				.update({imageUrl: publicUrl})
-				.eq("id", problemId)
-				.eq("userId", problemStates.userId)
-
-			if (imageUrlUpdateError) {
-				throw imageUrlUpdateError;
 			}
+
+			// handle image upload to storage if any
+			if (problemStates.questionImage) {
+				console.log("[useProblem] saveProblem() - Saving to storage bucket")
+	
+				const fileExt = problemStates.questionImage.name.split('.').pop();
+	
+				const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`
+				
+				const { error : UploadError } = await supabase.storage
+					.from("problemImages")
+					.upload(fileStorePath, problemStates.questionImage, {
+						cacheControl: '3600',
+						upsert: true
+					});
+				
+					if (UploadError) {
+						throw UploadError
+					}
+	
+				const { data: { publicUrl } } = supabase.storage
+					.from("problemImages")
+					.getPublicUrl(fileStorePath);
+	
+				const { error: imageUrlUpdateError } = await supabase
+					.from("Problems")
+					.update({imageUrl: publicUrl})
+					.eq("id", problemId)
+					.eq("userId", problemStates.userId)
+	
+				if (imageUrlUpdateError) {
+					throw imageUrlUpdateError;
+				}
+			} else {
+				const { error: imageUrlUpdateError } = await supabase
+					.from("Problems")
+					.update({imageUrl: null})
+					.eq("id", problemId)
+					.eq("userId", problemStates.userId)
+			}
+
 
 		} catch (err) {
 			console.log("[useProblem] error in saving problem:");
