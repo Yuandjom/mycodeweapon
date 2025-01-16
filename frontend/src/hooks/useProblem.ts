@@ -17,6 +17,14 @@ export const useProblem = (title: string, user: User | null) => {
 		imagePreview: ""
 	}
 
+	// for updating user details when user are loaded asynchronously
+	useEffect(()=>{
+		if (user) {
+			updateProblemStates({userId: user.id})
+			console.log(`[useProblem] updated userId: ${user.id}`)
+		}
+	}, [user])
+
 	const [problemStates, setProblemStates] = useState<ProblemState>(DEFAULT_PROBLEM_STATE)
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,8 +83,6 @@ export const useProblem = (title: string, user: User | null) => {
 				console.log("[useProblem] error:")
 				console.log(err);
 				setError(err instanceof Error ? err : new Error('Failed to fetch problem'));
-			} finally {
-				setIsLoading(false);
 			}
 
 		}
@@ -84,6 +90,8 @@ export const useProblem = (title: string, user: User | null) => {
 		if (title!=="new") {
 			fetchProblem();
 		}
+
+		setIsLoading(false);
 
 
 	}, [title, user])
@@ -175,6 +183,9 @@ export const useProblem = (title: string, user: User | null) => {
 
 	const resetProblem = () => {
 		updateProblemStates(DEFAULT_PROBLEM_STATE);
+		setError(null);
+		setIsLoading(false);
+		setIsSaving(false);
 	}
 
 	return {
