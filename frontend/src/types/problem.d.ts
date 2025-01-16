@@ -1,10 +1,11 @@
 export interface ProblemState {
-    problemId: int;
+    problemId: string;
     userId: string;
     title: string;
     code: string;
     languageId: string;
     questionImage: File | null;
+    imageUrl: string | null;
     imagePreview: string;
 }
 

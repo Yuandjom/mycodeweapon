@@ -8,12 +8,13 @@ import { ProblemActions, ProblemState } from "@/types/problem"
 export const useProblem = (title: string, user: User | null) => {
 
 	const DEFAULT_PROBLEM_STATE : ProblemState = {
-		problemId: -1,
+		problemId: "-1",
 		userId: user?.id || "-",
 		title: "untitled",
 		code: "# your code here", //TODO: make this dynamic based on languageId
 		languageId: "71", // python's language Id
 		questionImage: null,
+		imageUrl: null,
 		imagePreview: ""
 	}
 
@@ -69,9 +70,29 @@ export const useProblem = (title: string, user: User | null) => {
 				if (fetchError) {
 					throw fetchError;
 				}
+				
+				// fetch the image if such exist
+				if (data.imageUrl) {
+					try {
+						updateProblemStates({
+							imagePreview: data.imageUrl,
+							imageUrl: data.imageUrl
+						});
 
-				console.log("[useProblem] fetched data:")
-				console.table(data)
+						const response = await fetch(data.imageUrl);
+						const blob = await response.blob();
+						
+						// Get file extension from URL
+						const fileExt = data.imageUrl.split('.').pop()?.split('?')[0] || 'png';
+						const fileName = `${data.id}.${fileExt}`;
+						
+						const imageFile = new File([blob], fileName, { type: `image/${fileExt}` });
+						updateProblemStates({ questionImage: imageFile });
+
+					} catch (err) {
+						console.error("[useProblem] Error fetching image:", err);
+					}
+				}
 	
 				updateProblemStates({
 					problemId: data.id,
@@ -79,6 +100,9 @@ export const useProblem = (title: string, user: User | null) => {
 					code: data.code,
 					languageId: data.languageId,
 				})
+
+				console.log("[useProblem] fetched & processe data:")
+				console.table(data)
 			} catch(err) {
 				console.log("[useProblem] error:")
 				console.log(err);
@@ -123,6 +147,8 @@ export const useProblem = (title: string, user: User | null) => {
 
 			const supabase = createClient();
 
+			let problemId : string = problemStates.problemId
+
 			const toInsertData = {
 				title: problemStates.title,
 				userId: problemStates.userId,
@@ -131,7 +157,7 @@ export const useProblem = (title: string, user: User | null) => {
 			};
 
 			// new problem to insert
-			if (problemStates.problemId === -1) {
+			if (problemStates.problemId === "-1") {
 
 				console.log("[useProblem] fresh insert")
 				console.log(toInsertData)
@@ -146,8 +172,8 @@ export const useProblem = (title: string, user: User | null) => {
 					throw supaError
 				}
 
-				const insertedProblemId = data.id
-				updateProblemStates({problemId : insertedProblemId})
+				const problemId = data.id
+				updateProblemStates({problemId})
 			
 			// update previously inserted problem
 			} else {
@@ -158,7 +184,7 @@ export const useProblem = (title: string, user: User | null) => {
 				const { data, error: supaError } = await supabase
 					.from("Problems")
 					.update(toInsertData)
-					.eq("id", problemStates.problemId)	
+					.eq("id", problemStates.problemId)
 				
 				if (supaError) {
 					throw supaError
@@ -168,9 +194,43 @@ export const useProblem = (title: string, user: User | null) => {
 				console.log("[useProblem] problem data upserted to DB: ", problemStates.problemId)
 			}
 
-			// TODO: handle image upload to storage
+			// handle image upload to storage if any
+			if (!problemStates.questionImage) return;
 
+			console.log("[useProblem] saveProblem() - Saving to storage bucket")
 
+			const fileExt = problemStates.questionImage.name.split('.').pop();
+
+			const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`
+			
+			await supabase.storage
+				.from("problemImages")
+				.remove([fileStorePath]);
+			
+			const { error : UploadError } = await supabase.storage
+				.from("problemImages")
+				.upload(fileStorePath, problemStates.questionImage, {
+					cacheControl: '3600',
+					upsert: true
+				});
+			
+				if (UploadError) {
+					throw UploadError
+				}
+
+			const { data: { publicUrl } } = supabase.storage
+				.from("problemImages")
+				.getPublicUrl(fileStorePath);
+
+			const { error: imageUrlUpdateError } = await supabase
+				.from("Problems")
+				.update({imageUrl: publicUrl})
+				.eq("id", problemId)
+				.eq("userId", problemStates.userId)
+
+			if (imageUrlUpdateError) {
+				throw imageUrlUpdateError;
+			}
 
 		} catch (err) {
 			console.log("[useProblem] error in saving problem:");
@@ -178,6 +238,8 @@ export const useProblem = (title: string, user: User | null) => {
 			setError(err instanceof Error ? err : new Error("Unexpected error occured") )
 		} finally {
 			setIsSaving(false);
+			console.log("[useProblem] saveProblem() completed")
+
 		}
 	}
 

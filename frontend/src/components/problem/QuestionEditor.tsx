@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Problem } from "@/types/supabasetable";
 
 interface QuestionEditorProps {
+    imageUrl: string | null,
     title: string,
     setTitle: (title: string) => void,
     image: File | null,
@@ -16,17 +17,21 @@ interface QuestionEditorProps {
 
 }
 
-const QuestionEditor = ( {title, setTitle, image, setImage} : QuestionEditorProps) => {
+const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : QuestionEditorProps) => {
 
     const { toast } = useToast();
 
     const [isEdittingTitle, setIsEditingTitle] = useState<boolean>(false);
     const [tempTitle, setTempTitle] = useState<string>(title)
-    const [preview, setPreview] = useState<string>('');
+    const [preview, setPreview] = useState<string>(imageUrl || "");
 
     useEffect(()=>{
         setTempTitle(title);
     }, [title])
+
+    useEffect(()=>{
+        setPreview(imageUrl || "");
+    }, [imageUrl])
 
     const handleTitleSave = () => {
         setTitle(tempTitle.trim());

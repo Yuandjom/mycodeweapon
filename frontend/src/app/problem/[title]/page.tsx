@@ -83,6 +83,7 @@ const ProblemPage = ({ params }: {
                           <QuestionEditor
                             title={problemStates.title}
                             setTitle={setTitle}
+                            imageUrl={problemStates.imageUrl}
                             image={problemStates.questionImage}
                             setImage={setQuestionImage}
                           />
