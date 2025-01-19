@@ -97,7 +97,7 @@ const ChatHistory = ( { messages } : ChatHistoryProps) => {
     }, [messages])
 
     return (
-        <ScrollArea className="h-full pr-4">
+        <ScrollArea className="flex-1 pr-4">
             <div className="space-y-4 p-4">
                 {messages.map((m, i) => {
                     const fromAI = i % 2 === 0

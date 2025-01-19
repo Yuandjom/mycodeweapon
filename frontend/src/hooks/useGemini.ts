@@ -23,18 +23,28 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
     const [prompt, setPrompt] = useState<string>("");
     const [isPrompting, setIsPrompting] = useState<boolean>(false);
 
-    const [chatHistory, SetChatHistory] = useState<string[]>(HARDCODE);
+    const [chatHistory, setChatHistory] = useState<string[]>(HARDCODE);
 
     const [includeCode, setIncludeCode] = useState<boolean>(false);
-    const [includeQuestion, setIncludeQuestion] = useState<boolean>(false);
+    const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(false);
 
     const submitPrompt = async () => {
 
-        if (!prompt) return;
+        if (!prompt.trim()) return;
 
+        
         setIsPrompting(true);
+        setChatHistory((prev)=>[...prev, prompt])
+        const cachedPrompt = prompt;
         setPrompt("")
-        SetChatHistory((prev)=>[...prev, prompt])
+
+        let context = ""
+        if (includeQuestionImg && questionImage) {
+            context += "Question Image: [Image will be processed]\n\n"
+        }
+        if (includeCode && code) {
+            context += `Current Code (language: ${language}):\n${code}\n\n`
+        }
 
         try {
             
@@ -44,11 +54,23 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
                     "Content-Type" : "application/json"
                 },
                 body: JSON.stringify({
-                    prompt,
+                    prompt: cachedPrompt,
+                    context,
+                    chatHistory,
+                    questionImage: includeQuestionImg ? questionImage : null
                 })
             })
-        } catch (err) {
 
+            if (!response.ok) {
+                throw new Error("Failed to get response")
+            }
+
+            const reply = await response.text();
+            setChatHistory((prev) => [...prev, reply])
+            
+        } catch (err) {
+            console.log(err);
+            setChatHistory((prev) => [...prev, "I apologize, I am currently unavailable. Try again later!"])
         } finally {
             setIsPrompting(false);
         }
@@ -62,8 +84,8 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
         prompt,
         includeCode,
         setIncludeCode,
-        includeQuestion,
-        setIncludeQuestion,
+        includeQuestionImg,
+        setIncludeQuestionImg,
         setPrompt,
         isPrompting,
         submitPrompt
