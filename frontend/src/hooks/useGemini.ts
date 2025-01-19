@@ -39,8 +39,10 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
         setPrompt("")
 
         let context = ""
+        let imageData = null
         if (includeQuestionImg && questionImage) {
             context += "Question Image: [Image will be processed]\n\n"
+            imageData = await convertQuestionImage(questionImage)
         }
         if (includeCode && code) {
             context += `Current Code (language: ${language}):\n${code}\n\n`
@@ -57,7 +59,7 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
                     prompt: cachedPrompt,
                     context,
                     chatHistory,
-                    questionImage: includeQuestionImg ? questionImage : null
+                    questionImage: includeQuestionImg ? imageData : null
                 })
             })
 
@@ -91,3 +93,18 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
         submitPrompt
     }
 }
+
+
+const convertQuestionImage = async (file: File) => {
+    try {
+        const buffer = await file.arrayBuffer();
+        const data = new Uint8Array(buffer);
+        return {
+            type: file.type,
+            data: Array.from(data) // Convert to regular array for JSON serialization
+        };
+    } catch (error) {
+        console.error("Error converting image:", error);
+        return null;
+    }
+};
