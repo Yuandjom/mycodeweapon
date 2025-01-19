@@ -3,6 +3,7 @@
 import CodeEditor from "@/components/problem/CodeEditor"
 import CodeOutput from "@/components/problem/CodeOutput"
 import QuestionEditor from "@/components/problem/QuestionEditor"
+import AiChat from "@/components/problem/AiChat"
 import LoadingContent from "@/components/problem/LoadingContent"
 import {
     ResizableHandle,
@@ -14,6 +15,7 @@ import { useProblem } from "@/hooks/useProblem"
 import { useJudge0 } from "@/hooks/useJudge0"
 import { use, Suspense } from 'react'
 import Link from "next/link"
+import { judge0ToMonacoMap } from "@/constants/judge0"
 
 
 const ProblemPage = ({ params }: {
@@ -90,7 +92,11 @@ const ProblemPage = ({ params }: {
                       </ResizablePanel>
                       <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
                       <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
-                        <p>TODO AI chatbot integration</p>
+                        <AiChat 
+                          questionImage={problemStates.questionImage}
+                          code={problemStates.code}
+                          language={judge0ToMonacoMap[problemStates.languageId] || "python"}
+                        />
                       </ResizablePanel>
                   </ResizablePanelGroup>
               </ResizablePanel>
