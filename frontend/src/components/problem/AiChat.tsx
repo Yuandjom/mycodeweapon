@@ -25,7 +25,7 @@ const AiChat = ({questionImage, code, language} : AiChatProps) => {
             includeCode, setIncludeCode, includeQuestionImg, setIncludeQuestionImg, submitPrompt } = useGemini({  questionImage, code, language })
 
     return (
-        <div className="flex flex-col h-full gap-4">
+        <div className="flex flex-col h-full">
             
             {/* Prompt context flags */}
             <div className="flex gap-4 items-center">
@@ -47,7 +47,7 @@ const AiChat = ({questionImage, code, language} : AiChatProps) => {
                 </div>
             </div>
 
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col min-h-0">
                 <ChatHistory messages={chatHistory}/>
             </div>
 
