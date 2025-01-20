@@ -5,6 +5,7 @@ import CodeOutput from "@/components/problem/CodeOutput"
 import QuestionEditor from "@/components/problem/QuestionEditor"
 import AiChat from "@/components/problem/AiChat"
 import LoadingContent from "@/components/problem/LoadingContent"
+import CollapsiblePanel from "@/components/utils/CollapsiblePanel"
 import {
     ResizableHandle,
     ResizablePanel,
@@ -91,13 +92,19 @@ const ProblemPage = ({ params }: {
                           />
                       </ResizablePanel>
                       <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                      <ResizablePanel defaultSize={50} className="mt-1 bg-background rounded-lg p-4">
+                      <CollapsiblePanel
+                        defaultSize={50}
+                        className="mt-1 bg-background rounded-lg p-4"
+                        collapsedText="AI Chatbot"
+                        collapseThreshold={15}
+                        collapsedSize={5}
+                      >
                         <AiChat 
                           questionImage={problemStates.questionImage}
                           code={problemStates.code}
                           language={judge0ToMonacoMap[problemStates.languageId] || "python"}
                         />
-                      </ResizablePanel>
+                      </CollapsiblePanel>
                   </ResizablePanelGroup>
               </ResizablePanel>
 
@@ -119,7 +126,13 @@ const ProblemPage = ({ params }: {
                         />
                       </ResizablePanel>
                       <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                      <ResizablePanel defaultSize={25} className="mt-1 bg-background rounded-lg p-4">
+                      <CollapsiblePanel
+                        defaultSize={50}
+                        className="mt-1 bg-background rounded-lg p-4"
+                        collapsedText="Code Output"
+                        collapseThreshold={15}
+                        collapsedSize={5}
+                      >
                         <CodeOutput
                           isSubmitting={isSubmitting}
                           codeOutput={codeOutput}
@@ -128,7 +141,7 @@ const ProblemPage = ({ params }: {
                           codeMemoryUsed={codeMemoryUsed}
                           codeTimeUsed={codeTimeUsed}
                         />
-                      </ResizablePanel>
+                      </CollapsiblePanel>
                   </ResizablePanelGroup>
               </ResizablePanel>
           </ResizablePanelGroup>
