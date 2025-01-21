@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { ProblemActions, ProblemState } from "@/types/problem"
+import { ProblemState } from "@/types/problem"
 
 export const useProblem = (title: string, user: User | null) => {
 
@@ -168,7 +168,7 @@ export const useProblem = (title: string, user: User | null) => {
 			};
 
 			// new problem to insert
-			if (problemStates.problemId === "-1") {
+			if (problemId === "-1") {
 
 				console.log("[useProblem] fresh insert")
 				console.log(toInsertData)
@@ -183,8 +183,8 @@ export const useProblem = (title: string, user: User | null) => {
 					throw supaError
 				}
 
-				const problemId = data.id
-				updateProblemStates({problemId})
+				problemId = data.id
+				updateProblemStates({problemId: data.id})
 			
 			// update previously inserted problem
 			} else {
@@ -202,7 +202,7 @@ export const useProblem = (title: string, user: User | null) => {
 				}
 			}
 			if (process.env.NODE_ENV==="development") {
-				console.log("[useProblem] problem data upserted to DB: ", problemStates.problemId)
+				console.log("[useProblem] problem data upserted to DB: ", problemId)
 			}
 
 			// if there's images in storage, delete first
@@ -249,14 +249,19 @@ export const useProblem = (title: string, user: User | null) => {
 				if (imageUrlUpdateError) {
 					throw imageUrlUpdateError;
 				}
-			} else {
+			
+				
+			} else { // no image given in this saveProblem() request
 				const { error: imageUrlUpdateError } = await supabase
 					.from("Problems")
 					.update({imageUrl: null})
 					.eq("id", problemId)
 					.eq("userId", problemStates.userId)
-			}
 
+				if (imageUrlUpdateError) {
+					throw imageUrlUpdateError
+				}
+			}
 
 		} catch (err) {
 			console.log("[useProblem] error in saving problem:");

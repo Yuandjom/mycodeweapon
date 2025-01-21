@@ -78,6 +78,12 @@ const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : Question
                             className="w-full bg-secondary"
                             value={tempTitle}
                             onChange={(e)=>{setTempTitle(e.target.value)}}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleTitleSave()
+                                }
+                            }}
                         />
                         <Button
                             onClick={handleTitleSave}

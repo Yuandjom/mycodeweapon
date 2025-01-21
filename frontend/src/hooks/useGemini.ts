@@ -7,9 +7,7 @@ interface SubmitPromptParams {
 }
 
 const HARDCODE = [
-    "Hello! I am Gemini, Do you need any help?",
-    "What is your name?",
-    "I am Gemini, I am here to help answer your questions",
+    "Hello! I am Gemini, I am here to help answer your questions!",
 ]
 
 interface UseGeminiProps {
