@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useGemini } from "@/hooks/useGemini"
-import { Loader2, Send } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { useEffect, useRef } from "react"
 import { Label } from "@/components/ui/label"
 import ReactMarkdown from "react-markdown"
+import Image from "next/image"
 
 interface ChatHistoryProps {
     messages: string[]
@@ -39,20 +40,21 @@ const AiChat = ({questionImage, code, language} : AiChatProps) => {
             <div className="flex gap-4 items-center p-4 border-b">
                 <div className="flex items-center gap-2">
                     <Checkbox
-                        id="includeCode"
-                        checked={includeCode}
-                        onCheckedChange={()=>setIncludeCode(prev=>!prev)}
-                    />
-                    <Label htmlFor="includeCode" className="text-sm">Include Code</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Checkbox
                         id="includeQuesImg"
                         checked={includeQuestionImg}
                         onCheckedChange={()=>setIncludeQuestionImg(prev=>!prev)}
                     />
                     <Label htmlFor="includeQuesImg" className="text-sm">Include Question Img</Label>
                 </div>
+                <div className="flex items-center gap-2">
+                    <Checkbox
+                        id="includeCode"
+                        checked={includeCode}
+                        onCheckedChange={()=>setIncludeCode(prev=>!prev)}
+                    />
+                    <Label htmlFor="includeCode" className="text-sm">Include Code</Label>
+                </div>
+
             </div>
 
             <div className="flex-1 min-h-0">
@@ -67,28 +69,44 @@ const AiChat = ({questionImage, code, language} : AiChatProps) => {
                     </div>
                 )}
 
-                <div className="flex gap-2 items-center">
-                    <Textarea
-                        onChange={(e)=>setPrompt(e.target.value)}
-                        value={prompt}
-                        placeholder="Ask a question"
-                        className="resize-none"
-                        disabled={isPrompting}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.shiftKey) {
-                                e.preventDefault();
-                                submitPrompt();
-                            }
-                        }}
-                    />
+                <div className="flex gap-2 items-center relative">
+                    <div className="relative flex-1">
+                        <Textarea
+                            onChange={(e)=>setPrompt(e.target.value)}
+                            value={prompt}
+                            placeholder="Ask a question"
+                            className="resize-none pr-32"
+                            disabled={isPrompting}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    submitPrompt();
+                                }
+                            }}
+                        />
+                        <div className="absolute right-2 bottom-0 flex items-center opacity-70">
+                            <span className="text-xs bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-400 bg-clip-text text-transparent pr-2">
+                                Powered By
+                            </span>
+                            <Image 
+                                src="/geminiText.svg" 
+                                alt="gemini" 
+                                height={25} 
+                                width={38}
+                                className="pb-1"
+                            />
+                        </div>
+                    </div>
                     <Button
                         onClick={submitPrompt}
                         disabled={isPrompting || prompt.trim().length === 0}
+                        className="bg-slate-50 disabled:bg-slate-100"
                     >
-                        <Send className="h-4 w-4"/>
+                        <Image src="/geminiLogo.png" alt="ai" height={10} width={25}/>
                     </Button>
                 </div>
             </div>
+            
         </div>
     )
 }
@@ -116,9 +134,9 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
                     const fromAI = i % 2 === 0;
                     return (
                         <div
-                            className={`flex ${fromAI ? "justify-start" : "justify-end"}`}
+                            className={`flex ${fromAI ? "justify-start gap-2" : "justify-end"}`}
                             key={`aichat-${i}`}
-                        >
+                        >   
                             <div 
                                 className={`max-w-[75%] px-4 py-2 rounded-2xl
                                     ${fromAI ? 
@@ -161,6 +179,7 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
                 })}
                 <div ref={scrollRef} />
             </div>
+
         </ScrollArea>
     );
 };

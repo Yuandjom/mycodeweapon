@@ -80,7 +80,7 @@ const ProblemPage = ({ params }: {
           <ResizablePanelGroup 
             direction="horizontal"
           >
-              <ResizablePanel defaultSize={40} className="mr-1 bg-slate-400 dark:bg-black">
+              <ResizablePanel defaultSize={40} minSize={27} className="mr-1 bg-slate-400 dark:bg-black">
                   <ResizablePanelGroup direction="vertical">
                       <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
                           <QuestionEditor

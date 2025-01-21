@@ -7,7 +7,7 @@ interface SubmitPromptParams {
 }
 
 const HARDCODE = [
-    "Hello! Do you need any help?",
+    "Hello! I am Gemini, Do you need any help?",
     "What is your name?",
     "I am Gemini, I am here to help answer your questions",
 ]
@@ -26,7 +26,7 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
     const [chatHistory, setChatHistory] = useState<string[]>(HARDCODE);
 
     const [includeCode, setIncludeCode] = useState<boolean>(false);
-    const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(false);
+    const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
 
     const submitPrompt = async () => {
 
