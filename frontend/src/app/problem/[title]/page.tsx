@@ -16,6 +16,7 @@ import { useProblem } from "@/hooks/useProblem"
 import { useJudge0 } from "@/hooks/useJudge0"
 import { use, Suspense } from 'react'
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { judge0ToMonacoMap } from "@/constants/judge0"
 
 
@@ -23,6 +24,7 @@ const ProblemPage = ({ params }: {
   params: Promise<{ title: string }>
 }) => {
 
+  const router = useRouter();
   const { user, authLoading } = useAuth();
 
   // problem dependencies
@@ -52,6 +54,20 @@ const ProblemPage = ({ params }: {
     codeTimeUsed 
   } = useJudge0();
 
+  // Wrap saveProblem to update URL after successful save
+  const handleSaveProblem = async () => {
+    try {
+      await saveProblem();
+      const newTitle = problemStates.title.replace(/ /g, '-');
+      if (newTitle !== title) {
+        router.push(`/problem/${newTitle}`);
+      }
+    } catch (err) {
+      console.error('Error saving problem:', err);
+    }
+  };
+
+  // TODO: different error types - right now they are all clustered together in this one variable
   if (error) {
     return (
       <div className="h-full w-full flex_col_center gap-4">
@@ -121,7 +137,7 @@ const ProblemPage = ({ params }: {
                           onCodeChange={setCode}
                           onSubmitCode={submitCode}
                           isSubmitting={isSubmitting}
-                          onSaveProblem={saveProblem}
+                          onSaveProblem={handleSaveProblem}
                           isSaving={isSaving}
                         />
                       </ResizablePanel>

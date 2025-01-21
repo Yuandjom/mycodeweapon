@@ -132,7 +132,7 @@ export const useProblem = (title: string, user: User | null) => {
 	}, [title, user])
 
 	const setTitle = (title: string) => {
-		updateProblemStates({title: title.trim()})
+		updateProblemStates({title: title.trim().toLowerCase()})
 	}
 
 	const setQuestionImage = (questionImage: File | null) => {
