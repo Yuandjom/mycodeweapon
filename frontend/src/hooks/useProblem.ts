@@ -11,6 +11,7 @@ export const useProblem = (title: string, user: User | null) => {
 		problemId: "-1",
 		userId: user?.id || "-",
 		title: "untitled",
+		status: "In Progress",
 		code: "# your code here", //TODO: make this dynamic based on languageId
 		languageId: "71", // python's language Id
 		questionImage: null,

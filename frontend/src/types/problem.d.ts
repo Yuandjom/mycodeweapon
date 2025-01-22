@@ -2,6 +2,7 @@ export interface ProblemState {
     problemId: string;
     userId: string;
     title: string;
+    status: "In Progress" | "Completed" | "To Do"
     code: string;
     languageId: string;
     questionImage: File | null;

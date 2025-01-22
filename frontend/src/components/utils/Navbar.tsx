@@ -26,7 +26,7 @@ export const Navbar = () => {
   const navItems = [
     {
       name: "Problems",
-      link: "#",
+      link: "/problem",
     },
   ];
 
