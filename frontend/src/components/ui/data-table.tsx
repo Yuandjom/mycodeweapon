@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { cn } from "@/lib/utils"
 import {
   ColumnDef,
   flexRender,
@@ -53,11 +54,13 @@ import Link from "next/link"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  columnSizes?: Record<string, string>
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  columnSizes,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -83,7 +86,7 @@ export function DataTable<TData, TValue>({
   })
 
   return (
-    <div>
+    <div className="w-full max-w-[1100px]">
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter title..."
@@ -162,7 +165,12 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        columnSizes?.[cell.column.id]
+                      )}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -181,11 +189,11 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center justify-between px-2 pt-3">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredRowModel().rows.length} problem(s) selected.
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Rows per page</p>
+            <p className="text-sm font-medium">Problems per page</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {

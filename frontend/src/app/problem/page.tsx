@@ -1,7 +1,6 @@
 "use client"
 
-import { columns } from "@/components/table/problem"
-import { ProblemState } from "@/types/problem"
+import { columns, COLUMN_SIZES } from "@/components/table/problem"
 import { DataTable } from "@/components/ui/data-table"
 import { useAuth } from "@/providers/auth-provider"
 import { useProblemsTable } from "@/hooks/useProblemsTable"
@@ -20,9 +19,9 @@ export default function DemoPage() {
   const { problemsData } = useProblemsTable(user);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="w-full flex justify-center items-start py-10">
 
-      <DataTable columns={columns} data={problemsData} />
+      <DataTable columns={columns} data={problemsData} columnSizes={COLUMN_SIZES} />
     </div>
 
   )

@@ -44,6 +44,13 @@ export const STATUSES_STYLE = [
   },
 ]
 
+export const COLUMN_SIZES = {
+  select: "w-12",
+  title: "w-[60%]",
+  status: "w-32",
+  actions: "w-20"
+}
+
 export const columns: ColumnDef<ProblemState>[] = [
   {
     id: "select",
@@ -72,6 +79,11 @@ export const columns: ColumnDef<ProblemState>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
+    cell: ({ row }) => {
+      return (
+        <p className="capitalize">{row.getValue("title")}</p>
+      )
+    }
   },
   {
     accessorKey: "status",
