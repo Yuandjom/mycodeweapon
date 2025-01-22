@@ -5,19 +5,28 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Edit2, ImagePlus, Save, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-import { Problem } from "@/types/supabasetable";
+import { ProblemStatus } from "@/types/problem";
+import {
+    DropdownMenu,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { STATUSES_STYLE } from "@/components/table/problem"
 
 interface QuestionEditorProps {
     imageUrl: string | null,
     title: string,
     setTitle: (title: string) => void,
+    status: ProblemStatus,
+    setStatus: (status: ProblemStatus) => void,
     image: File | null,
     setImage: (file: File | null) => void
 
 }
 
-const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : QuestionEditorProps) => {
+const QuestionEditor = ({ imageUrl, title, setTitle, status, setStatus, image, setImage }: QuestionEditorProps) => {
 
     const { toast } = useToast();
 
@@ -25,11 +34,11 @@ const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : Question
     const [tempTitle, setTempTitle] = useState<string>(title)
     const [preview, setPreview] = useState<string>(imageUrl || "");
 
-    useEffect(()=>{
+    useEffect(() => {
         setTempTitle(title);
     }, [title])
 
-    useEffect(()=>{
+    useEffect(() => {
         setPreview(imageUrl || "");
     }, [imageUrl])
 
@@ -38,7 +47,7 @@ const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : Question
         setIsEditingTitle(false)
     }
 
-    const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>)=> {
+    const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 
         const file = e.target.files?.[0]
         if (!file || !file.type.includes('image/')) {
@@ -69,52 +78,96 @@ const QuestionEditor = ( {imageUrl, title, setTitle, image, setImage} : Question
         <div className="w-full h-full flex flex-col space-y-4">
 
             {/* Title component */}
-            <div className="space-y-2 flex justify-start items-baseline gap-4">
-                <Label htmlFor="title" className="text-lg font-bold text-left">Title</Label>
-                {isEdittingTitle ? 
-                    <div className="flex items-center justify-between space-x-2">
-                        <Input
-                            id="title"
-                            className="w-full bg-secondary"
-                            value={tempTitle}
-                            onChange={(e)=>{setTempTitle(e.target.value)}}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleTitleSave()
+            <div className="space-y-2 flex justify-between items-center gap-4">
+
+                <div className="flex_center gap-2">
+                    <Label htmlFor="title" className="text-lg font-bold text-left">Title:</Label>
+                    {isEdittingTitle ?
+                        <div className="flex items-center justify-between space-x-2">
+                            <Input
+                                id="title"
+                                className="w-full bg-secondary"
+                                value={tempTitle}
+                                onChange={(e) => { setTempTitle(e.target.value) }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleTitleSave()
+                                    }
+                                }}
+                            />
+                            <Button
+                                onClick={handleTitleSave}
+                            >
+                                <Save className="icon" />
+                            </Button>
+                        </div>
+                        :
+                        <div className="text-foreground px-3 rounded-md flex items-center justify-between">
+                            <p className="w-full">{tempTitle}</p>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setIsEditingTitle(true)}
+                            >
+                                <Edit2 className="icon" />
+                            </Button>
+                        </div>
+                    }
+                </div>
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant="secondary"
+                            className={`${STATUSES_STYLE.find((s) => s.value == status)?.css} rounded-lg`}
+                        >
+                            {(() => {
+                                const currentStatus = STATUSES_STYLE.find((s) => s.value === status);
+                                if (currentStatus) {
+                                    const StatusIcon = currentStatus.icon;
+                                    return (
+                                        <>
+                                            <StatusIcon className={cn("h-4 w-4", currentStatus.css)} />
+                                            <span>{status}</span>
+                                        </>
+                                    );
                                 }
-                            }}
-                        />
-                        <Button
-                            onClick={handleTitleSave}
-                        >
-                            <Save className="icon"/>
+                                return <span>{status}</span>;
+                            })()}
                         </Button>
-                    </div>
-                :
-                    <div className="text-foreground px-3 rounded-md flex items-center justify-between">
-                        <p className="w-full">{tempTitle}</p>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={()=>setIsEditingTitle(true)}
-                        >
-                            <Edit2 className="icon"/>
-                        </Button>
-                    </div>
-                }
-            
-            
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-[150px]">
+                        <DropdownMenuLabel>Set Status</DropdownMenuLabel>
+                        {STATUSES_STYLE.map((s, i) => {
+                            const Icon = s.icon
+                            const cssI = s.css
+                            return (
+                                <DropdownMenuItem
+                                    key={`setStatus-${i}`}
+                                    onClick={() => setStatus(s.value as ProblemStatus)}
+                                >
+                                    <div className="flex w-[100px] items-center">
+                                        <s.icon className={cn("mr-2 h-4 w-4", s.css)} />
+                                        <span className={cn(s.css)}>{s.label}</span>
+                                    </div>
+                                </DropdownMenuItem>
+                            )
+                        })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
+
             </div>
-            
+
 
             {/* Image Component */}
-            <ImageUploadSection 
+            <ImageUploadSection
                 preview={preview}
                 handleImageUpload={handleImageUpload}
                 handleImageDelete={handleImageDelete}
             />
-        
+
         </div>
 
     )
@@ -126,7 +179,7 @@ interface ImageUploadSectionProps {
 }
 
 
-const ImageUploadSection = ({ preview, handleImageUpload, handleImageDelete } : ImageUploadSectionProps) => {
+const ImageUploadSection = ({ preview, handleImageUpload, handleImageDelete }: ImageUploadSectionProps) => {
     const triggerFileInput = () => {
         document.getElementById('image-upload')?.click();
     };
@@ -154,8 +207,8 @@ const ImageUploadSection = ({ preview, handleImageUpload, handleImageDelete } : 
                         />
                     </div>
                 ) : (
-                    <div 
-                        className="w-full h-full cursor-pointer" 
+                    <div
+                        className="w-full h-full cursor-pointer"
                         onClick={triggerFileInput}
                     >
                         <div className="w-full h-full p-4 flex_col_center">

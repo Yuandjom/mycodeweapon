@@ -24,6 +24,6 @@ export default function DemoPage() {
 
       <DataTable columns={columns} data={problemsData} />
     </div>
-    
+
   )
 }

@@ -1,8 +1,14 @@
+export enum ProblemStatus {
+    InProgress = "In Progress",
+    Completed = "Completed",
+    ToDo = "To Do"
+}
+
 export interface ProblemState {
     problemId: string;
     userId: string;
     title: string;
-    status: "In Progress" | "Completed" | "To Do"
+    status: ProblemStatus
     code: string;
     languageId: string;
     questionImage: File | null;
@@ -25,3 +31,5 @@ export interface ProblemActions {
     isSaving: boolean;
     error: Error | null;
 }
+
+

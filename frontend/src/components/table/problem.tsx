@@ -15,28 +15,54 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Column } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react"
 import { ProblemState } from "@/types/problem"
-
 import { cn } from "@/lib/utils"
+
+import {
+  CheckCircle,
+  Circle,
+  Timer,
+} from "lucide-react"
+
+export const STATUSES_STYLE = [
+  {
+    value: "To Do",
+    label: "Todo",
+    icon: Circle,
+    css: '!text-blue-700 dark:!text-blue-300'
+  },
+  {
+    value: "In Progress",
+    label: "In Progress",
+    icon: Timer,
+    css: '!text-yellow-700 dark:!text-yellow-300'
+  },
+  {
+    value: "Completed",
+    label: "Completed",
+    icon: CheckCircle,
+    css: '!text-emerald-700 dark:!text-emerald-300'
+  },
+]
 
 export const columns: ColumnDef<ProblemState>[] = [
   {
     id: "select",
     header: ({ table }) => (
-        <Checkbox
+      <Checkbox
         checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        />
+      />
     ),
     cell: ({ row }) => (
-        <Checkbox
+      <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        />
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -49,13 +75,36 @@ export const columns: ColumnDef<ProblemState>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const status = STATUSES_STYLE.find(
+        (status) => status.value == row.getValue("status")
+      )
+
+      if (!status) {
+        return null
+      }
+
+      return (
+        <div className="flex w-[100px] items-center">
+          {status.icon && (
+            <status.icon className={`${status.css} mr-2 h-4 w-4 text-muted-foreground`} />
+          )}
+          <span className={status.css}>{status.label}</span>
+        </div>
+      )
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id))
+    },
   },
   {
     id: "actions",
     cell: ({ row }) => {
       const rowData = row.original
- 
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

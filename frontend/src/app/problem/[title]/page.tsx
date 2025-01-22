@@ -7,10 +7,10 @@ import AiChat from "@/components/problem/AiChat"
 import LoadingContent from "@/components/problem/LoadingContent"
 import CollapsiblePanel from "@/components/utils/CollapsiblePanel"
 import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
-  } from "@/components/ui/resizable"
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
 import { useAuth } from "@/providers/auth-provider"
 import { useProblem } from "@/hooks/useProblem"
 import { useJudge0 } from "@/hooks/useJudge0"
@@ -29,29 +29,30 @@ const ProblemPage = ({ params }: {
 
   // problem dependencies
   const { title } = use(params)
-  const { 
+  const {
     problemStates,
-		setTitle,
-		setQuestionImage,
-		setCode,
-		setLanguageId,
-		saveProblem,
-		resetProblem,
-		isLoading,
-		isSaving,
-		error
-   } = useProblem(title, user);
+    setTitle,
+    setStatus,
+    setQuestionImage,
+    setCode,
+    setLanguageId,
+    saveProblem,
+    resetProblem,
+    isLoading,
+    isSaving,
+    error
+  } = useProblem(title, user);
 
   // judge0 dependencies
-  const { 
-    languages, 
-    submitCode, 
-    isSubmitting, 
+  const {
+    languages,
+    submitCode,
+    isSubmitting,
     codeOutput,
     codeErrorId,
     codeErrorDesc,
     codeMemoryUsed,
-    codeTimeUsed 
+    codeTimeUsed
   } = useJudge0();
 
   // Wrap saveProblem to update URL after successful save
@@ -87,84 +88,89 @@ const ProblemPage = ({ params }: {
   }
 
   return (
-    <Suspense fallback={<LoadingContent/>}>
+    <Suspense fallback={<LoadingContent />}>
       {(authLoading || isLoading) ? (
-        <LoadingContent/>)
+        <LoadingContent />)
         :
         (
-        <div className="h-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black">
-          <ResizablePanelGroup 
-            direction="horizontal"
-          >
+          <div className="h-full w-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black">
+            <div className="flex_center md:hidden bg-yellow-700 w-full">
+              <p className="text-yellow-300 font-bold">Use larger screens for code execution features!</p>
+            </div>
+            <ResizablePanelGroup
+              direction="horizontal"
+            >
               <ResizablePanel defaultSize={40} minSize={27} className="mr-1 bg-slate-400 dark:bg-black">
-                  <ResizablePanelGroup direction="vertical">
-                      <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
-                          <QuestionEditor
-                            title={problemStates.title}
-                            setTitle={setTitle}
-                            imageUrl={problemStates.imageUrl}
-                            image={problemStates.questionImage}
-                            setImage={setQuestionImage}
-                          />
-                      </ResizablePanel>
-                      <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                      <CollapsiblePanel
-                        defaultSize={50}
-                        className="mt-1 bg-background rounded-lg p-4"
-                        collapsedText="AI Chatbot"
-                        collapseThreshold={15}
-                        collapsedSize={5}
-                      >
-                        <AiChat 
-                          questionImage={problemStates.questionImage}
-                          code={problemStates.code}
-                          language={judge0ToMonacoMap[problemStates.languageId] || "python"}
-                        />
-                      </CollapsiblePanel>
-                  </ResizablePanelGroup>
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
+                    <QuestionEditor
+                      title={problemStates.title}
+                      setTitle={setTitle}
+                      status={problemStates.status}
+                      setStatus={setStatus}
+                      imageUrl={problemStates.imageUrl}
+                      image={problemStates.questionImage}
+                      setImage={setQuestionImage}
+                    />
+                  </ResizablePanel>
+                  <ResizableHandle withHandle className="bg-slate-400 dark:bg-black" />
+                  <CollapsiblePanel
+                    defaultSize={50}
+                    className="mt-1 bg-background rounded-lg p-4"
+                    collapsedText="AI Chatbot"
+                    collapseThreshold={15}
+                    collapsedSize={5}
+                  >
+                    <AiChat
+                      questionImage={problemStates.questionImage}
+                      code={problemStates.code}
+                      language={judge0ToMonacoMap[problemStates.languageId] || "python"}
+                    />
+                  </CollapsiblePanel>
+                </ResizablePanelGroup>
               </ResizablePanel>
 
-              <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
+              <ResizableHandle withHandle className="bg-slate-400 dark:bg-black hidden md:flex" />
 
-              <ResizablePanel defaultSize={60} className="ml-1 bg-slate-400 dark:bg-black">
-                  <ResizablePanelGroup direction="vertical">
-                      <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg p-4">
-                        <CodeEditor 
-                          languages={languages}
-                          languageId={problemStates.languageId}
-                          onLanguageIdChange={setLanguageId}
-                          code={problemStates.code}
-                          onCodeChange={setCode}
-                          onSubmitCode={submitCode}
-                          isSubmitting={isSubmitting}
-                          onSaveProblem={handleSaveProblem}
-                          isSaving={isSaving}
-                        />
-                      </ResizablePanel>
-                      <ResizableHandle withHandle className="bg-slate-400 dark:bg-black"/>
-                      <CollapsiblePanel
-                        defaultSize={50}
-                        className="mt-1 bg-background rounded-lg p-4"
-                        collapsedText="Code Output"
-                        collapseThreshold={15}
-                        collapsedSize={5}
-                      >
-                        <CodeOutput
-                          isSubmitting={isSubmitting}
-                          codeOutput={codeOutput}
-                          codeErrorId={codeErrorId}
-                          codeErrorDesc={codeErrorDesc}
-                          codeMemoryUsed={codeMemoryUsed}
-                          codeTimeUsed={codeTimeUsed}
-                        />
-                      </CollapsiblePanel>
-                  </ResizablePanelGroup>
+              <ResizablePanel defaultSize={60} className="ml-1 bg-slate-400 dark:bg-black hidden md:flex">
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg p-4">
+                    <CodeEditor
+                      languages={languages}
+                      languageId={problemStates.languageId}
+                      onLanguageIdChange={setLanguageId}
+                      code={problemStates.code}
+                      onCodeChange={setCode}
+                      onSubmitCode={submitCode}
+                      isSubmitting={isSubmitting}
+                      onSaveProblem={handleSaveProblem}
+                      isSaving={isSaving}
+                    />
+                  </ResizablePanel>
+                  <ResizableHandle withHandle className="bg-slate-400 dark:bg-black" />
+                  <CollapsiblePanel
+                    defaultSize={50}
+                    className="mt-1 bg-background rounded-lg p-4"
+                    collapsedText="Code Output"
+                    collapseThreshold={15}
+                    collapsedSize={5}
+                  >
+                    <CodeOutput
+                      isSubmitting={isSubmitting}
+                      codeOutput={codeOutput}
+                      codeErrorId={codeErrorId}
+                      codeErrorDesc={codeErrorDesc}
+                      codeMemoryUsed={codeMemoryUsed}
+                      codeTimeUsed={codeTimeUsed}
+                    />
+                  </CollapsiblePanel>
+                </ResizablePanelGroup>
               </ResizablePanel>
-          </ResizablePanelGroup>
-      </div>
-      )}
+            </ResizablePanelGroup>
+          </div>
+        )}
     </Suspense>
-    
+
   )
 }
 

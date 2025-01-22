@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { ProblemState } from "@/types/problem"
+import { ProblemState, ProblemStatus } from "@/types/problem"
+
+
 
 export const useProblem = (title: string, user: User | null) => {
 
-	const DEFAULT_PROBLEM_STATE : ProblemState = {
+	const DEFAULT_PROBLEM_STATE: ProblemState = {
 		problemId: "-1",
 		userId: user?.id || "-",
 		title: "untitled",
-		status: "In Progress",
+		status: ProblemStatus.InProgress,
 		code: "# your code here", //TODO: make this dynamic based on languageId
 		languageId: "71", // python's language Id
 		questionImage: null,
@@ -20,9 +22,9 @@ export const useProblem = (title: string, user: User | null) => {
 	}
 
 	// for updating user details when user are loaded asynchronously
-	useEffect(()=>{
+	useEffect(() => {
 		if (user) {
-			updateProblemStates({userId: user.id})
+			updateProblemStates({ userId: user.id })
 			console.log(`[useProblem] updated userId: ${user.id}`)
 		}
 	}, [user])
@@ -38,7 +40,7 @@ export const useProblem = (title: string, user: User | null) => {
 
 	// utility function
 	const updateProblemStates = (newStates: Partial<ProblemState>) => {
-		
+
 		setProblemStates(prev => ({
 			...prev,
 			...newStates
@@ -46,7 +48,7 @@ export const useProblem = (title: string, user: User | null) => {
 	}
 
 	// init
-	useEffect(()=> {
+	useEffect(() => {
 
 		const fetchProblem = async () => {
 
@@ -55,8 +57,8 @@ export const useProblem = (title: string, user: User | null) => {
 			setIsLoading(true);
 			setError(null);
 
-			const spacedTitle : string = title.replaceAll('-', ' ')
-			const userId : string = user.id;
+			const spacedTitle: string = title.replaceAll('-', ' ')
+			const userId: string = user.id;
 
 			if (spacedTitle.length === 0) {
 				return;
@@ -64,17 +66,17 @@ export const useProblem = (title: string, user: User | null) => {
 
 			try {
 				const supabase = await createClient();
-				const { data, error : fetchError } = await supabase
+				const { data, error: fetchError } = await supabase
 					.from("Problems")
 					.select("*")
 					.eq("userId", userId)
 					.eq("title", spacedTitle)
 					.single()
-	
+
 				if (fetchError) {
 					throw fetchError;
 				}
-				
+
 				// fetch the image if such exist
 				if (data.imageUrl) {
 					try {
@@ -93,11 +95,11 @@ export const useProblem = (title: string, user: User | null) => {
 
 						const response = await fetch(data.imageUrl);
 						const blob = await response.blob();
-						
+
 						// Get file extension from URL
 						const fileExt = data.imageUrl.split('.').pop()?.split('?')[0] || 'png';
 						const fileName = `${data.id}.${fileExt}`;
-						
+
 						const imageFile = new File([blob], fileName, { type: `image/${fileExt}` });
 						updateProblemStates({ questionImage: imageFile });
 
@@ -105,17 +107,18 @@ export const useProblem = (title: string, user: User | null) => {
 						console.error("[useProblem] Error fetching image:", err);
 					}
 				}
-	
+
 				updateProblemStates({
 					problemId: data.id,
 					title: data.title,
+					status: data.status,
 					code: data.code,
 					languageId: data.languageId,
 				})
 
 				console.log("[useProblem] fetched & processe data:")
 				console.table(data)
-			} catch(err) {
+			} catch (err) {
 				console.log("[useProblem] error:")
 				console.log(err);
 				setError(err instanceof Error ? err : new Error('Failed to fetch problem'));
@@ -123,7 +126,7 @@ export const useProblem = (title: string, user: User | null) => {
 
 		}
 
-		if (title!=="new") {
+		if (title !== "new") {
 			fetchProblem();
 		}
 
@@ -133,19 +136,23 @@ export const useProblem = (title: string, user: User | null) => {
 	}, [title, user])
 
 	const setTitle = (title: string) => {
-		updateProblemStates({title: title.trim().toLowerCase()})
+		updateProblemStates({ title: title.trim().toLowerCase() })
+	}
+
+	const setStatus = (status: ProblemStatus) => {
+		updateProblemStates({ status })
 	}
 
 	const setQuestionImage = (questionImage: File | null) => {
-		updateProblemStates({questionImage})
+		updateProblemStates({ questionImage })
 	}
 
 	const setCode = (code: string) => {
-		updateProblemStates({code})
+		updateProblemStates({ code })
 	}
 
-	const setLanguageId = (languageId : string) => {
-		updateProblemStates({languageId})
+	const setLanguageId = (languageId: string) => {
+		updateProblemStates({ languageId })
 	}
 
 	const saveProblem = async () => {
@@ -159,10 +166,11 @@ export const useProblem = (title: string, user: User | null) => {
 
 			const supabase = createClient();
 
-			let problemId : string = problemStates.problemId
+			let problemId: string = problemStates.problemId
 
 			const toInsertData = {
 				title: problemStates.title,
+				status: problemStates.status,
 				userId: problemStates.userId,
 				code: problemStates.code,
 				languageId: problemStates.languageId
@@ -185,9 +193,9 @@ export const useProblem = (title: string, user: User | null) => {
 				}
 
 				problemId = data.id
-				updateProblemStates({problemId: data.id})
-			
-			// update previously inserted problem
+				updateProblemStates({ problemId: data.id })
+
+				// update previously inserted problem
 			} else {
 
 				console.log("[useProblem] update")
@@ -197,12 +205,12 @@ export const useProblem = (title: string, user: User | null) => {
 					.from("Problems")
 					.update(toInsertData)
 					.eq("id", problemStates.problemId)
-				
+
 				if (supaError) {
 					throw supaError
 				}
 			}
-			if (process.env.NODE_ENV==="development") {
+			if (process.env.NODE_ENV === "development") {
 				console.log("[useProblem] problem data upserted to DB: ", problemId)
 			}
 
@@ -212,7 +220,7 @@ export const useProblem = (title: string, user: User | null) => {
 				const { error: deleteError } = await supabase.storage
 					.from("problemImages")
 					.remove([oldImagePath])
-				
+
 				if (deleteError) {
 					throw deleteError;
 				}
@@ -221,41 +229,41 @@ export const useProblem = (title: string, user: User | null) => {
 			// handle image upload to storage if any
 			if (problemStates.questionImage) {
 				console.log("[useProblem] saveProblem() - Saving to storage bucket")
-	
+
 				const fileExt = problemStates.questionImage.name.split('.').pop();
-	
+
 				const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`
-				
-				const { error : UploadError } = await supabase.storage
+
+				const { error: UploadError } = await supabase.storage
 					.from("problemImages")
 					.upload(fileStorePath, problemStates.questionImage, {
 						cacheControl: '3600',
 						upsert: true
 					});
-				
-					if (UploadError) {
-						throw UploadError
-					}
-	
+
+				if (UploadError) {
+					throw UploadError
+				}
+
 				const { data: { publicUrl } } = supabase.storage
 					.from("problemImages")
 					.getPublicUrl(fileStorePath);
-	
+
 				const { error: imageUrlUpdateError } = await supabase
 					.from("Problems")
-					.update({imageUrl: publicUrl})
+					.update({ imageUrl: publicUrl })
 					.eq("id", problemId)
 					.eq("userId", problemStates.userId)
-	
+
 				if (imageUrlUpdateError) {
 					throw imageUrlUpdateError;
 				}
-			
-				
+
+
 			} else { // no image given in this saveProblem() request
 				const { error: imageUrlUpdateError } = await supabase
 					.from("Problems")
-					.update({imageUrl: null})
+					.update({ imageUrl: null })
 					.eq("id", problemId)
 					.eq("userId", problemStates.userId)
 
@@ -267,7 +275,7 @@ export const useProblem = (title: string, user: User | null) => {
 		} catch (err) {
 			console.log("[useProblem] error in saving problem:");
 			console.log(err);
-			setError(err instanceof Error ? err : new Error("Unexpected error occured") )
+			setError(err instanceof Error ? err : new Error("Unexpected error occured"))
 		} finally {
 			setIsSaving(false);
 			console.log("[useProblem] saveProblem() completed")
@@ -286,6 +294,7 @@ export const useProblem = (title: string, user: User | null) => {
 		problemStates,
 
 		setTitle,
+		setStatus,
 		setQuestionImage,
 		setCode,
 		setLanguageId,
