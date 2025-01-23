@@ -24,10 +24,6 @@ export default function ProblemsPage() {
         columns={problem_columns}
         data={problemsData}
         columnSizes={COLUMN_SIZES}
-        onRowClick={(row) => {
-          const problemTitle = row.title.replace(/ /g, '-').toLowerCase();
-          window.open(`/problem/${problemTitle}`, '_blank');
-        }}
       />
     </div>
 

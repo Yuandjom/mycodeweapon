@@ -81,8 +81,14 @@ export const problem_columns: ColumnDef<ProblemState>[] = [
       <DataTableColumnHeader column={column} title="Title" />
     ),
     cell: ({ row }) => {
+      const problemTitle = row.getValue("title") as string
       return (
-        <p className="capitalize">{row.getValue("title")}</p>
+        <p
+          onClick={() => {
+            window.open(`/problem/${problemTitle.replace(/ /g, '-').toLowerCase()}`, '_blank');
+          }}
+          className="capitalize font-bold hover:underline hover:text-blue-500 cursor-pointer">{row.getValue("title")}
+        </p>
       )
     }
   },
