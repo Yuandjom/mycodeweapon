@@ -6,16 +6,22 @@ const PUBLIC_ROUTES = [
     "/signup",
     "/signin",
     "/signout",
+    "/resetpassword"
 ]
 
 export async function middleware(request: NextRequest) {
+    // console.log("[middleware] intercepted request:")
+    // console.log(request);
+
+    if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
+        return NextResponse.next()
+    }
 
     let supabaseResponse = NextResponse.next({
         request,
     })
 
-    // console.log("[middleware] intercepted request:")
-    // console.log(request);
+
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -49,8 +55,8 @@ export async function middleware(request: NextRequest) {
 
     const nxtPathname = request.nextUrl.pathname
 
-    const isPublicRoute = nxtPathname === "/" || PUBLIC_ROUTES.some(route => 
-      nxtPathname.startsWith(route)
+    const isPublicRoute = nxtPathname === "/" || PUBLIC_ROUTES.some(route =>
+        nxtPathname.startsWith(route)
     )
 
     // Handle protected routes
@@ -64,8 +70,8 @@ export async function middleware(request: NextRequest) {
     }
 
     // Handle auth routes when user is already logged in
-    if (user && (request.nextUrl.pathname.startsWith('/signin') || 
-                 request.nextUrl.pathname.startsWith('/signup'))) {
+    if (user && (request.nextUrl.pathname.startsWith('/signin') ||
+        request.nextUrl.pathname.startsWith('/signup'))) {
         return NextResponse.redirect(new URL('/', request.url))
     }
 

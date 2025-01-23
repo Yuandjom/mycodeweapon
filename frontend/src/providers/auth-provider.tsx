@@ -22,13 +22,14 @@ interface AuthContextType {
   session: Session | null;
   authLoading: boolean;
   signUp: (data: SignUpCredentials) => Promise<AuthResult>
-  signIn: (data : SignInCredentials) => Promise<AuthResult>
+  signIn: (data: SignInCredentials) => Promise<AuthResult>
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<AuthResult>
 }
 
 export interface AuthResult {
   success: boolean;
-  error: AuthError | null;
+  error: AuthError | Error | null;
   data: any | null;
 }
 
@@ -39,7 +40,8 @@ const AuthContext = createContext<AuthContextType>({
   authLoading: true,
   signUp: async () => ({ success: false, error: null, data: null }),
   signIn: async () => ({ success: false, error: null, data: null }),
-  signOut: async () => {},
+  signOut: async () => { },
+  resetPassword: async () => ({ success: false, error: null, data: null })
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -48,20 +50,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const router = useRouter();
-  
+
   if (process.env.NODE_ENV === "development") {
-    useEffect(()=>{
+    useEffect(() => {
       console.log("Updated user:")
       console.log(user);
     }, [user])
-    useEffect(()=>{
+    useEffect(() => {
       console.log("Updated session:")
       console.log(session);
     }, [session])
   }
 
   const supabase = createClient();
-    
+
   useEffect(() => {
 
     setAuthLoading(true);
@@ -85,12 +87,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   }, []);
 
-  const signUp = async ({ email, password, username }: SignUpCredentials) : Promise<AuthResult> => {
-    if (!isValidSignUpCredentials({email, password, username})) {
+  const signUp = async ({ email, password, username }: SignUpCredentials): Promise<AuthResult> => {
+    if (!isValidSignUpCredentials({ email, password, username })) {
       throw new Error("Invalid sign up credentials")
     }
 
-    const { success, error, data } = await signUp_SA({email, password, username});
+    const { success, error, data } = await signUp_SA({ email, password, username });
 
     if (error) {
       return {
@@ -112,9 +114,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signIn = async ({ email, password }: SignInCredentials): Promise<AuthResult> => {
-    
+
     console.log("[auth-provider] signing in")
-    const { success, error, data } = await signIn_SA({email, password});
+    const { success, error, data } = await signIn_SA({ email, password });
 
     if (error) {
       return {
@@ -141,6 +143,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   };
 
+  const resetPassword = async (email: string): Promise<AuthResult> => {
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      email,
+      {
+        redirectTo: `${window.location.origin}/resetpassword`
+      }
+    )
+
+    if (resetError) {
+      return {
+        success: false,
+        error: resetError,
+        data: null,
+      }
+    }
+
+    return {
+      success: true,
+      error: null,
+      data: null
+    }
+
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -150,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signIn,
         signOut,
+        resetPassword
       }}
     >
       {children}
@@ -168,22 +196,22 @@ export const useAuth = () => {
 
 
 
-export const isValidSignUpCredentials = ({email, password, username}: SignUpCredentials) : boolean => {
-    // Basic validation
-    if (!email || !password || !username) {
-      return false
-    }
+export const isValidSignUpCredentials = ({ email, password, username }: SignUpCredentials): boolean => {
+  // Basic validation
+  if (!email || !password || !username) {
+    return false
+  }
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return false
-    }
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return false
+  }
 
-    // Password validation (customize as needed)
-    if (password.length < 6) {
-        return false
-    }
+  // Password validation (customize as needed)
+  if (password.length < 6) {
+    return false
+  }
 
-    return true
+  return true
 }

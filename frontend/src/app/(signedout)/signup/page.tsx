@@ -35,7 +35,7 @@ function Form() {
         email: formData.get('email') as string,
         password: formData.get('password') as string
       };
-  
+
       const result = await signUp(userData);
       if (!result.success) {
         throw new Error(result.error?.message || "Failed to create account");
@@ -47,7 +47,7 @@ function Form() {
       if (result.data?.message?.includes("verification")) {
         toast.info(result.data.message);
       } else {
-        router.push("/");
+        router.push("/problem");
       }
 
     } catch (err) {
@@ -57,7 +57,7 @@ function Form() {
     } finally {
       setIsSigningUp(false);
     }
-    
+
   }
 
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
@@ -68,7 +68,7 @@ function Form() {
         <div className="mx-auto w-full max-w-md">
           <div>
             <div className="flex">
-              <Logo withText logoSize={40}/>
+              <Logo withText logoSize={40} />
             </div>
             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
               Sign Up for an account
@@ -131,7 +131,7 @@ function Form() {
                   </Button>
                   <p className={cn("text-sm text-neutral-600 text-center mt-4 dark:text-neutral-400")}>
                     Already have an account?{" "}
-                    <Link href="/signin" className="text-black dark:text-white">
+                    <Link href="/signin" className="text-black dark:text-white hover:underline">
                       Sign in
                     </Link>
                   </p>

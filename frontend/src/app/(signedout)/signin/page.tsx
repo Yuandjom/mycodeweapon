@@ -7,8 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter, useSearchParams } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function SignInPage() {
   return (
@@ -20,11 +29,36 @@ export default function SignInPage() {
 
 function Form() {
 
-  const { signIn } = useAuth();
+  const { signIn, resetPassword } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+
+  // password reset logic
+  const [isResettingPW, setIsResettingPW] = useState<boolean>(false);
+  const [resetEmail, setResetEmail] = useState<string>("");
+  const [resetSuccess, setResetSuccess] = useState<string>("");
+  const [resetError, setResetError] = useState<string>("");
+
+  async function handleResetPassword() {
+    if (!resetEmail) return;
+
+    setIsResettingPW(true);
+    setResetSuccess("")
+    setResetError("")
+
+    const result = await resetPassword(resetEmail);
+
+    if (!result.success) {
+      setResetError("Error! Please check your credentials or try again later")
+    } else {
+      setResetSuccess("Password reset link sent to your email!")
+    }
+
+    setIsResettingPW(false);
+
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,10 +83,10 @@ function Form() {
       if (redirectPage) {
         router.push(redirectPage)
       } else {
-        router.push("/")
+        router.push("/problem")
       }
 
-    } catch(err) {
+    } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
       toast.error(err instanceof Error ? err.message : "Failed to sign in");
     } finally {
@@ -66,7 +100,7 @@ function Form() {
         <div className="mx-auto w-full max-w-md">
           <div>
             <div className="flex">
-              <Logo withText logoSize={40}/>
+              <Logo withText logoSize={40} />
             </div>
             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
               Sign In
@@ -114,8 +148,61 @@ function Form() {
                     {isSigningIn ? "Signing In..." : "Sign In"}
                   </Button>
                   <p className={cn("text-sm text-neutral-600 text-center mt-4 dark:text-neutral-400")}>
+                    Forgot Password?{" "}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="hover:underline hover:bg-transparent text-black dark:text-white"
+                          onClick={() => {
+                            setResetError("");
+                            setResetSuccess("");
+                            setResetEmail("");
+                          }}
+                        >
+                          Reset Password
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Reset Password</DialogTitle>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          {resetError && <p className="px-2 py-1 rounded-lg bg-destructive text-destructive-foreground text-center">{resetError}</p>}
+                          {resetSuccess && <p className="px-2 py-1 rounded-lg bg-green-500 text-green-200 text-center">{resetSuccess}</p>}
+                          <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="email" className="text-right">
+                              Email
+                            </Label>
+                            <Input
+                              id="email"
+                              className="col-span-3"
+                              onChange={(e) => setResetEmail(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                  handleResetPassword();
+                                }
+                              }}
+                            />
+
+                          </div>
+
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            type="submit"
+                            disabled={!resetEmail || isResettingPW}
+                            onClick={handleResetPassword}
+                          >
+                            {isResettingPW ? "Resetting..." : "Reset"}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </p>
+                  <p className={cn("text-sm text-neutral-600 text-center mt-4 dark:text-neutral-400")}>
                     Do not have an account?{" "}
-                    <Link href="/signup" className="text-black dark:text-white">
+                    <Link href="/signup" className="text-black dark:text-white hover:underline">
                       Sign up
                     </Link>
                   </p>
