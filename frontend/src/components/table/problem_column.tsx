@@ -51,7 +51,7 @@ export const COLUMN_SIZES = {
   actions: "w-20"
 }
 
-export const columns: ColumnDef<ProblemState>[] = [
+export const problem_columns: ColumnDef<ProblemState>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -69,6 +69,7 @@ export const columns: ColumnDef<ProblemState>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        onClick={(e) => e.stopPropagation()}
       />
     ),
     enableSorting: false,
@@ -88,7 +89,7 @@ export const columns: ColumnDef<ProblemState>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <p>Status</p>
     ),
     cell: ({ row }) => {
       const status = STATUSES_STYLE.find(

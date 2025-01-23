@@ -1,13 +1,13 @@
 "use client"
 
-import { columns, COLUMN_SIZES } from "@/components/table/problem"
+import { problem_columns, COLUMN_SIZES } from "@/components/table/problem_column"
 import { DataTable } from "@/components/ui/data-table"
 import { useAuth } from "@/providers/auth-provider"
 import { useProblemsTable } from "@/hooks/useProblemsTable"
 import { useRouter } from "next/navigation"
 
 
-export default function DemoPage() {
+export default function ProblemsPage() {
 
   const { authLoading, user } = useAuth();
   const router = useRouter();
@@ -20,8 +20,15 @@ export default function DemoPage() {
 
   return (
     <div className="w-full flex justify-center items-start py-10">
-
-      <DataTable columns={columns} data={problemsData} columnSizes={COLUMN_SIZES} />
+      <DataTable
+        columns={problem_columns}
+        data={problemsData}
+        columnSizes={COLUMN_SIZES}
+        onRowClick={(row) => {
+          const problemTitle = row.title.replace(/ /g, '-').toLowerCase();
+          window.open(`/problem/${problemTitle}`, '_blank');
+        }}
+      />
     </div>
 
   )

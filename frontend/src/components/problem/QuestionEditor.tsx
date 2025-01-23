@@ -13,7 +13,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { STATUSES_STYLE } from "@/components/table/problem"
+import { STATUSES_STYLE } from "@/components/table/problem_column"
 
 interface QuestionEditorProps {
     imageUrl: string | null,

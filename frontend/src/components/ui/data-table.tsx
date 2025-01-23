@@ -50,17 +50,21 @@ import {
 } from "@/components/ui/select"
 
 import Link from "next/link"
+import { STATUSES_STYLE } from "@/components/table/problem_column"
+
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   columnSizes?: Record<string, string>
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   columnSizes,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -88,14 +92,50 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full max-w-[1100px]">
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter title..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex gap-4">
+          <Input
+            placeholder="Filter title..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Filter status
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {STATUSES_STYLE.map((status, i) => (
+                <DropdownMenuCheckboxItem
+                  key={`filter_status_${i}`}
+                  checked={(table.getColumn("status")?.getFilterValue() as string[] || []).includes(status.value)}
+                  onCheckedChange={(checked) => {
+                    const filterValues = (table.getColumn("status")?.getFilterValue() as string[]) || []
+                    table
+                      .getColumn("status")
+                      ?.setFilterValue(
+                        checked
+                          ? [...filterValues, status.value]
+                          : filterValues.filter((value) => value !== status.value)
+                      )
+                  }}
+                >
+                  <div className="flex items-center justify-start">
+                    <status.icon className={`${status.css} mr-2 h-w w-4`} />
+                    <span className={status.css}>{status.label}</span>
+                  </div>
+
+                </DropdownMenuCheckboxItem>
+              ))}
+
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+
         <Button
           variant="secondary"
           className="ml-auto"
@@ -163,6 +203,8 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => onRowClick?.(row.original)}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted" : ""}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -179,7 +221,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  <p>You have no problems saved currently</p>
                 </TableCell>
               </TableRow>
             )}
