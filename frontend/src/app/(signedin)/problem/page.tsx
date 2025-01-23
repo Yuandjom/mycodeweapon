@@ -6,14 +6,14 @@ import { useAuth } from "@/providers/auth-provider"
 import { useProblemsTable } from "@/hooks/useProblemsTable"
 import { useRouter } from "next/navigation"
 
-
 export default function ProblemsPage() {
 
   const { authLoading, user } = useAuth();
   const router = useRouter();
 
   if (!authLoading && !user) {
-    router.push("/signin")
+    router.push("/signin");
+    return;
   }
 
   const { problemsData } = useProblemsTable(user);
