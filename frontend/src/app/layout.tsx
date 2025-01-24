@@ -6,9 +6,11 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "My Code Weapon",
-  description: "Your Ultimate Leetcode Companion",
-};
+  title: {
+    template: "%s | My Code Weapon",
+    default: "My Code Weapon"
+  }
+}
 
 export default function RootLayout({
   children,

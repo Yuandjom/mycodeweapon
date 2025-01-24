@@ -1,30 +1,15 @@
-"use client"
+import type { Metadata } from "next";
+import ProblemsTable from "@/components/problem/ProblemsTable";
 
-import { problem_columns, COLUMN_SIZES } from "@/components/table/problem_column"
-import { DataTable } from "@/components/ui/data-table"
-import { useAuth } from "@/providers/auth-provider"
-import { useProblemsTable } from "@/hooks/useProblemsTable"
-import { useRouter } from "next/navigation"
+export const metadata: Metadata = {
+  title: "Problems"
+}
 
 export default function ProblemsPage() {
 
-  const { authLoading, user } = useAuth();
-  const router = useRouter();
-
-  if (!authLoading && !user) {
-    router.push("/signin");
-    return;
-  }
-
-  const { problemsData } = useProblemsTable(user);
-
   return (
-    <div className="w-full flex justify-center items-start py-10">
-      <DataTable
-        columns={problem_columns}
-        data={problemsData}
-        columnSizes={COLUMN_SIZES}
-      />
+    <div className="w-full flex_center">
+      <ProblemsTable />
     </div>
 
   )
