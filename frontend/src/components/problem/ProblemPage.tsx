@@ -18,6 +18,7 @@ import { Suspense } from 'react'
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { judge0ToMonacoMap } from "@/constants/judge0"
+import { useApiKey } from "@/providers/apikey-provider"
 
 
 const ProblemPage = ({ title }: { title: string }) => {

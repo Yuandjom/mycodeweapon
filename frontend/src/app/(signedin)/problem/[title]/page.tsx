@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import ProblemPage from "@/components/problem/ProblemPage";
 
 type MetadataProps = {
