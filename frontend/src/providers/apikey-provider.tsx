@@ -67,13 +67,41 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
     const [isSavingPref, setIsSavingPref] = useState<boolean>(false)
     const saveGeminiPref = async (pref: KeyStorePref, key: string) => {
 
-        setIsSavingPref(true);
+        if (!user) return;
 
-        //TODO: save the pref and key into DB
+        setIsSavingPref(true);
         setGeminiPref(pref);
 
-        setIsSavingPref(false);
-        return true
+        try {
+
+            const supabase = createClient();
+
+            const { error } = await supabase
+                .from("users")
+                .update({ gemini_key_store: pref })
+                .eq('id', user.id)
+
+            if (error) throw error
+
+            // TODO: encryption
+            if (pref === KeyStorePref.CLOUD) {
+
+            } else {
+                // set to non cloud option so delete away past api keys
+                await supabase
+                    .from("userkeys")
+                    .delete()
+                    .eq('userId', user.id)
+            }
+
+        } catch (err) {
+            console.log(err)
+            return false;
+        } finally {
+            setIsSavingPref(false);
+        }
+
+        return true;
     }
 
     return (

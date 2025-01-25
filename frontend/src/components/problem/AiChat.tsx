@@ -298,7 +298,7 @@ const AiSettings = ({ geminiKey, setGeminiKey, saveGeminiPref, geminiPref, isSav
                             </Select>
                             <p className="text-sm text-muted-foreground">
                                 {storageOption === KeyStorePref.LOCAL
-                                    ? "API key will be stored locally in your browser"
+                                    ? "API key will not be stored and cleared after every session."
                                     : "API key will be encrypted & stored securely in our database"}
                             </p>
                         </div>
@@ -310,7 +310,6 @@ const AiSettings = ({ geminiKey, setGeminiKey, saveGeminiPref, geminiPref, isSav
                             <PasswordInput
                                 id="apiKey"
                                 name="apiKey"
-                                placeholder="Enter your Gemini API key"
                                 className="w-full"
                             />
                             <p className="text-sm text-muted-foreground">For security reasons, your API key is never displayed (& fetched to client)</p>
