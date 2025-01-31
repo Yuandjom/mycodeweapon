@@ -14,18 +14,18 @@ interface RequestBody {
 export async function POST(req: NextRequest) {
     if (!process.env.GEMINI_API_KEY) {
         return NextResponse.json(
-            { error: "Missing Gemini API key"},
-            { status: 500},
+            { error: "Missing Gemini API key" },
+            { status: 500 },
         )
     }
 
     try {
         const body = await req.json();
-        const { prompt, context, chatHistory, questionImage } : RequestBody = body;
+        const { prompt, context, chatHistory, questionImage }: RequestBody = body;
 
         const MAX_OUTPUT_TOKENS = 2048;
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro"});
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
         const processedHistory = chatHistory.slice(1).map((m, i) => ({
             role: i % 2 === 0 ? "user" : "model",
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
         let result;
         if (questionImage) {
             const imageBuffer = Buffer.from(questionImage.data);
-            
+
             result = await chat.sendMessage([
                 {
                     inlineData: {
@@ -61,17 +61,17 @@ export async function POST(req: NextRequest) {
 
         const response = result.response;
         console.log("Received response:", response.text());
-        
+
         return NextResponse.json(
             response.text(),
-            { status: 200}
+            { status: 200 }
         );
 
     } catch (err) {
         console.error("Error in Gemini API:", err);
         return NextResponse.json(
-            { error: err instanceof Error ? err.message : "Error processing request"},
-            { status: 500}
+            { error: err instanceof Error ? err.message : "Error processing request" },
+            { status: 500 }
         );
     }
 }

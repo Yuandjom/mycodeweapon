@@ -43,6 +43,9 @@ interface AiChatProps {
 }
 
 const AiChat = ({ questionImage, code, language }: AiChatProps) => {
+
+    const { geminiKey, saveGeminiPref, geminiPref, isSavingPref } = useApiKey()
+
     const {
         chatHistory,
         prompt,
@@ -53,13 +56,13 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
         includeQuestionImg,
         setIncludeQuestionImg,
         submitPrompt
-    } = useGemini({ questionImage, code, language })
+    } = useGemini({ questionImage, code, language, geminiPref, geminiKey })
 
-    const { geminiKey, setGeminiKey, saveGeminiPref, geminiPref, isSavingPref } = useApiKey()
 
 
     return (
         <div className="flex flex-col h-full gap-2">
+            <p className="text-white">Key: {geminiKey}</p>
             {/* Prompt context flags */}
             <div className="flex gap-4 items-center pl-2">
                 <div className="flex items-center gap-2">
@@ -81,8 +84,6 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
 
                 <div className="flex-1 flex justify-end">
                     <AiSettings
-                        geminiKey={geminiKey}
-                        setGeminiKey={setGeminiKey}
                         saveGeminiPref={saveGeminiPref}
                         geminiPref={geminiPref}
                         isSavingPref={isSavingPref}
@@ -162,13 +163,13 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
     };
 
     return (
-        <ScrollArea className="h-full pr-4">
+        <ScrollArea className="h-full w-full pr-4">
             <div className="space-y-4 p-4">
                 {messages.map((m, i) => {
                     const fromAI = i % 2 === 0;
                     return (
                         <div
-                            className={`flex ${fromAI ? "justify-start gap-2" : "justify-end"}`}
+                            className={`flex ${fromAI ? "justify-start" : "justify-end"}`}
                             key={`aichat-${i}`}
                         >
                             <div
@@ -180,8 +181,9 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
                                     }
                                 `}
                             >
+                                {/* TODO: add font size selector in settings */}
                                 <ReactMarkdown
-                                    className="prose max-w-none
+                                    className="prose max-w-none break-words text-sm
                                         [&>*]:text-current
                                         prose-p:my-1 prose-p:first:mt-0 prose-p:last:mb-0
                                         prose-pre:my-2 
@@ -190,18 +192,18 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
                                     components={{
                                         pre: ({ children }) => (
                                             <div className="not-prose my-2 w-full">
-                                                <pre className="bg-primary/20 p-4 rounded-md overflow-x-auto">
+                                                <pre className="bg-card/20 p-4 rounded-md overflow-x-auto whitespace-pre-wrap break-words">
                                                     {children}
                                                 </pre>
                                             </div>
                                         ),
                                         code: ({ inline, children }: any) =>
                                             inline ? (
-                                                <code className="bg-primary px-1.5 py-0.5 rounded-md">
+                                                <code className="px-1.5 py-0.5 rounded-md break-words">
                                                     {children}
                                                 </code>
                                             ) : (
-                                                <code>{children}</code>
+                                                <code className="break-words">{children}</code>
                                             )
                                     }}
                                 >
@@ -219,14 +221,12 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
 };
 
 interface AiSettingsProps {
-    geminiKey: string | null,
-    setGeminiKey: (key: string | null) => void
     geminiPref: KeyStorePref
     saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>
     isSavingPref: boolean
 }
 
-const AiSettings = ({ geminiKey, setGeminiKey, saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProps) => {
+const AiSettings = ({ saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProps) => {
 
     const [storageOption, setStorageOption] = useState(geminiPref);
     useEffect(() => {
@@ -247,9 +247,6 @@ const AiSettings = ({ geminiKey, setGeminiKey, saveGeminiPref, geminiPref, isSav
             if (!success) {
                 throw new Error('Failed to save storage preference');
             }
-
-            // Save API key
-            setGeminiKey(newApiKey);
 
             alert('AI settings saved successfully');
             setIsOpen(false);

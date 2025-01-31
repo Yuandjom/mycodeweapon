@@ -1,6 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { KeyStorePref } from '@/providers/apikey-provider'
+import { GoogleGenerativeAI } from "@google/generative-ai"
+
 
 interface SubmitPromptParams {
     prompt: string
@@ -14,9 +17,11 @@ interface UseGeminiProps {
     questionImage: File | null
     code: string
     language: string
+    geminiPref: KeyStorePref
+    geminiKey: string | null
 }
 
-export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
+export const useGemini = ({ questionImage, code, language, geminiPref, geminiKey }: UseGeminiProps) => {
 
     const [prompt, setPrompt] = useState<string>("");
     const [isPrompting, setIsPrompting] = useState<boolean>(false);
@@ -30,14 +35,14 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
 
         if (!prompt.trim()) return;
 
-        
         setIsPrompting(true);
-        setChatHistory((prev)=>[...prev, prompt])
+        setChatHistory((prev) => [...prev, prompt])
         const cachedPrompt = prompt;
         setPrompt("")
 
         let context = ""
         let imageData = null
+
         if (includeQuestionImg && questionImage) {
             context += "Question Image: [Image will be processed]\n\n"
             imageData = await convertQuestionImage(questionImage)
@@ -47,27 +52,70 @@ export const useGemini = ({questionImage, code, language} : UseGeminiProps) => {
         }
 
         try {
-            
-            const response = await fetch("/api/gemini", {
-                method: "POST",
-                headers: {
-                    "Content-Type" : "application/json"
-                },
-                body: JSON.stringify({
-                    prompt: cachedPrompt,
-                    context,
-                    chatHistory,
-                    questionImage: includeQuestionImg ? imageData : null
-                })
-            })
+            let response;
 
-            if (!response.ok) {
-                throw new Error("Failed to get response")
+            if (geminiPref === KeyStorePref.CLOUD) {
+                // Use server-side API call
+                response = await fetch("/api/gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        prompt: cachedPrompt,
+                        context,
+                        chatHistory,
+                        questionImage: includeQuestionImg ? imageData : null
+                    })
+                });
+
+                if (!response.ok) throw new Error("Failed to get response");
+                response = await response.text();
+            } else {
+
+                if (!geminiKey) {
+                    throw new Error("No API key set!")
+                }
+
+                console.log("[useGemini] local version with key:", geminiKey)
+
+                // Direct client-side call using local key
+                const genAI = new GoogleGenerativeAI(geminiKey);
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+                const processedHistory = chatHistory.slice(1).map((m, i) => ({
+                    role: i % 2 === 0 ? "user" : "model",
+                    parts: [{ text: m }],
+                }));
+
+                const chat = model.startChat({
+                    history: processedHistory,
+                    generationConfig: {
+                        maxOutputTokens: 2048
+                    }
+                });
+
+                let result;
+                if (imageData) {
+                    const imageBuffer = Buffer.from(imageData.data);
+                    result = await chat.sendMessage([
+                        {
+                            inlineData: {
+                                data: imageBuffer.toString("base64"),
+                                mimeType: imageData.type
+                            }
+                        },
+                        {
+                            text: context ? `${context}\n\n${cachedPrompt}` : cachedPrompt
+                        }
+                    ]);
+                } else {
+                    result = await chat.sendMessage(context ? `${context}\n\n${cachedPrompt}` : cachedPrompt);
+                }
+
+                response = result.response.text();
             }
 
-            const reply = await response.text();
-            setChatHistory((prev) => [...prev, reply])
-            
+            setChatHistory((prev) => [...prev, response]);
+
         } catch (err) {
             console.log(err);
             setChatHistory((prev) => [...prev, "I apologize, I am currently unavailable. Try again later!"])

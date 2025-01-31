@@ -18,7 +18,6 @@ import { Suspense } from 'react'
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { judge0ToMonacoMap } from "@/constants/judge0"
-import { useApiKey } from "@/providers/apikey-provider"
 
 
 const ProblemPage = ({ title }: { title: string }) => {
@@ -101,7 +100,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                         >
                             <ResizablePanel defaultSize={40} minSize={27} className="mr-1 bg-slate-400 dark:bg-black">
                                 <ResizablePanelGroup direction="vertical">
-                                    <ResizablePanel defaultSize={50} className="mb-1 bg-background rounded-lg p-4">
+                                    <ResizablePanel defaultSize={50} minSize={20} className="mb-1 bg-background rounded-lg p-4">
                                         <QuestionEditor
                                             title={problemStates.title}
                                             setTitle={setTitle}
@@ -148,7 +147,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                                     </ResizablePanel>
                                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black" />
                                     <CollapsiblePanel
-                                        defaultSize={50}
+                                        defaultSize={25}
                                         className="mt-1 bg-background rounded-lg p-4"
                                         collapsedText="Code Output"
                                         collapseThreshold={15}

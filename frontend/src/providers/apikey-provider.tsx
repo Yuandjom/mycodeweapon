@@ -8,6 +8,7 @@ import {
 } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "./auth-provider"
+import { cloudStoreGeminiKey } from "@/app/actions/gemini"
 
 export enum KeyStorePref {
     UNSET = "UNSET",
@@ -17,7 +18,6 @@ export enum KeyStorePref {
 
 interface ApiKeyContextType {
     geminiKey: string | null,
-    setGeminiKey: (key: string | null) => void
     geminiPref: KeyStorePref
     saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>
     isSavingPref: boolean
@@ -26,7 +26,6 @@ interface ApiKeyContextType {
 const ApiKeyContext = createContext<ApiKeyContextType>({
     geminiPref: KeyStorePref.UNSET,
     geminiKey: null,
-    setGeminiKey: () => { },
     saveGeminiPref: async (pref: KeyStorePref, key: string) => (false),
     isSavingPref: false,
 })
@@ -65,9 +64,10 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
     }, [user])
 
     const [isSavingPref, setIsSavingPref] = useState<boolean>(false)
-    const saveGeminiPref = async (pref: KeyStorePref, key: string) => {
 
-        if (!user) return;
+    const saveGeminiPref = async (pref: KeyStorePref, key: string): Promise<boolean> => {
+
+        if (!user) return false;
 
         setIsSavingPref(true);
         setGeminiPref(pref);
@@ -83,15 +83,17 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
 
             if (error) throw error
 
-            // TODO: encryption
             if (pref === KeyStorePref.CLOUD) {
-
+                await cloudStoreGeminiKey(user.id, key);
             } else {
-                // set to non cloud option so delete away past api keys
+                // set to local option so delete away past api keys
                 await supabase
                     .from("userkeys")
                     .delete()
                     .eq('userId', user.id)
+
+                //TODO: fix losing key when refresh
+                setGeminiKey(key)
             }
 
         } catch (err) {
@@ -106,9 +108,8 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <ApiKeyContext.Provider value={{
-            geminiPref,
             geminiKey,
-            setGeminiKey,
+            geminiPref,
             saveGeminiPref,
             isSavingPref,
         }}>

@@ -1,4 +1,4 @@
-const GEMINI_INSTRUCTIONS = `
+export const GEMINI_INSTRUCTIONS = `
 This image shows a coding problem or technical question submitted by a user. 
 The image will serve as the primary reference point.
 
@@ -20,3 +20,8 @@ The goal is to provide comprehensive assistance in understanding and solving thi
 
 Please analyze the image and provide guidance based on the user prompt in a concise manner.
 `
+
+export const GEMINI_MODELS: string[] = [
+    "gemini-1.5-flash",
+    "gemini-1.5-pro"
+]
