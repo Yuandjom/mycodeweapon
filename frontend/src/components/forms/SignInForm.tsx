@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth, AuthResult } from "@/providers/auth-provider";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"
 import {
     Dialog,
     DialogContent,
@@ -25,6 +25,8 @@ const SignInForm = () => {
     const searchParams = useSearchParams();
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [error, setError] = useState("");
+
+    const { toast } = useToast();
 
     const fields = [
         {
@@ -57,13 +59,12 @@ const SignInForm = () => {
                 throw new Error(result.error?.message || "Failed to sign in");
             }
 
-            toast.success("Signed in successfully!");
+            toast({ "title": "Signed in successfully!" });
 
             const redirectPage = searchParams.get("next");
             router.push(redirectPage || "/problem");
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
-            toast.error(err instanceof Error ? err.message : "Failed to sign in");
         } finally {
             setIsSigningIn(false);
         }

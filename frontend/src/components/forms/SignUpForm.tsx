@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"
 import { AuthForm, FormField } from "@/components/utils/AuthForm";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/utils/PasswordInput";
@@ -15,6 +15,7 @@ const SignUpForm = () => {
     const router = useRouter();
     const [isSigningUp, setIsSigningUp] = useState(false);
     const [error, setError] = useState("");
+    const { toast } = useToast();
 
     const fields = [
         {
@@ -61,17 +62,16 @@ const SignUpForm = () => {
                 throw new Error(result.error?.message || "Failed to create account");
             }
 
-            toast.success("Account created successfully!");
+            toast({ "title": "Account created successfully!" });
 
             if (result.data?.message?.includes("verification")) {
-                toast.info(result.data.message);
+                toast({ "title": result.data.message });
             } else {
                 router.push("/problem");
             }
         } catch (err) {
             console.error("Signup error:", err);
             setError(err instanceof Error ? err.message : "An unexpected error occurred");
-            toast.error(err instanceof Error ? err.message : "Failed to create account");
         } finally {
             setIsSigningUp(false);
         }

@@ -18,11 +18,12 @@ import {
 import { Button } from "../ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { LogOut, User, Settings } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"
 
 export const Navbar = () => {
   const [hovered, setHovered] = useState<number | null>(null);
   const { user, authLoading, signOut } = useAuth();
+  const { toast } = useToast();
   const navItems = [
     {
       name: "Problems",
@@ -33,9 +34,9 @@ export const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast.success("Signed out successfully");
+      toast({ "title": "Signed out successfully" });
     } catch (error) {
-      toast.error("Failed to sign out");
+      toast({ "title": "Failed to sign out" });
       console.error("Sign out error:", error);
     }
   };
@@ -46,9 +47,9 @@ export const Navbar = () => {
         setHovered(null);
       }}
       className=
-        "w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0"
+      "w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0"
     >
-      <Logo withText/>
+      <Logo withText />
       <div className="flex flex-row flex-1 items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
         {navItems.map((navItem: any, idx: number) => (
           <Link
@@ -74,8 +75,8 @@ export const Navbar = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     className="rounded-full w-9 h-9"
                   >
@@ -114,8 +115,8 @@ export const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 size="sm"
                 asChild
               >

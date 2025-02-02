@@ -8,7 +8,6 @@ import { useGemini } from "@/hooks/useGemini"
 import { Loader2, SettingsIcon } from "lucide-react"
 import { useEffect, useRef } from "react"
 import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
 import ReactMarkdown from "react-markdown"
 import Image from "next/image"
 import { useApiKey, KeyStorePref } from "@/providers/apikey-provider"
@@ -31,6 +30,8 @@ import {
 } from "@/components/ui/select"
 import { useState } from "react"
 import { PasswordInput } from "@/components/utils/PasswordInput"
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 interface ChatHistoryProps {
     messages: string[]
@@ -62,7 +63,6 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
 
     return (
         <div className="flex flex-col h-full gap-2">
-            <p className="text-white">Key: {geminiKey}</p>
             {/* Prompt context flags */}
             <div className="flex gap-4 items-center pl-2">
                 <div className="flex items-center gap-2">
@@ -228,6 +228,8 @@ interface AiSettingsProps {
 
 const AiSettings = ({ saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProps) => {
 
+    const { toast } = useToast()
+
     const [storageOption, setStorageOption] = useState(geminiPref);
     useEffect(() => {
         setStorageOption(geminiPref)
@@ -248,8 +250,8 @@ const AiSettings = ({ saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProp
                 throw new Error('Failed to save storage preference');
             }
 
-            alert('AI settings saved successfully');
             setIsOpen(false);
+            toast({ "title": "Settings Saved" })
         } catch (error) {
             alert('Failed to save settings');
             console.error('Error saving settings:', error);
@@ -277,7 +279,7 @@ const AiSettings = ({ saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProp
                             <Select
                                 value={storageOption}
                                 defaultValue={geminiPref}
-                                onValueChange={(value) => setStorageOption(value as KeyStorePref)}
+                                onValueChange={(value: KeyStorePref) => setStorageOption(value as KeyStorePref)}
                             >
                                 <SelectTrigger className="w-full">
                                     <SelectValue>

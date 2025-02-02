@@ -32,10 +32,10 @@ export default function RootLayout({
             <div className="flex flex-col w-full h-screen">
               <Navbar />
               {children}
-              <Toaster />
             </div>
           </ThemeProvider>
         </AuthProvider>
+        <Toaster />
       </body>
     </html>
   );

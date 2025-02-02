@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/utils/PasswordInput";
@@ -15,6 +15,7 @@ const ResetPasswordForm = () => {
 
     const router = useRouter();
     const supabase = createClient();
+    const { toast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -36,8 +37,8 @@ const ResetPasswordForm = () => {
             });
 
             if (error) throw error;
+            toast({ "title": "Settings Saved" })
 
-            toast.success("Password updated!");
             router.push("/signin");
         } catch (error) {
             setResetError("Error in resetting password, please try again later!");
