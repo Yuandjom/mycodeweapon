@@ -1,6 +1,7 @@
 "use server"
 
 import { CodeSubmissionREQ, CodeSubmissionRES } from "@/types/judge0";
+import { AvailLanguage } from "@/types/judge0";
 
 export const submitCode_SA = async (submissionBody: CodeSubmissionREQ, userId: string) => {
 
@@ -11,8 +12,9 @@ export const submitCode_SA = async (submissionBody: CodeSubmissionREQ, userId: s
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "X-User-Id": userId,
                 },
-                body: JSON.stringify({ ...submissionBody, userId })
+                body: JSON.stringify(submissionBody)
             }
         );
 
@@ -32,5 +34,36 @@ export const submitCode_SA = async (submissionBody: CodeSubmissionREQ, userId: s
             message: err instanceof Error ? err.message : "Unknown error occurred"
         };
     }
+
+}
+
+export const getAvailableLanguages_SA = async (userId: string): Promise<AvailLanguage[]> => {
+    try {
+        console.log("[getAvailableLanguages_SA] GET Methd to: ", `${process.env.JUDGE0_API_GATEWAY}/judge0/languages`)
+        const response = await fetch(
+            `${process.env.JUDGE0_URL}/languages`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-User-Id": userId,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            console.log("[getAvailableLanguages_SA] error")
+            throw new Error(`HTTP Error in request to Judge0, Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return data;
+
+    } catch (err) {
+        console.log("Error in fetching languages: ", err);
+    }
+
+    return [];
 
 }

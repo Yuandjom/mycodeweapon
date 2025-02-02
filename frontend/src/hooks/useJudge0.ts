@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { CodeSubmissionREQ, CodeSubmissionRES, AvailLanguage } from "@/types/judge0";
 import { DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT, judge0ToMonacoMap } from "@/constants/judge0";
 import { useAuth } from "@/providers/auth-provider";
-import { submitCode_SA } from "@/actions/judge0";
+import { submitCode_SA, getAvailableLanguages_SA } from "@/actions/judge0";
 
 export type submitCodeParams = {
     source_code: string;
@@ -15,6 +15,8 @@ export type submitCodeParams = {
 export const useJudge0 = () => {
 
     const { user } = useAuth()
+
+    const [initJudge0, setInitJudge0] = useState<boolean>(true);
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [judge0Error, setJudge0Error] = useState<string | null>(null);
@@ -57,7 +59,6 @@ export const useJudge0 = () => {
             }
 
             const data = response.data as CodeSubmissionRES
-            console.log("[submitCode] After SA")
             setCodeOutput(data.stdout);
             setCodeErrorId(data.status.id);
             setCodeErrorDesc(data.stderr);
@@ -84,41 +85,29 @@ export const useJudge0 = () => {
     }
 
     useEffect(() => {
-        const getAvailableLanguages = async (): Promise<AvailLanguage[]> => {
+
+        const initLanguages = async () => {
+
+            setInitJudge0(true);
 
             try {
-                const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_JUDGE0_URL}/languages`,
-                    {
-                        method: "GET",
-                        headers: {
-                            "api-token": "TODOAPITOKEN",
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`HTTP Error in request to Judge0, Status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
+                if (!user) return;
+                console.log("initLanguages with userId:", user.id)
+                const data = await getAvailableLanguages_SA(user.id);
                 const filteredLangauges = data.filter((d: any) => d.id.toString() in judge0ToMonacoMap).sort((a: any, b: any) => a.name.localeCompare(b.name));;
 
                 setLanguages(filteredLangauges);
 
-
             } catch (err) {
-                console.log("Error in fetching languages: ", err);
+                setJudge0Error("Code Execution Service unavailable at the moment")
+            } finally {
+                setInitJudge0(false);
             }
-
-            return [];
-
         }
 
-        getAvailableLanguages();
+        initLanguages();
 
-    }, [])
+    }, [user])
 
     return {
         isSubmitting, judge0Error, languages, codeOutput, codeErrorId, codeErrorDesc, codeMemoryUsed, codeTimeUsed,

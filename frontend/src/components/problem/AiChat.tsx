@@ -31,7 +31,6 @@ import {
 import { useState } from "react"
 import { PasswordInput } from "@/components/utils/PasswordInput"
 import { useToast } from "@/hooks/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 
 interface ChatHistoryProps {
     messages: string[]
@@ -65,13 +64,14 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
         <div className="flex flex-col h-full gap-2">
             {/* Prompt context flags */}
             <div className="flex gap-4 items-center pl-2">
+                <p className="text-sm font-semibold pr-1">Chat Contexts:</p>
                 <div className="flex items-center gap-2">
                     <Checkbox
                         id="includeQuesImg"
                         checked={includeQuestionImg}
                         onCheckedChange={() => setIncludeQuestionImg(prev => !prev)}
                     />
-                    <Label htmlFor="includeQuesImg" className="text-sm">Include Question Img</Label>
+                    <Label htmlFor="includeQuesImg" className="text-sm">Question Img</Label>
                 </div>
                 <div className="flex items-center gap-2">
                     <Checkbox
@@ -79,7 +79,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
                         checked={includeCode}
                         onCheckedChange={() => setIncludeCode(prev => !prev)}
                     />
-                    <Label htmlFor="includeCode" className="text-sm">Include Code</Label>
+                    <Label htmlFor="includeCode" className="text-sm">Code</Label>
                 </div>
 
                 <div className="flex-1 flex justify-end">

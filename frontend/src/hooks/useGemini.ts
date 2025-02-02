@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { KeyStorePref } from '@/providers/apikey-provider'
 import { GoogleGenerativeAI } from "@google/generative-ai"
-
+import { GEMINI_INSTRUCTIONS } from "@/constants/gemini"
 
 interface SubmitPromptParams {
     prompt: string
@@ -41,6 +41,11 @@ export const useGemini = ({ questionImage, code, language, geminiPref, geminiKey
         setPrompt("")
 
         let context = ""
+
+        if (chatHistory.length === 1) {
+            context += GEMINI_INSTRUCTIONS
+        }
+
         let imageData = null
 
         if (includeQuestionImg && questionImage) {
