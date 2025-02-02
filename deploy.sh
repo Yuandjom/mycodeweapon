@@ -12,7 +12,9 @@ if [ -f "./judge0-apigateway/.env" ]; then
     set +a
     echo "Loaded judge0 api-gateway env variables"
 else
-    echo -e "MISSING judge0 api-gateway env variables"
+    echo "MISSING judge0 api-gateway env variables"
 fi
 
+echo "Restarting judge0 api-gateway"
 sudo systemctl restart judge0-apigateway
+echo "Restarted judge0 api-gateway"

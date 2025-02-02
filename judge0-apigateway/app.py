@@ -29,14 +29,14 @@ DEFAULT_RATE_LIMIT = 100
 
 @app.route('/ping', methods=['GET'])
 def test():
-    return Response("API Gateway is running!", 200)
+    return Response("API Gateway V2 is running!", 200)
 
 @app.route('/judge0/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def proxy(path):
 
     # Validate the request body
     body = request.get_json() or {}
-    userId = body.get('userId', "-")
+    userId = request.headers.get('X-User-Id', '-')
     if userId == "-":
         return Response(
         json.dumps({"error": "Invalid JSON body"}),
@@ -81,8 +81,6 @@ def proxy(path):
 
     # Forward request to Judge0
     try:
-        if 'userId' in body:
-            del body['userId']
 
         # Get query parameters
         query_params = request.args.to_dict()
