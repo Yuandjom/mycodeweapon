@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { CodeSubmissionREQ, CodeSubmissionRES, AvailLanguage } from "@/types/judge0";
 import { DEFAULT_MEMORY_LIMIT, DEFAULT_TIME_LIMIT, judge0ToMonacoMap } from "@/constants/judge0";
+import { useAuth } from "@/providers/auth-provider";
+import { submitCode_SA } from "@/actions/judge0";
 
 export type submitCodeParams = {
     source_code: string;
@@ -12,8 +14,10 @@ export type submitCodeParams = {
 
 export const useJudge0 = () => {
 
+    const { user } = useAuth()
+
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const [judge0Error, setJudge0Error] = useState<string | null>(null);
 
     // judge0 useful return values
     const [languages, setLanguages] = useState<AvailLanguage[]>([]);
@@ -23,17 +27,17 @@ export const useJudge0 = () => {
     const [codeMemoryUsed, setCodeMemoryUsed] = useState<number | null>(null);
     const [codeTimeUsed, setCodeTimeUsed] = useState<string | null>(null);
 
-    const submitCode = async ({source_code, language_id} : submitCodeParams ) => {
+    const submitCode = async ({ source_code, language_id }: submitCodeParams) => {
 
         setIsSubmitting(true);
-        setError(null);
+        setJudge0Error(null);
         setCodeOutput(null);
         setCodeErrorId(-1);
         setCodeErrorDesc(null);
         setCodeMemoryUsed(null);
         setCodeTimeUsed(null);
 
-        const submissionBody : CodeSubmissionREQ = {
+        const submissionBody: CodeSubmissionREQ = {
             source_code,
             language_id,
             memory_limit: DEFAULT_MEMORY_LIMIT,
@@ -41,24 +45,19 @@ export const useJudge0 = () => {
         }
 
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_JUDGE0_URL}/submissions?wait=true`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "api-token": "TODOAPITOKEN"
-                    },
-                    body: JSON.stringify(submissionBody)
-                }
-            );
 
-            if (!response.ok) {
-                throw new Error(`HTTP Error in request to Judge0, Status: ${response.status}`);
+            if (!user) {
+                throw new Error("You are not signed in")
             }
 
-            const data: CodeSubmissionRES = await response.json();
+            const response = await submitCode_SA(submissionBody, user.id)
 
+            if (response.error) {
+                throw new Error(response.message);
+            }
+
+            const data = response.data as CodeSubmissionRES
+            console.log("[submitCode] After SA")
             setCodeOutput(data.stdout);
             setCodeErrorId(data.status.id);
             setCodeErrorDesc(data.stderr);
@@ -66,8 +65,8 @@ export const useJudge0 = () => {
             setCodeTimeUsed(data.time);
 
 
-        } catch(err) {
-            setError(err instanceof Error ? err.message : "Unknown error occured")
+        } catch (err) {
+            setJudge0Error(err instanceof Error ? err.message : "Unknown error occured")
         } finally {
             setIsSubmitting(false);
         }
@@ -76,7 +75,7 @@ export const useJudge0 = () => {
 
     const clearCodeSubmission = () => {
         setIsSubmitting(false);
-        setError(null);
+        setJudge0Error(null);
         setCodeOutput(null);
         setCodeErrorId(-1);
         setCodeErrorDesc(null);
@@ -84,8 +83,8 @@ export const useJudge0 = () => {
         setCodeTimeUsed(null);
     }
 
-    useEffect(()=> {
-        const getAvailableLanguages = async () : Promise<AvailLanguage[]> => {
+    useEffect(() => {
+        const getAvailableLanguages = async (): Promise<AvailLanguage[]> => {
 
             try {
                 const response = await fetch(
@@ -97,24 +96,24 @@ export const useJudge0 = () => {
                         }
                     }
                 );
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP Error in request to Judge0, Status: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
-                
-                const filteredLangauges = data.filter((d : any) => d.id.toString() in judge0ToMonacoMap).sort((a: any, b : any) => a.name.localeCompare(b.name));;
-    
+
+                const filteredLangauges = data.filter((d: any) => d.id.toString() in judge0ToMonacoMap).sort((a: any, b: any) => a.name.localeCompare(b.name));;
+
                 setLanguages(filteredLangauges);
-    
-            
-            } catch(err) {
+
+
+            } catch (err) {
                 console.log("Error in fetching languages: ", err);
             }
-    
+
             return [];
-            
+
         }
 
         getAvailableLanguages();
@@ -122,7 +121,7 @@ export const useJudge0 = () => {
     }, [])
 
     return {
-        isSubmitting, error, languages, codeOutput, codeErrorId, codeErrorDesc, codeMemoryUsed, codeTimeUsed,
+        isSubmitting, judge0Error, languages, codeOutput, codeErrorId, codeErrorDesc, codeMemoryUsed, codeTimeUsed,
         submitCode, // caller function
         clearCodeSubmission,
     }

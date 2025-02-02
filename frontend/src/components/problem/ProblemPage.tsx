@@ -43,6 +43,7 @@ const ProblemPage = ({ title }: { title: string }) => {
 
     // judge0 dependencies
     const {
+        judge0Error,
         languages,
         submitCode,
         isSubmitting,
@@ -154,6 +155,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                                         collapsedSize={5}
                                     >
                                         <CodeOutput
+                                            judge0Error={judge0Error}
                                             isSubmitting={isSubmitting}
                                             codeOutput={codeOutput}
                                             codeErrorId={codeErrorId}
