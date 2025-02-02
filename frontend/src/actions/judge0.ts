@@ -6,7 +6,7 @@ export const submitCode_SA = async (submissionBody: CodeSubmissionREQ, userId: s
 
     try {
         const response = await fetch(
-            `${process.env.JUDGE0_API_GATEWAY}/judge01/submissions?wait=true`,
+            `${process.env.JUDGE0_API_GATEWAY}/judge0/submissions?wait=true`,
             {
                 method: "POST",
                 headers: {
