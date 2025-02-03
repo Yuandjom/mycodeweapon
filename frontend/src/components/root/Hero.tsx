@@ -6,6 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
+import { Macbook } from "@/components/root/Macbook";
 
 export function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -14,7 +15,7 @@ export function Hero() {
     return (
         <div
             ref={parentRef}
-            className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40"
+            className="relative flex md:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40"
         >
             <BackgroundGrids />
             <CollisionMechanism
@@ -74,7 +75,7 @@ export function Hero() {
             <p className="relative z-50 mx-auto mt-4 max-w-lg px-4 text-center text-base/6 text-gray-600 dark:text-gray-200">
                 Get immediate AI assistance to bring your coding prowess to the next level
             </p>
-            <div className="mb-10 mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20">
+            <div className="mt-8 flex w-full flex-col items-center justify-center gap-4 px-8 sm:flex-row md:mb-20">
                 <Link
                     href="/signup"
                     className="group relative z-20 flex h-10 w-full cursor-pointer items-center justify-center space-x-2 rounded-lg bg-black p-px px-4 py-2 text-center text-sm font-semibold leading-6 text-white no-underline transition duration-200 dark:bg-white dark:text-black sm:w-52"
@@ -90,7 +91,7 @@ export function Hero() {
             </div>
             <div
                 ref={containerRef}
-                className="relative mx-auto max-w-7xl rounded-[32px] border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
+                className="w-full flex_center lg:hidden relative mx-auto max-w-7xl rounded-[32px] border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
             >
                 <div className="rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
                     <Image
@@ -101,6 +102,12 @@ export function Hero() {
                         className="rounded-[20px]"
                     />
                 </div>
+            </div>
+            <div className="hidden lg:flex_center" ref={containerRef}>
+                <Macbook
+                    src="/heroImg.png"
+                    showGradient={false}
+                />
             </div>
         </div>
     );
@@ -240,7 +247,7 @@ const CollisionMechanism = React.forwardRef<
                     repeatDelay: beamOptions.repeatDelay || 0,
                 }}
                 className={cn(
-                    "absolute left-96 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-orange-500 via-yellow-500 to-transparent",
+                    "absolute left-96 top-20 m-auto h-14 w-px rounded-full bg-gradient-to-t from-cyan-500 via-cyan-300 to-transparent",
                     beamOptions.className,
                 )}
             />
@@ -279,7 +286,7 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
                 animate={{ opacity: [0, 1, 0] }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className="absolute -inset-x-10 top-0 m-auto h-[4px] w-10 rounded-full bg-gradient-to-r from-transparent via-orange-500 to-transparent blur-sm"
+                className="absolute -inset-x-10 top-0 m-auto h-[4px] w-10 rounded-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent blur-sm"
             ></motion.div>
             {spans.map((span) => (
                 <motion.span
@@ -291,7 +298,7 @@ const Explosion = ({ ...props }: React.HTMLProps<HTMLDivElement>) => {
                         opacity: 0,
                     }}
                     transition={{ duration: Math.random() * 1.5 + 0.5, ease: "easeOut" }}
-                    className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-orange-500 to-yellow-500"
+                    className="absolute h-1 w-1 rounded-full bg-gradient-to-b from-cyan-400 to-cyan-300"
                 />
             ))}
         </div>
