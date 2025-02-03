@@ -9,16 +9,17 @@ type supportLanguagesType = {
 	icon: string,
 }
 const supportLanguages: supportLanguagesType[] = [
+	{ "lang": "Python", "icon": "python.svg" },
 	{ "lang": "C", "icon": "c.svg" },
 	{ "lang": "C++", "icon": "cpp.svg" },
 	{ "lang": "C#", "icon": "csharp.svg" },
-	{ "lang": "Go", "icon": "go.svg" },
 	{ "lang": "Java", "icon": "java.svg" },
 	{ "lang": "Javascript", "icon": "javascript.svg" },
+	{ "lang": "Typescript", "icon": "typescript.svg" },
+	{ "lang": "Go", "icon": "go.svg" },
 	{ "lang": "Kotlin", "icon": "kotlin.svg" },
 	{ "lang": "Lua", "icon": "lua.svg" },
 	{ "lang": "Perl", "icon": "perl.svg" },
-	{ "lang": "Python", "icon": "python.svg" },
 	{ "lang": "Ruby", "icon": "ruby.svg" },
 	{ "lang": "Rust", "icon": "rust.svg" },
 	{ "lang": "Swift", "icon": "swift.svg" },
@@ -35,7 +36,7 @@ const LanguageSupport = () => {
 					We support
 				</h2>
 				<h3 className="text-2xl md:text-4xl font-semibold text-muted-foreground">
-					{hoveredLanguage || "your favourite language!"}
+					{hoveredLanguage || "your favourite languages!"}
 				</h3>
 			</div>
 
