@@ -42,23 +42,15 @@ export const Macbook = ({
         offset: ["start start", "end start"],
     });
 
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        if (window && window.innerWidth < 768) {
-            setIsMobile(true);
-        }
-    }, []);
-
     const scaleX = useTransform(
         scrollYProgress,
-        [0, 0.3],
-        [1.2, isMobile ? 1 : 1.5]
+        [0, 1.4],
+        [1.4, 2]
     );
     const scaleY = useTransform(
         scrollYProgress,
-        [0, 0.3],
-        [0.6, isMobile ? 1 : 1.5]
+        [0, 0.64],
+        [0.64, 0.8]
     );
     const translate = useTransform(scrollYProgress, [0, 1], [0, 2500]);
     const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
@@ -66,7 +58,7 @@ export const Macbook = ({
     return (
         <div
             ref={ref}
-            className="min-h-[200vh] flex flex-col items-center py-0 pt-16 justify-start flex-shrink-0 [perspective:800px] transform md:scale-100  scale-[0.35] sm:scale-50"
+            className="min-h-[250vh] flex flex-col items-center py-0 mt-2 pt-16 justify-start flex-shrink-0 [perspective:800px] transform scale-100"
         >
             <Lid
                 src={src}
@@ -117,17 +109,18 @@ export const Lid = ({
     src?: string;
 }) => {
     return (
-        <div className="relative [perspective:800px]">
+        <div className="relative [perspective:750px]">
+            {/* Base frame */}
             <div
                 style={{
                     transform: "perspective(800px) rotateX(-25deg) translateZ(0px)",
                     transformOrigin: "bottom",
                     transformStyle: "preserve-3d",
                 }}
-                className="h-[18rem] w-[48rem] bg-[#010101] rounded-2xl p-2 relative"
-            >
+                className="h-[19rem] w-[48rem] bg-[#010101] rounded-2xl relative"
+            />
 
-            </div>
+            {/* Screen content */}
             <motion.div
                 style={{
                     scaleX: scaleX,
@@ -137,15 +130,19 @@ export const Lid = ({
                     transformStyle: "preserve-3d",
                     transformOrigin: "top",
                 }}
-                className="h-[18rem] w-[48rem] absolute inset-0 bg-[#010101] rounded-2xl p-2"
+                className="absolute mx-auto inset-0 h-[43rem] w-[47rem]"
             >
-                <div className="absolute inset-0 bg-[#272729] rounded-lg" />
-                <Image
-                    src={src as string}
-                    alt="aceternity logo"
-                    fill
-                    className="object-cover object-left-top absolute rounded-lg inset-0 h-full w-full"
-                />
+                <div className="rounded-2xl relative h-full w-full bg-[#010101] p-2 top-[-13%]">
+                    {src && (
+                        <Image
+                            src={src}
+                            alt="Screen content"
+                            fill
+                            className="object-cover rounded-2xl"
+                            priority
+                        />
+                    )}
+                </div>
             </motion.div>
         </div>
     );
@@ -622,3 +619,5 @@ export const OptionKey = ({ className }: { className: string }) => {
         </svg>
     );
 };
+
+export default Macbook

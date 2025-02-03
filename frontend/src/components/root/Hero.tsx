@@ -6,7 +6,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
-import { Macbook } from "@/components/root/Macbook";
+import Macbook from "@/components/root/Macbook";
 
 export function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -15,7 +15,7 @@ export function Hero() {
     return (
         <div
             ref={parentRef}
-            className="relative flex md:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-40"
+            className="relative flex md:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-30"
         >
             <BackgroundGrids />
             <CollisionMechanism
@@ -105,7 +105,7 @@ export function Hero() {
             </div>
             <div className="hidden lg:flex_center" ref={containerRef}>
                 <Macbook
-                    src="/heroImg.png"
+                    src="/heroImg3.png"
                     showGradient={false}
                 />
             </div>
