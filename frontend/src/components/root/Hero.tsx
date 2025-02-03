@@ -59,7 +59,7 @@ export function Hero() {
             />
             <span className="mb-4 z-10 bg-slate-500 shadow-slate-300 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm ">
                 We are still in development phase! If you face any bugs/issue, raise them{" "}
-                <Link className="underline hover:text-blue-500 hover:scale-150" href="https://github.com/LimJiaEarn/mycodeweapon">here</Link>!
+                <Link className="underline hover:text-blue-500 hover:scale-150" href="https://github.com/LimJiaEarn/mycodeweapon/issues">here</Link>!
             </span>
             <h2 className="text-balance relative z-50 mx-auto mb-4 mt-4 max-w-4xl text-center text-3xl font-semibold tracking-tight text-gray-700 dark:text-neutral-300 md:text-7xl">
                 <Balancer>
