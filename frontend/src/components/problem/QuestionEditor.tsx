@@ -75,10 +75,10 @@ const QuestionEditor = ({ imageUrl, title, setTitle, status, setStatus, image, s
 
 
     return (
-        <div className="w-full h-full flex flex-col space-y-4">
+        <div className="w-full h-full flex flex-col space-y-2">
 
             {/* Title component */}
-            <div className="space-y-2 flex justify-between items-center gap-4">
+            <div className="space-y-2 flex justify-between items-center gap-2">
 
                 <div className="flex_center gap-2">
                     <Label htmlFor="title" className="text-lg font-bold text-left">Title:</Label>

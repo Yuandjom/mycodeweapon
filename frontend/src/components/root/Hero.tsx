@@ -15,7 +15,7 @@ export function Hero() {
     return (
         <div
             ref={parentRef}
-            className="relative flex md:min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-20 md:px-8 md:py-30"
+            className="relative flex md:min-h-screen flex-col items-center justify-start overflow-hidden px-4 py-20 md:px-8 md:pt-30"
         >
             <BackgroundGrids />
             <CollisionMechanism
@@ -58,7 +58,7 @@ export function Hero() {
                     repeatDelay: 3,
                 }}
             />
-            <span className="mb-4 z-10 bg-slate-500 shadow-slate-300 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm ">
+            <span className="mb-4 z-10 bg-card shadow-slate-500 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm ">
                 We are still in development phase! If you face any bugs/issue, raise them{" "}
                 <Link className="underline hover:text-blue-500 hover:scale-150" href="https://github.com/LimJiaEarn/mycodeweapon/issues">here</Link>!
             </span>
@@ -89,11 +89,12 @@ export function Hero() {
                     Explore Features
                 </Link>
             </div>
+
             <div
                 ref={containerRef}
-                className="w-full flex_center lg:hidden relative mx-auto max-w-7xl rounded-[32px] border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
+                className="w-full mt-8 flex_center md:hidden relative mx-auto max-w-7xl rounded-[32px] border border-neutral-200/50 bg-neutral-100 p-2 backdrop-blur-lg dark:border-neutral-700 dark:bg-neutral-800/50 md:p-4"
             >
-                <div className="rounded-lg border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
+                <div className="rounded-3xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
                     <Image
                         src="/heroImg.png"
                         alt="heroImg"
@@ -103,10 +104,13 @@ export function Hero() {
                     />
                 </div>
             </div>
-            <div className="hidden lg:flex_center" ref={containerRef}>
+
+            <div
+                ref={containerRef}
+                className="hidden mx-auto md:flex_center pt-10"
+            >
                 <Macbook
-                    src="/heroImg3.png"
-                    showGradient={false}
+                    src="/heroImg.png"
                 />
             </div>
         </div>

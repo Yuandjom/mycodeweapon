@@ -92,7 +92,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                 <LoadingContent />)
                 :
                 (
-                    <div className="h-full w-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black">
+                    <div className="h-full w-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black px-2 pb-2">
                         <div className="flex_center md:hidden bg-yellow-700 w-full">
                             <p className="text-yellow-300 font-bold">Use larger screens for code execution features!</p>
                         </div>

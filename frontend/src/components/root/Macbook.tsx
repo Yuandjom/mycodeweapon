@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MotionValue, motion, useScroll, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
@@ -28,7 +28,6 @@ import Image from "next/image";
 export const Macbook = ({
     src,
     showGradient,
-    title,
     badge,
 }: {
     src?: string;
@@ -42,23 +41,31 @@ export const Macbook = ({
         offset: ["start start", "end start"],
     });
 
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        if (window && window.innerWidth < 768) {
+            setIsMobile(true);
+        }
+    }, []);
+
     const scaleX = useTransform(
         scrollYProgress,
-        [0, 1.4],
-        [1.4, 2]
+        [0, 0.3],
+        [1.2, isMobile ? 1 : 1.5]
     );
     const scaleY = useTransform(
         scrollYProgress,
-        [0, 0.64],
-        [0.64, 0.8]
+        [0, 0.3],
+        [0.6, isMobile ? 1 : 1.5]
     );
-    const translate = useTransform(scrollYProgress, [0, 1], [0, 2500]);
+    const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
     const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
 
     return (
         <div
             ref={ref}
-            className="min-h-[250vh] flex flex-col items-center py-0 mt-2 pt-16 justify-start flex-shrink-0 [perspective:800px] transform scale-100"
+            className="min-h-[130vh] lg:min-h-[180vh] xl:min-h-[185vh] flex flex-col items-center lg:pt-60 xl:pt-80 justify-start flex-shrink-0 [perspective:800px] transform scale-[0.35] sm:scale-75 md:scale-100 lg:scale-125 xl:scale-150"
         >
             <Lid
                 src={src}
@@ -68,19 +75,19 @@ export const Macbook = ({
                 translate={translate}
             />
             {/* Base area */}
-            <div className="h-[33rem] w-[48rem] bg-gray-200 dark:bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
+            <div className="h-[22rem] w-[32rem] bg-gray-200 dark:bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
                 {/* above keyboard bar */}
-                <div className="h-20 w-full relative">
+                <div className="h-10 w-full relative">
                     <div className="absolute inset-x-0 mx-auto w-[80%] h-4 bg-[#050505]" />
                 </div>
                 <div className="flex relative">
-                    <div className="mx-auto w-[10%] overflow-hidden h-full">
+                    <div className="mx-auto w-[10%] overflow-hidden  h-full">
                         <SpeakerGrid />
                     </div>
                     <div className="mx-auto w-[80%] h-full">
                         <Keypad />
                     </div>
-                    <div className="mx-auto w-[10%] overflow-hidden h-full">
+                    <div className="mx-auto w-[10%] overflow-hidden  h-full">
                         <SpeakerGrid />
                     </div>
                 </div>
@@ -108,41 +115,49 @@ export const Lid = ({
     translate: MotionValue<number>;
     src?: string;
 }) => {
+
+    const ref = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start start", "end start"]
+    });
+
+    // Modify the translate value to stop at a certain scroll point
+    const clampedTranslate = useTransform(
+        scrollYProgress,
+        [0.1, 0.35, 0.75], // Adjust these values to control when it stops
+        [0, 600, 600]  // The last two numbers being the same makes it "stick"
+    );
+
     return (
-        <div className="relative [perspective:750px]">
-            {/* Base frame */}
+        <div className="relative [perspective:800px]">
             <div
                 style={{
                     transform: "perspective(800px) rotateX(-25deg) translateZ(0px)",
                     transformOrigin: "bottom",
                     transformStyle: "preserve-3d",
                 }}
-                className="h-[19rem] w-[48rem] bg-[#010101] rounded-2xl relative"
-            />
-
-            {/* Screen content */}
+                className="h-[12rem] w-[32rem] bg-[#010101] rounded-2xl p-2 relative"
+            >
+            </div>
             <motion.div
                 style={{
                     scaleX: scaleX,
                     scaleY: scaleY,
                     rotateX: rotate,
-                    translateY: translate,
+                    translateY: clampedTranslate,
                     transformStyle: "preserve-3d",
                     transformOrigin: "top",
                 }}
-                className="absolute mx-auto inset-0 h-[43rem] w-[47rem]"
+                className="h-96 w-[32rem] absolute inset-0 bg-[#010101] rounded-2xl p-2"
             >
-                <div className="rounded-2xl relative h-full w-full bg-[#010101] p-2 top-[-13%]">
-                    {src && (
-                        <Image
-                            src={src}
-                            alt="Screen content"
-                            fill
-                            className="object-cover rounded-2xl"
-                            priority
-                        />
-                    )}
-                </div>
+                <div className="absolute inset-0 bg-[#272729] rounded-lg" />
+                <Image
+                    src={src as string}
+                    alt="demo"
+                    fill
+                    className="object-cover absolute rounded-lg inset-0 h-full w-full"
+                />
             </motion.div>
         </div>
     );
@@ -151,7 +166,7 @@ export const Lid = ({
 export const Trackpad = () => {
     return (
         <div
-            className="w-[40%] mx-auto h-48 rounded-xl my-1"
+            className="w-[40%] mx-auto h-32  rounded-xl my-1"
             style={{
                 boxShadow: "0px 0px 1px 1px #00000020 inset",
             }}
@@ -165,58 +180,58 @@ export const Keypad = () => {
             {/* First Row */}
             <Row>
                 <KBtn
-                    className="w-[5rem] items-end justify-start pl-[4px] pb-[2px]"
+                    className="w-10 items-end justify-start pl-[4px] pb-[2px]"
                     childrenClassName="items-start"
                 >
                     esc
                 </KBtn>
                 <KBtn>
-                    <IconBrightnessDown className="h-[9px] w-[9px]" />
+                    <IconBrightnessDown className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F1</span>
                 </KBtn>
 
                 <KBtn>
-                    <IconBrightnessUp className="h-[9px] w-[9px]" />
+                    <IconBrightnessUp className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F2</span>
                 </KBtn>
                 <KBtn>
-                    <IconTable className="h-[9px] w-[9px]" />
+                    <IconTable className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F3</span>
                 </KBtn>
                 <KBtn>
-                    <IconSearch className="h-[9px] w-[9px]" />
+                    <IconSearch className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F4</span>
                 </KBtn>
                 <KBtn>
-                    <IconMicrophone className="h-[9px] w-[9px]" />
+                    <IconMicrophone className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F5</span>
                 </KBtn>
                 <KBtn>
-                    <IconMoon className="h-[9px] w-[9px]" />
+                    <IconMoon className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F6</span>
                 </KBtn>
                 <KBtn>
-                    <IconPlayerTrackPrev className="h-[9px] w-[9px]" />
+                    <IconPlayerTrackPrev className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F7</span>
                 </KBtn>
                 <KBtn>
-                    <IconPlayerSkipForward className="h-[9px] w-[9px]" />
+                    <IconPlayerSkipForward className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F8</span>
                 </KBtn>
                 <KBtn>
-                    <IconPlayerTrackNext className="h-[9px] w-[9px]" />
+                    <IconPlayerTrackNext className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F8</span>
                 </KBtn>
                 <KBtn>
-                    <IconVolume3 className="h-[9px] w-[9px]" />
+                    <IconVolume3 className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F10</span>
                 </KBtn>
                 <KBtn>
-                    <IconVolume2 className="h-[9px] w-[9px]" />
+                    <IconVolume2 className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F11</span>
                 </KBtn>
                 <KBtn>
-                    <IconVolume className="h-[9px] w-[9px]" />
+                    <IconVolume className="h-[6px] w-[6px]" />
                     <span className="inline-block mt-1">F12</span>
                 </KBtn>
                 <KBtn>
@@ -282,7 +297,7 @@ export const Keypad = () => {
                     <span className="block"> = </span>
                 </KBtn>
                 <KBtn
-                    className="w-[5rem] items-end justify-end pr-[4px] pb-[2px]"
+                    className="w-10 items-end justify-end pr-[4px] pb-[2px]"
                     childrenClassName="items-end"
                 >
                     delete
@@ -292,7 +307,7 @@ export const Keypad = () => {
             {/* Third row */}
             <Row>
                 <KBtn
-                    className="w-[5rem] items-end justify-start pl-[4px] pb-[2px]"
+                    className="w-10 items-end justify-start pl-[4px] pb-[2px]"
                     childrenClassName="items-start"
                 >
                     tab
@@ -345,7 +360,7 @@ export const Keypad = () => {
             {/* Fourth Row */}
             <Row>
                 <KBtn
-                    className="w-[5.2rem] items-end justify-start pl-[4px] pb-[2px]"
+                    className="w-[2.8rem] items-end justify-start pl-[4px] pb-[2px]"
                     childrenClassName="items-start"
                 >
                     caps lock
@@ -387,7 +402,7 @@ export const Keypad = () => {
                     <span className="block">{`'`}</span>
                 </KBtn>
                 <KBtn
-                    className="w-[4.7rem] items-end justify-end pr-[4px] pb-[2px]"
+                    className="w-[2.85rem] items-end justify-end pr-[4px] pb-[2px]"
                     childrenClassName="items-end"
                 >
                     return
@@ -397,7 +412,7 @@ export const Keypad = () => {
             {/* Fifth Row */}
             <Row>
                 <KBtn
-                    className="w-[6.2rem] items-end justify-start pl-[4px] pb-[2px]"
+                    className="w-[3.65rem] items-end justify-start pl-[4px] pb-[2px]"
                     childrenClassName="items-start"
                 >
                     shift
@@ -436,7 +451,7 @@ export const Keypad = () => {
                     <span className="block">{`/`}</span>
                 </KBtn>
                 <KBtn
-                    className="w-[6.2rem] items-end justify-end pr-[4px] pb-[2px]"
+                    className="w-[3.65rem] items-end justify-end pr-[4px] pb-[2px]"
                     childrenClassName="items-end"
                 >
                     shift
@@ -444,74 +459,74 @@ export const Keypad = () => {
             </Row>
 
             {/* sixth Row */}
-            <Row classNames="justify-start pl-0.5">
-                <KBtn className="w-[48px]" childrenClassName="h-full justify-between py-[4px]">
+            <Row>
+                <KBtn className="" childrenClassName="h-full justify-between py-[4px]">
                     <div className="flex justify-end w-full pr-1">
                         <span className="block">fn</span>
                     </div>
                     <div className="flex justify-start w-full pl-1">
-                        <IconWorld className="h-[9px] w-[9px]" />
+                        <IconWorld className="h-[6px] w-[6px]" />
                     </div>
                 </KBtn>
-                <KBtn className="w-[48px]" childrenClassName="h-full justify-between py-[4px]">
+                <KBtn className="" childrenClassName="h-full justify-between py-[4px]">
                     <div className="flex justify-end w-full pr-1">
-                        <IconChevronUp className="h-[9px] w-[9px]" />
+                        <IconChevronUp className="h-[6px] w-[6px]" />
                     </div>
                     <div className="flex justify-start w-full pl-1">
                         <span className="block">control</span>
                     </div>
                 </KBtn>
-                <KBtn className="w-[48px]" childrenClassName="h-full justify-between py-[4px]">
+                <KBtn className="" childrenClassName="h-full justify-between py-[4px]">
                     <div className="flex justify-end w-full pr-1">
-                        <OptionKey className="h-[9px] w-[9px]" />
+                        <OptionKey className="h-[6px] w-[6px]" />
                     </div>
                     <div className="flex justify-start w-full pl-1">
                         <span className="block">option</span>
                     </div>
                 </KBtn>
                 <KBtn
-                    className="w-[48px]"
+                    className="w-8"
                     childrenClassName="h-full justify-between py-[4px]"
                 >
                     <div className="flex justify-end w-full pr-1">
-                        <IconCommand className="h-[9px] w-[9px]" />
+                        <IconCommand className="h-[6px] w-[6px]" />
                     </div>
                     <div className="flex justify-start w-full pl-1">
                         <span className="block">command</span>
                     </div>
                 </KBtn>
-                <KBtn className="w-[11rem]"></KBtn>
+                <KBtn className="w-[8.2rem]"></KBtn>
                 <KBtn
-                    className="w-[48px]"
+                    className="w-8"
                     childrenClassName="h-full justify-between py-[4px]"
                 >
                     <div className="flex justify-start w-full pl-1">
-                        <IconCommand className="h-[9px] w-[9px]" />
+                        <IconCommand className="h-[6px] w-[6px]" />
                     </div>
                     <div className="flex justify-start w-full pl-1">
                         <span className="block">command</span>
                     </div>
                 </KBtn>
-                <KBtn className="w-[48px]" childrenClassName="h-full justify-between py-[4px]">
+                <KBtn className="" childrenClassName="h-full justify-between py-[4px]">
                     <div className="flex justify-start w-full pl-1">
-                        <OptionKey className="h-[9px] w-[9px]" />
+                        <OptionKey className="h-[6px] w-[6px]" />
                     </div>
                     <div className="flex justify-start w-full pl-1">
                         <span className="block">option</span>
                     </div>
                 </KBtn>
-                <div className="w-[8rem] mt-[14px] h-6 p-[0.5px] rounded-[4px] flex flex-col justify-end items-center">
-                    <KBtn className="w-9 h-[1.1rem]">
+                <div className="w-[4.9rem] mt-[2px] h-6 p-[0.5px] rounded-[4px] flex flex-col justify-end items-center">
+                    <KBtn className="w-6 h-3">
                         <IconCaretUpFilled className="h-[6px] w-[6px]" />
                     </KBtn>
                     <div className="flex">
-                        <KBtn className="w-9 h-[1.1rem]">
+                        <KBtn className="w-6 h-3">
                             <IconCaretLeftFilled className="h-[6px] w-[6px]" />
                         </KBtn>
-                        <KBtn className="w-9 h-[1.1rem]">
+                        <KBtn className="w-6 h-3">
                             <IconCaretDownFilled className="h-[6px] w-[6px]" />
                         </KBtn>
-                        <KBtn className="w-9 h-[1.1rem]">
+                        <KBtn className="w-6 h-3">
                             <IconCaretRightFilled className="h-[6px] w-[6px]" />
                         </KBtn>
                     </div>
@@ -520,6 +535,7 @@ export const Keypad = () => {
         </div>
     );
 };
+
 export const KBtn = ({
     className,
     children,
@@ -540,7 +556,7 @@ export const KBtn = ({
         >
             <div
                 className={cn(
-                    "h-9 w-9 bg-[#0A090D] rounded-[3.5px] flex items-center justify-center",
+                    "h-6 w-6 bg-[#0A090D] rounded-[3.5px] flex items-center justify-center",
                     className
                 )}
                 style={{
@@ -550,7 +566,7 @@ export const KBtn = ({
             >
                 <div
                     className={cn(
-                        "text-neutral-200 text-[10px] w-full flex justify-center items-center flex-col",
+                        "text-neutral-200 text-[5px] w-full flex justify-center items-center flex-col",
                         childrenClassName,
                         backlit && "text-white"
                     )}
@@ -562,12 +578,9 @@ export const KBtn = ({
     );
 };
 
-export const Row = ({ classNames, children }: { classNames?: string, children: React.ReactNode }) => {
+export const Row = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className={cn(
-            "flex gap-[2px] mb-[2px] w-full flex-shrink-0 relative justify-center items-center",
-            classNames
-        )}>
+        <div className="flex justify-center gap-[2px] mb-[2px] w-full flex-shrink-0">
             {children}
         </div>
     );
@@ -620,4 +633,4 @@ export const OptionKey = ({ className }: { className: string }) => {
     );
 };
 
-export default Macbook
+export default Macbook;
