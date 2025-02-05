@@ -65,7 +65,7 @@ export const Macbook = ({
     return (
         <div
             ref={ref}
-            className="min-h-[130vh] lg:min-h-[180vh] xl:min-h-[185vh] flex flex-col items-center lg:pt-60 xl:pt-80 justify-start flex-shrink-0 [perspective:800px] transform scale-[0.35] sm:scale-75 md:scale-100 lg:scale-125 xl:scale-150"
+            className="border-2 border-red-300 min-h-[130vh] lg:min-h-[180vh] xl:min-h-[185vh] xl:pt-80 flex flex-col items-center justify-start flex-shrink-0 [perspective:800px] transform scale-[0.35] sm:scale-75 md:scale-100 xl:scale-125"
         >
             <Lid
                 src={src}
@@ -75,7 +75,7 @@ export const Macbook = ({
                 translate={translate}
             />
             {/* Base area */}
-            <div className="h-[22rem] w-[32rem] bg-gray-200 dark:bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
+            <div className="h-[22rem] w-[32rem] bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
                 {/* above keyboard bar */}
                 <div className="h-10 w-full relative">
                     <div className="absolute inset-x-0 mx-auto w-[80%] h-4 bg-[#050505]" />
