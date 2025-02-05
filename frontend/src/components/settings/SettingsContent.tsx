@@ -2,6 +2,7 @@
 
 import { Separator } from "@/components/ui/separator"
 import ProfileSettingsForm from "@/components/forms/ProfileSettingForm"
+import AiSettingsForm from "@/components/forms/AiSettingForm"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/providers/auth-provider"
@@ -18,6 +19,11 @@ const SettingsContent = () => {
         updateUsername,
         updateEmail,
         updatePassword,
+
+        aiKeysState,
+        updateGeminiKey,
+        updateGeminiStore,
+
         isSaving,
         saveError
     } = useAccountSettings(user)
@@ -52,6 +58,12 @@ const SettingsContent = () => {
         <div className="flex flex-col justify-center items-start">
             <h2 className="text-lg font-bold ">AI Settings</h2>
             <Separator className="w-[90%] mt-2 mb-4" />
+            <AiSettingsForm 
+                aiKeysState={aiKeysState}
+                updateGeminiKey={updateGeminiKey}
+                updateGeminiStore={updateGeminiStore}
+                isSaving={isSaving}
+            />
         </div>
 
         <div className="flex flex-col justify-center items-start">

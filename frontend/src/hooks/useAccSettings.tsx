@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
 import { useEffect, useState } from "react"
+import { KeyStorePref } from "@/providers/apikey-provider"
 
 interface AccountSettingDetails {
     profileState: profileStateType
@@ -10,6 +11,11 @@ interface AccountSettingDetails {
     updateUsername: (username: string) => void
     updateEmail: (email: string) => void
     updatePassword: (password: string) => void
+
+    aiKeysState: aiStateType
+    updateGeminiKey: (geminiKey: string) => void
+    updateGeminiStore: (geminiStore: string) => void
+
     isSaving: boolean
     saveError: Error | null
 } 
@@ -20,6 +26,11 @@ export interface profileStateType {
     password: string
 }
 
+export interface aiStateType {
+    geminiKey: string
+    geminiStore: KeyStorePref
+}
+
 
 export const useAccountSettings = (user : User | null) : AccountSettingDetails  => {
     
@@ -27,6 +38,11 @@ export const useAccountSettings = (user : User | null) : AccountSettingDetails  
         username: "",
         email: "",
         password: "",
+    });
+
+    const [aiKeysState, setAiKeysState] = useState<aiStateType>({
+        geminiKey: "",
+        geminiStore: KeyStorePref.LOCAL,
     });
 
     useEffect(()=> {
@@ -39,8 +55,8 @@ export const useAccountSettings = (user : User | null) : AccountSettingDetails  
 
     useEffect(()=>{
         console.log("debugging")
-        console.table(profileState)
-    }, [profileState])
+        console.table(aiKeysState)
+    }, [aiKeysState])
 
     const updateUsername = (username: string) => {
         console.log("debugging setting username:", username)
@@ -53,6 +69,15 @@ export const useAccountSettings = (user : User | null) : AccountSettingDetails  
     const updatePassword = (password: string) => {
         console.log("debugging setting password:", password)
         setProfileState((prev)=>({...prev, password}))
+    }
+    const updateGeminiKey = (geminiKey: string) => {
+        setAiKeysState((prev)=>({...prev, geminiKey}))
+    }
+    const updateGeminiStore = (geminiStore: string) => {
+        setAiKeysState((prev)=>({
+            ...prev,
+            geminiStore: geminiStore as KeyStorePref
+        }))
     }
     
 
@@ -80,6 +105,7 @@ export const useAccountSettings = (user : User | null) : AccountSettingDetails  
                 throw updateError;
             }
 
+
         } catch (err) {
             setSaveError(err instanceof Error ? err : new Error("Something went wrong"))
         } finally {
@@ -96,6 +122,11 @@ export const useAccountSettings = (user : User | null) : AccountSettingDetails  
         updateUsername,
         updateEmail,
         updatePassword,
+        
+        aiKeysState,
+        updateGeminiKey,
+        updateGeminiStore,
+
         isSaving,
         saveError,
     }

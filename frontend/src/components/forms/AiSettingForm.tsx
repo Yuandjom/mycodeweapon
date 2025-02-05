@@ -6,26 +6,27 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { SettingForm, SettingFormField } from "@/components/utils/SettingForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { aiStateType } from "@/hooks/useAccSettings";
+import { KeyStorePref } from "@/providers/apikey-provider";
 
 const STORAGE_OPTIONS = [
     { label: "Local Storage", value: "LOCAL" },
     { label: "Cloud Storage", value: "CLOUD" },
 ]
 
-const AiSettingsForm = () => {
-    const [isSaving, setIsSaving] = useState<boolean>(false)
+interface AiSettingsFormProps {
+    aiKeysState: aiStateType
+    updateGeminiKey: (geminiKey: string) => void
+    updateGeminiStore: (geminiStore: string) => void
+    isSaving: boolean
+}
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSaving(true)
-        try {
-            alert("TODO")
-        } catch (err) {
-            alert(err)
-        } finally {
-            setIsSaving(false);  // Fixed: was setting to true
-        }
-    }
+const AiSettingsForm = ({
+    aiKeysState,
+    updateGeminiKey,
+    updateGeminiStore,
+    isSaving,
+} : AiSettingsFormProps ) => {
 
     const renderField = (field: SettingFormField) => {
         switch (field.type) {
@@ -39,11 +40,15 @@ const AiSettingsForm = () => {
                         disabled={isSaving}
                         parentClassName="col-span-2 flex justify-start items-center w-full relative"
                         eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                        handleUpdate={updateGeminiKey}
                     />
                 );
             case "select":
                 return (
-                    <Select defaultValue={field.initValue}>
+                    <Select
+                        defaultValue={field.initValue}
+                        onValueChange={(value) => updateGeminiStore(value)}
+                    >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder={field.placeholder} />
                         </SelectTrigger>
@@ -65,6 +70,10 @@ const AiSettingsForm = () => {
                         placeholder={field.placeholder}
                         required
                         disabled={isSaving}
+                        onChange={(e)=>{
+                            console.log("changing input: ", e.target.value)
+                            field.handleUpdate(e.target.value)
+                        }}
                     />
                 );
         }
@@ -76,6 +85,7 @@ const AiSettingsForm = () => {
             label: "",
             type: "select",
             initValue: "LOCAL",
+            handleUpdate: updateGeminiStore,
         },
         {
             id: `${prefix}_apikey`,
@@ -83,14 +93,15 @@ const AiSettingsForm = () => {
             type: "password",
             initValue: "",
             placeholder: "Enter your API key",
+            handleUpdate: updateGeminiKey,
         }
     ];
 
     const aiProviders = [
         { cmgSoon: false, title: "Gemini", prefix: "gemini", icon: "/companyIcons/gemini.svg" },
-        { cmgSoon: true, title: "OpenAI", prefix: "openai", icon: "/companyIcons/openai.svg" },
-        { cmgSoon: true, title: "Deepseek", prefix: "deepseek", icon: "/companyIcons/deepseek.svg" },
-        { cmgSoon: true, title: "Claude", prefix: "claude", icon: "/companyIcons/claude.svg" },
+        // { cmgSoon: true, title: "OpenAI", prefix: "openai", icon: "/companyIcons/openai.svg" },
+        // { cmgSoon: true, title: "Deepseek", prefix: "deepseek", icon: "/companyIcons/deepseek.svg" },
+        // { cmgSoon: true, title: "Claude", prefix: "claude", icon: "/companyIcons/claude.svg" },
     ];
 
     return (
@@ -109,7 +120,6 @@ const AiSettingsForm = () => {
                     : <SettingForm
                         key={provider.prefix}
                         fields={createAiFields(provider.prefix)}
-                        onSubmit={handleSubmit}
                         isSubmitting={isSaving}
                         renderField={renderField}
                         formClassName="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
