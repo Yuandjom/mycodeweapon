@@ -6,7 +6,8 @@ const PUBLIC_ROUTES = [
     "/signup",
     "/signin",
     "/signout",
-    "/resetpassword"
+    "/resetpassword",
+    "/docs"
 ]
 
 export async function middleware(request: NextRequest) {

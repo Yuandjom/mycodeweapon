@@ -1,8 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import Logo from "./Logo";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -15,12 +14,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { LogOut, User, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation";
 
 export const Navbar = () => {
+  const router = useRouter();
   const [hovered, setHovered] = useState<number | null>(null);
   const { user, authLoading, signOut } = useAuth();
   const { toast } = useToast();
@@ -28,6 +29,10 @@ export const Navbar = () => {
     {
       name: "Problems",
       link: "/problem",
+    },
+    {
+      name: "Docs",
+      link: "/docs",
     },
   ];
 
@@ -54,7 +59,7 @@ export const Navbar = () => {
         {navItems.map((navItem: any, idx: number) => (
           <Link
             onMouseEnter={() => setHovered(idx)}
-            className="text-neutral-600 dark:text-neutral-300 relative px-4 py-2"
+            className="text-primary relative px-4 py-2 hover:text-primary/80"
             key={`link=${idx}`}
             href={navItem.link}
           >
@@ -64,7 +69,7 @@ export const Navbar = () => {
                 className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
               />
             )}
-            <span className="relative z-20">{navItem.name}</span>
+            <span className="relative z-20 font-semibold">{navItem.name}</span>
           </Link>
         ))}
       </div>
@@ -78,7 +83,7 @@ export const Navbar = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full w-9 h-9"
+                    className="w-10 h-10 bg-background hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   >
                     {user.user_metadata.avatar_url ? (
                       <Image
@@ -105,6 +110,13 @@ export const Navbar = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={()=>{router.push("/profile/settings")}}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={handleSignOut}

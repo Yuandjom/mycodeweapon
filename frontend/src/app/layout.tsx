@@ -29,10 +29,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex flex-col w-full h-screen">
+            <main className="flex flex-col w-full min-h-screen">
               <Navbar />
-              {children}
-            </div>
+              <div className="w-full h-screen">
+                {children}
+              </div>
+            </main>
           </ThemeProvider>
         </AuthProvider>
         <Toaster />

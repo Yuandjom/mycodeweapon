@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function ProblemsPage() {
 
   return (
-    <div className="w-full flex_center">
+    <div className="w-full flex justify-center items-start pt-10">
       <ProblemsTable />
     </div>
 
