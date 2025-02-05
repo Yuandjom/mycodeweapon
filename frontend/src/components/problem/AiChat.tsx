@@ -137,7 +137,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
                         disabled={isPrompting || prompt.trim().length === 0}
                         className="bg-slate-50 disabled:bg-slate-100"
                     >
-                        <Image src="/geminiLogo.png" alt="ai" height={10} width={25} />
+                        <Image src="/companyIcons/gemini.png" alt="ai" height={10} width={25} />
                     </Button>
                 </div>
             </div>

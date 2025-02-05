@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 import { useToast } from "@/hooks/use-toast"
-import { AuthForm, FormField } from "@/components/utils/AuthForm";
+import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/utils/PasswordInput";
 
@@ -77,7 +77,7 @@ const SignUpForm = () => {
         }
     };
 
-    const renderField = (field: FormField) => {
+    const renderField = (field: AuthFormField) => {
         if (field.type === "password") {
             return (
                 <PasswordInput
@@ -86,6 +86,8 @@ const SignUpForm = () => {
                     placeholder={field.placeholder}
                     required
                     disabled={isSigningUp}
+                    parentClassName="relative"
+                    eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 />
             );
         }

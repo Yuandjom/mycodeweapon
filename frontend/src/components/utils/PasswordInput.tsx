@@ -11,7 +11,9 @@ interface PasswordInputProps {
     placeholder?: string;
     required?: boolean;
     disabled?: boolean;
-    className?: string;
+    parentClassName?: string;
+    inputClassName?: string;
+    eyeClassName?: string;
 }
 
 export const PasswordInput = ({
@@ -20,12 +22,14 @@ export const PasswordInput = ({
     placeholder,
     required = false,
     disabled = false,
-    className,
+    parentClassName,
+    inputClassName,
+    eyeClassName,
 }: PasswordInputProps) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="relative">
+        <div className={parentClassName}>
             <Input
                 id={id}
                 name={name}
@@ -33,13 +37,13 @@ export const PasswordInput = ({
                 placeholder={placeholder || ""}
                 required={required}
                 disabled={disabled}
-                className={className}
+                className={inputClassName}
             />
             <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                className={eyeClassName}
                 onClick={() => setShowPassword(!showPassword)}
             >
                 {showPassword ? (

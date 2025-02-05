@@ -16,7 +16,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { AuthForm, FormField } from "@/components/utils/AuthForm";
+import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { PasswordInput } from "../utils/PasswordInput";
 
 const SignInForm = () => {
@@ -70,7 +70,7 @@ const SignInForm = () => {
         }
     };
 
-    const renderField = (field: FormField) => {
+    const renderField = (field: AuthFormField) => {
         if (field.type === "password") {
             return (
                 <PasswordInput
@@ -79,6 +79,8 @@ const SignInForm = () => {
                     placeholder={field.placeholder}
                     required
                     disabled={isSigningIn}
+                    parentClassName="relative"
+                    eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 />
             );
         }
