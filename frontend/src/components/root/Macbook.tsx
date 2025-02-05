@@ -65,7 +65,7 @@ export const Macbook = ({
     return (
         <div
             ref={ref}
-            className="border-2 border-red-300 min-h-[130vh] lg:min-h-[180vh] xl:min-h-[185vh] xl:pt-80 flex flex-col items-center justify-start flex-shrink-0 [perspective:800px] transform scale-[0.35] sm:scale-75 md:scale-100 xl:scale-125"
+            className="min-h-[130vh] lg:min-h-[180vh] xl:min-h-[185vh] xl:pt-40 flex flex-col items-center justify-start flex-shrink-0 [perspective:800px] transform scale-[0.35] sm:scale-75 md:scale-100 xl:scale-125"
         >
             <Lid
                 src={src}
