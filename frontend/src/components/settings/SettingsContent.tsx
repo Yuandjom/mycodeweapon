@@ -2,27 +2,56 @@
 
 import { Separator } from "@/components/ui/separator"
 import ProfileSettingsForm from "@/components/forms/ProfileSettingForm"
-import AiSettingsForm from "@/components/forms/AiSettingForm"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/providers/auth-provider"
+import { useAccountSettings } from "@/hooks/useAccSettings"
 
 const SettingsContent = () => {
 
-    const { toast } = useToast()
+    const { toast } = useToast();
+    const { user } = useAuth();
 
-  return (
+    const {
+        profileState,
+        saveAccSettings,
+        updateUsername,
+        updateEmail,
+        updatePassword,
+        isSaving,
+        saveError
+    } = useAccountSettings(user)
+
+    const handleSaveAllSettings = async () => {
+        await saveAccSettings();
+
+        if (saveError) {
+            toast({title: "Something went wrong updating settings"})
+        } else {
+            toast({title: "Profile settings saved!"})
+        }
+    }
+
+
+  return(
     <div className="w-full flex flex-col justify-center items-start gap-12">
-
         <div className="flex flex-col justify-center items-start">
             <h2 className="text-lg font-bold ">Profile Settings</h2>
             <Separator className="w-[90%] mt-2 mb-4" />
-            <ProfileSettingsForm />
+            <ProfileSettingsForm 
+                username={profileState.username}
+                updateUsername={updateUsername}
+                email={profileState.email}
+                updateEmail={updateEmail}
+                password={profileState.password}
+                updatePassword={updatePassword}
+                isSaving={isSaving}
+            />
         </div>
         
         <div className="flex flex-col justify-center items-start">
             <h2 className="text-lg font-bold ">AI Settings</h2>
             <Separator className="w-[90%] mt-2 mb-4" />
-            <AiSettingsForm />
         </div>
 
         <div className="flex flex-col justify-center items-start">
@@ -30,15 +59,14 @@ const SettingsContent = () => {
             <Separator className="w-[90%] mt-2 mb-4" />
         </div>
 
-
         <Button
-            onClick={()=>{toast({title: "Unable to save settings. Please try again later!"})}}
+            onClick={handleSaveAllSettings}
             className="ml-auto mt-10 mr-4"
         >
             Save Changes
         </Button>
     </div>
-  )
-}
+
+)}
 
 export default SettingsContent

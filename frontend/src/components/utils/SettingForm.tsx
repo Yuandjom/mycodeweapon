@@ -9,29 +9,26 @@ export interface SettingFormField {
     type: string;
     placeholder?: string;
     initValue: string;
+    handleUpdate: (val: string) => void;
 }
 
 interface SettingFormProps {
     fields: SettingFormField[]
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => Promise<void>
     isSubmitting: boolean
     renderField?: (field: SettingFormField) => React.ReactNode;
     formClassName: string
 }
 
-export const SettingForm = ({fields, onSubmit, isSubmitting, renderField, formClassName}: SettingFormProps) => {
-
+export const SettingForm = ({fields, isSubmitting, renderField, formClassName}: SettingFormProps) => {
     return (
-            <form
-                onSubmit={onSubmit}
+            <div
                 className={formClassName}
             >
-                {fields.map((field)=> {
-
-
+                {fields.map((field, i)=> {
+                    console.log("rendering field: ", field)
                     return (
                         <div
-                            key={`profileSetting-${field.label}`}
+                            key={`profileSetting-${field.id}-${i}`}
                             className="flex flex-col justify-center items-start gap-1.5"
                         >
                             {field.label && <Label
@@ -48,10 +45,15 @@ export const SettingForm = ({fields, onSubmit, isSubmitting, renderField, formCl
                                             id={field.id}
                                             name={field.id}
                                             type={field.type}
-                                            placeholder={field.placeholder || ""}
+                                            placeholder=""
+                                            value={field.initValue}
                                             required
                                             disabled={isSubmitting}
                                             className="w-full"
+                                            onChange={(e)=>{
+                                                console.log("changing input: ", e.target.value)
+                                                field.handleUpdate(e.target.value)
+                                            }}
                                         />
                                     )}
 
@@ -59,7 +61,7 @@ export const SettingForm = ({fields, onSubmit, isSubmitting, renderField, formCl
                         </div>
                     )
                 })}
-            </form>
+            </div>
     )
 
 

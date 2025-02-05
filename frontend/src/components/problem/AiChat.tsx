@@ -309,7 +309,8 @@ const AiSettings = ({ saveGeminiPref, geminiPref, isSavingPref }: AiSettingsProp
                             <PasswordInput
                                 id="apiKey"
                                 name="apiKey"
-                                className="w-full"
+                                parentClassName="relative"
+                                eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
                             />
                             <p className="text-sm text-muted-foreground">For security reasons, your API key is never displayed (& fetched to client)</p>
                         </div>

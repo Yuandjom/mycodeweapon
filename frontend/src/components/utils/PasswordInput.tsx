@@ -9,11 +9,13 @@ interface PasswordInputProps {
     id: string;
     name: string;
     placeholder?: string;
+    value?: string
     required?: boolean;
     disabled?: boolean;
     parentClassName?: string;
     inputClassName?: string;
     eyeClassName?: string;
+    handleUpdate?: (val: string) => void
 }
 
 export const PasswordInput = ({
@@ -25,6 +27,7 @@ export const PasswordInput = ({
     parentClassName,
     inputClassName,
     eyeClassName,
+    handleUpdate,
 }: PasswordInputProps) => {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -38,6 +41,10 @@ export const PasswordInput = ({
                 required={required}
                 disabled={disabled}
                 className={inputClassName}
+                onChange={(e)=>{
+                    if (!handleUpdate) return
+                    handleUpdate(e.target.value)
+                }}
             />
             <Button
                 type="button"
