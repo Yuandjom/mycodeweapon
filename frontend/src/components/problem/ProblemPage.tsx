@@ -92,16 +92,16 @@ const ProblemPage = ({ title }: { title: string }) => {
                 <LoadingContent />)
                 :
                 (
-                    <div className="h-screen w-full bg-slate-400 dark:bg-black border-t-8 border-slate-400 dark:border-black px-2 pb-2">
+                    <div className="h-full w-full bg-slate-400 dark:bg-black border-t-4 border-slate-400 dark:border-black px-1 pb-0.5">
                         <div className="flex_center md:hidden bg-yellow-700 w-full">
                             <p className="text-yellow-300 font-bold">Use larger screens for code execution features!</p>
                         </div>
                         <ResizablePanelGroup
                             direction="horizontal"
                         >
-                            <ResizablePanel defaultSize={40} minSize={27} className="mr-1 bg-slate-400 dark:bg-black">
+                            <ResizablePanel defaultSize={40} minSize={27} className="mr-0.5 bg-slate-400 dark:bg-black">
                                 <ResizablePanelGroup direction="vertical">
-                                    <ResizablePanel defaultSize={50} minSize={20} className="mb-1 bg-background rounded-lg p-4">
+                                    <ResizablePanel defaultSize={50} minSize={20} className="mb-0.5 bg-background rounded-lg p-4">
                                         <QuestionEditor
                                             title={problemStates.title}
                                             setTitle={setTitle}
@@ -115,7 +115,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black" />
                                     <CollapsiblePanel
                                         defaultSize={50}
-                                        className="mt-1 bg-background rounded-lg p-4"
+                                        className="mt-0.5 bg-background rounded-lg px-4 pt-2"
                                         collapsedText="AI Chatbot"
                                         collapseThreshold={15}
                                         collapsedSize={5}
@@ -131,9 +131,9 @@ const ProblemPage = ({ title }: { title: string }) => {
 
                             <ResizableHandle withHandle className="bg-slate-400 dark:bg-black hidden md:flex" />
 
-                            <ResizablePanel defaultSize={60} className="ml-1 bg-slate-400 dark:bg-black hidden md:flex">
+                            <ResizablePanel defaultSize={60} className="ml-0.5 bg-slate-400 dark:bg-black hidden md:flex">
                                 <ResizablePanelGroup direction="vertical">
-                                    <ResizablePanel defaultSize={75} className="mb-1 bg-background rounded-lg p-4">
+                                    <ResizablePanel defaultSize={75} className="mb-0.5 bg-background rounded-lg p-4">
                                         <CodeEditor
                                             languages={languages}
                                             languageId={problemStates.languageId}
@@ -149,7 +149,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                                     <ResizableHandle withHandle className="bg-slate-400 dark:bg-black" />
                                     <CollapsiblePanel
                                         defaultSize={25}
-                                        className="mt-1 bg-background rounded-lg p-4"
+                                        className="mt-0.5 bg-background rounded-lg p-4"
                                         collapsedText="Code Output"
                                         collapseThreshold={15}
                                         collapsedSize={5}

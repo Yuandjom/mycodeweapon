@@ -29,9 +29,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main className="flex flex-col w-full min-h-screen">
+            <main className="flex flex-col w-full h-screen">
               <Navbar />
-              <div className="w-full h-screen">
+              <div className="w-full h-full">
                 {children}
               </div>
             </main>
