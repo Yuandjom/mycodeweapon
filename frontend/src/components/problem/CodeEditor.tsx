@@ -87,10 +87,25 @@ const CodeEditor = (props: Props) => {
           theme={theme === "light" ? "light" : "vs-dark"}
           options={{
             minimap: { enabled: false },
-            scrollBeyondLastLine: false,
             fontSize: 14,
             tabSize: 2,
+            scrollbar: {
+              vertical: 'visible',
+              horizontal: 'visible',
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10,
+            },
+            automaticLayout: true,
+            overviewRulerBorder: false,
+            lineNumbers: 'on',
+            roundedSelection: false,
+            selectOnLineNumbers: true,
+            quickSuggestions: true,
+            ariaLabel: 'code editor',
+            renderLineHighlight: 'line',
+            contextmenu: true,
           }}
+          saveViewState={true}
         />
       </div>
     </div>
