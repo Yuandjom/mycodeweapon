@@ -19,6 +19,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { LogOut, User, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation";
+import AnimatedButton from "@/components/ui/animated-button";
 
 export const Navbar = () => {
   const router = useRouter();
@@ -127,15 +128,20 @@ export const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                variant="default"
-                size="sm"
-                asChild
-              >
+              // <Button
+              //   variant="default"
+              //   size="sm"
+              //   asChild
+              // >
+              //   <Link href="/signin">
+              //     Sign in
+              //   </Link>
+              // </Button>
+              <AnimatedButton>
                 <Link href="/signin">
-                  Sign in
+                   <span className="text-sm md:text-base">Get Started!</span>
                 </Link>
-              </Button>
+              </AnimatedButton>
             )}
           </>
         )}

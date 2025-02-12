@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import Macbook from "@/components/root/Macbook";
+import { FlipWords } from "@/components/ui/flip-words";
 
 export function Hero() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +68,7 @@ export function Hero() {
                     Problems to solutions in seconds,{" "}
                     <div className="relative mx-auto inline-block w-max [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
                         <div className="text-black [text-shadow:0_0_rgba(0,0,0,0.1)] dark:text-white">
-                            <span className="">not hours.</span>
+                            not <FlipWords words={["hours.", "days.", "weeks."]}/>
                         </div>
                     </div>
                 </Balancer>
