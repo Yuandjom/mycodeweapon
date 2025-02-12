@@ -23,6 +23,7 @@ interface AuthFormProps {
     footer?: React.ReactNode;
     className?: string;
     renderField?: (field: AuthFormField) => React.ReactNode;
+    displayError: string;
 }
 
 export const AuthForm = ({
@@ -34,12 +35,15 @@ export const AuthForm = ({
     loadingButtonText,
     footer,
     className,
-    renderField
+    renderField,
+    displayError,
 }: AuthFormProps) => {
     return (
         <div className="bg-background">
             <div className="flex_center w-full px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+                
                 <div className="mx-auto w-full max-w-md">
+                   
                     <div>
                         <div className="flex">
                             <Logo withText logoSize={40} />
@@ -47,7 +51,12 @@ export const AuthForm = ({
                         <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
                             {title}
                         </h2>
+
                     </div>
+                    {displayError &&
+                        <span className="mt-2 w-full inline-block px-2 py-1.5 text-center text-sm font-semibold text-red-800 bg-red-100 rounded-lg">
+                            {displayError}
+                        </span>}
 
                     <div className="mt-10">
                         <form onSubmit={onSubmit} className="space-y-6">

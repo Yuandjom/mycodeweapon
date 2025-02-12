@@ -9,12 +9,13 @@ import { useToast } from "@/hooks/use-toast"
 import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/utils/PasswordInput";
+import { displayErrorCode } from "@/constants/supabase";
 
 const SignUpForm = () => {
     const { signUp } = useAuth();
     const router = useRouter();
     const [isSigningUp, setIsSigningUp] = useState(false);
-    const [error, setError] = useState("");
+    const [displayError, setDisplayError] = useState("");
     const { toast } = useToast();
 
     const fields = [
@@ -47,7 +48,7 @@ const SignUpForm = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSigningUp(true);
-        setError("");
+        setDisplayError("");
 
         try {
             const formData = new FormData(e.currentTarget);
@@ -59,7 +60,7 @@ const SignUpForm = () => {
 
             const result = await signUp(userData);
             if (!result.success) {
-                throw new Error(result.error?.message || "Failed to create account");
+                throw new Error(displayErrorCode(result.errorCode));
             }
 
             toast({ "title": "Account created successfully!" });
@@ -71,7 +72,7 @@ const SignUpForm = () => {
             }
         } catch (err) {
             console.error("Signup error:", err);
-            setError(err instanceof Error ? err.message : "An unexpected error occurred");
+            setDisplayError(err instanceof Error ? err.message : "An unexpected error occurred");
         } finally {
             setIsSigningUp(false);
         }
@@ -87,7 +88,7 @@ const SignUpForm = () => {
                     required
                     disabled={isSigningUp}
                     parentClassName="relative"
-                    eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                    eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 />
             );
         }
@@ -123,6 +124,7 @@ const SignUpForm = () => {
             loadingButtonText="Creating account..."
             footer={footer}
             renderField={renderField}
+            displayError={displayError}
         />
     );
 };

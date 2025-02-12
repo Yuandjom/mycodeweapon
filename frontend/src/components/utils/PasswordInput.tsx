@@ -46,11 +46,8 @@ export const PasswordInput = ({
                     handleUpdate(e.target.value)
                 }}
             />
-            <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className={eyeClassName}
+            <div
+                className={`${eyeClassName} cursor-pointer`}
                 onClick={() => setShowPassword(!showPassword)}
             >
                 {showPassword ? (
@@ -58,7 +55,7 @@ export const PasswordInput = ({
                 ) : (
                     <Eye className="h-4 w-4 text-muted-foreground" />
                 )}
-            </Button>
+            </div>
         </div>
     );
 };

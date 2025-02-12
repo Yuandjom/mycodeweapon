@@ -29,7 +29,7 @@ interface AuthContextType {
 
 export interface AuthResult {
   success: boolean;
-  error: AuthError | Error | null;
+  errorCode: string;
   data: any | null;
 }
 
@@ -38,10 +38,10 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   session: null,
   authLoading: true,
-  signUp: async () => ({ success: false, error: null, data: null }),
-  signIn: async () => ({ success: false, error: null, data: null }),
+  signUp: async () => ({ success: false, errorCode: "", data: null }),
+  signIn: async () => ({ success: false, errorCode: "", data: null }),
   signOut: async () => { },
-  resetPassword: async () => ({ success: false, error: null, data: null })
+  resetPassword: async () => ({ success: false, errorCode: "", data: null })
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -92,12 +92,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Invalid sign up credentials")
     }
 
-    const { success, error, data } = await signUp_SA({ email, password, username });
+    const { success, errorCode, data } = await signUp_SA({ email, password, username });
 
-    if (error) {
+    if (errorCode) {
       return {
         success: false,
-        error,
+        errorCode,
         data: null
       };
     }
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return {
       success: true,
-      error: null,
+      errorCode,
       data
     }
 
@@ -116,12 +116,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async ({ email, password }: SignInCredentials): Promise<AuthResult> => {
 
     console.log("[auth-provider] signing in")
-    const { success, error, data } = await signIn_SA({ email, password });
+    const { success, errorCode, data } = await signIn_SA({ email, password });
 
-    if (error) {
+    if (errorCode) {
       return {
         success: false,
-        error,
+        errorCode,
         data: null
       };
     }
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return {
       success: true,
-      error: null,
+      errorCode,
       data
     }
   };
@@ -155,14 +155,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (resetError) {
       return {
         success: false,
-        error: resetError,
+        errorCode: resetError.code || "Unexpected Error",
         data: null,
       }
     }
 
     return {
       success: true,
-      error: null,
+      errorCode: "",
       data: null
     }
 

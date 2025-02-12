@@ -22,14 +22,14 @@ export async function signUp_SA({email, password, username} : SignUpCredentials)
         console.log(error);
         return {
             success: false,
-            error,
+            errorCode: error.code || "Unexpected Error",
             data: null
         }
     }
 
     return {
         success: true,
-        error: null,
+        errorCode: "",
         data
     }
 
@@ -42,18 +42,18 @@ export async function signIn_SA({email, password} : SignInCredentials) : Promise
     const { data, error } = await supabase.auth.signInWithPassword({email, password})
 
     if (error) {
-        console.log("[signIn_SA] error:");
+        console.log("[signIn_SA] error code:", error.code);
         console.log(error);
         return {
             success: false,
-            error,
+            errorCode: error.code || "Unexpected Error",
             data: null
         }
     }
 
     return {
         success: true,
-        error: null,
+        errorCode: "",
         data
     }
 }

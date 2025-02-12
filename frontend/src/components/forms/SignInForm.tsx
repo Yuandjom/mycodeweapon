@@ -18,13 +18,14 @@ import {
 } from "@/components/ui/dialog"
 import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { PasswordInput } from "../utils/PasswordInput";
+import { displayErrorCode } from "@/constants/supabase";
 
 const SignInForm = () => {
     const { signIn, resetPassword } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isSigningIn, setIsSigningIn] = useState(false);
-    const [error, setError] = useState("");
+    const [displayError, setDisplayError] = useState<string>("");
 
     const { toast } = useToast();
 
@@ -56,7 +57,7 @@ const SignInForm = () => {
 
             const result = await signIn(userData);
             if (!result.success) {
-                throw new Error(result.error?.message || "Failed to sign in");
+                throw new Error(displayErrorCode(result.errorCode));
             }
 
             toast({ "title": "Signed in successfully!" });
@@ -64,7 +65,7 @@ const SignInForm = () => {
             const redirectPage = searchParams.get("next");
             router.push(redirectPage || "/problem");
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An unexpected error occurred");
+            setDisplayError(err instanceof Error ? err.message : "An unexpected error occurred");
         } finally {
             setIsSigningIn(false);
         }
@@ -80,7 +81,7 @@ const SignInForm = () => {
                     required
                     disabled={isSigningIn}
                     parentClassName="relative"
-                    eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                    eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
                 />
             );
         }
@@ -122,6 +123,7 @@ const SignInForm = () => {
             loadingButtonText="Signing In..."
             footer={footer}
             renderField={renderField}
+            displayError={displayError}
         />
     );
 };

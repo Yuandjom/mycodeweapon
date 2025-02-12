@@ -31,7 +31,7 @@ const ProfileSettingsForm = ({
                     required
                     disabled={isSaving}
                     parentClassName="col-span-2 flex justify-start items-center w-full relative"
-                    eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                    eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
                     handleUpdate={updatePassword}
                 />
             );
