@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { ProblemState } from "@/types/problem"
 import { User } from "@supabase/supabase-js"
 import { createClient } from "@/lib/supabase/client"
+import { PROBLEMS_TABLE } from "@/constants/supabase"
 
 export const useProblemsTable = (user: User | null) => {
 
@@ -26,7 +27,7 @@ export const useProblemsTable = (user: User | null) => {
                 const supabase = createClient();
 
                 const { data, error } = await supabase
-                    .from("Problems")
+                    .from(PROBLEMS_TABLE)
                     .select()
                     .eq("userId", user?.id)
 

@@ -6,7 +6,7 @@ import AiSettingsForm from "@/components/forms/AiSettingForm"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/providers/auth-provider"
-import { useAccountSettings } from "@/hooks/useAccSettings"
+import { useProfileSettings } from "@/hooks/useProfileSettings"
 
 const SettingsContent = () => {
 
@@ -15,23 +15,18 @@ const SettingsContent = () => {
 
     const {
         profileState,
-        saveAccSettings,
+        saveProfileSettings,
         updateUsername,
         updateEmail,
         updatePassword,
-
-        aiKeysState,
-        updateGeminiKey,
-        updateGeminiStore,
-
-        isSaving,
-        saveError
-    } = useAccountSettings(user)
+        isSavingProfile,
+        saveProfileError,
+    } = useProfileSettings(user)
 
     const handleSaveAllSettings = async () => {
-        await saveAccSettings();
+        await saveProfileSettings();
 
-        if (saveError) {
+        if (saveProfileError) {
             toast({title: "Something went wrong updating settings"})
         } else {
             toast({title: "Profile settings saved!"})
@@ -41,9 +36,9 @@ const SettingsContent = () => {
 
   return(
     <div className="w-full flex flex-col justify-center items-start gap-12">
-        <div className="flex flex-col justify-center items-start">
+        <div className="flex flex-col justify-center items-start gap-2">
             <h2 className="text-lg font-bold ">Profile Settings</h2>
-            <Separator className="w-[90%] mt-2 mb-4" />
+            <Separator className="w-[90%] mb-2" />
             <ProfileSettingsForm 
                 username={profileState.username}
                 updateUsername={updateUsername}
@@ -51,24 +46,28 @@ const SettingsContent = () => {
                 updateEmail={updateEmail}
                 password={profileState.password}
                 updatePassword={updatePassword}
-                isSaving={isSaving}
+                isSaving={isSavingProfile}
             />
         </div>
         
-        <div className="flex flex-col justify-center items-start">
+        <div className="flex flex-col justify-center items-start gap-2">
             <h2 className="text-lg font-bold ">AI Settings</h2>
-            <Separator className="w-[90%] mt-2 mb-4" />
+            <Separator className="w-[90%] mb-2" />
+
+
+
+{/* 
             <AiSettingsForm 
                 aiKeysState={aiKeysState}
                 updateGeminiKey={updateGeminiKey}
                 updateGeminiStore={updateGeminiStore}
                 isSaving={isSaving}
-            />
+            /> */}
         </div>
 
-        <div className="flex flex-col justify-center items-start">
+        <div className="flex flex-col justify-center items-start gap-2">
             <h2 className="text-lg font-bold">Code Settings <span className="ml-3 px-2 py-1 font-bold text-xs rounded-full bg-amber-600 text-gray-100">Coming Soon!</span></h2>
-            <Separator className="w-[90%] mt-2 mb-4" />
+            <Separator className="w-[90%] mb-2" />
         </div>
 
         <Button

@@ -9,6 +9,7 @@ import {
 import { createClient } from "@/lib/supabase/client"
 import { useAuth } from "./auth-provider"
 import { cloudStoreGeminiKey } from "@/app/actions/gemini"
+import { GEMINI_CONFIG_TABLE } from "@/constants/supabase"
 
 export enum KeyStorePref {
     UNSET = "UNSET",
@@ -43,15 +44,16 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
             if (!user) return;
 
             // init the gemini pref
+            console.log("[ApiKeyProvider] init gemini")
             const supabase = createClient();
 
             const { data, error } = await supabase
-                .from("users")
-                .select("gemini_key_store")
+                .from(GEMINI_CONFIG_TABLE)
+                .select("storePref")
                 .eq("id", user.id)
                 .single()
 
-            const pref = data?.gemini_key_store
+            const pref = data?.storePref
 
             if (pref) {
                 setGeminiPref(pref);
@@ -77,8 +79,8 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
             const supabase = createClient();
 
             const { error } = await supabase
-                .from("users")
-                .update({ gemini_key_store: pref })
+                .from(GEMINI_CONFIG_TABLE)
+                .update({ storePref: pref })
                 .eq('id', user.id)
 
             if (error) throw error
@@ -88,7 +90,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
             } else {
                 // set to local option so delete away past api keys
                 await supabase
-                    .from("userkeys")
+                    .from(GEMINI_CONFIG_TABLE)
                     .delete()
                     .eq('userId', user.id)
 

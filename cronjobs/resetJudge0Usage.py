@@ -13,7 +13,7 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-SUPABASE_RATE_LIMIT_TABLE = "judge0tokens"
+SUPABASE_RATE_LIMIT_TABLE = "judge0_tokens"
 
 def reset_usage():
     try:

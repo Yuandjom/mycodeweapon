@@ -4,13 +4,14 @@ import { createClient } from '@/lib/supabase/server'
 import { encryptKey, decryptKey } from './encryption'
 import { KeyStorePref } from '@/providers/apikey-provider'
 import { GoogleGenerativeAI } from "@google/generative-ai"
+import { GEMINI_CONFIG_TABLE } from '@/constants/supabase'
 
 export async function cloudGetGeminiKey(userId: string) {
     console.log("[cloudGetGeminiKey]")
     const supabase = await createClient();
 
     const { data, error } = await supabase
-        .from("userkeys")
+        .from(GEMINI_CONFIG_TABLE)
         .select("*")
         .eq("userId", userId)
         .single();
@@ -49,23 +50,16 @@ export async function cloudStoreGeminiKey(userId: string, key: string) {
 
         // upsert encrypted key to userkeys table
         const { error: upsertErr } = await supabase
-            .from("userkeys")
+            .from(GEMINI_CONFIG_TABLE)
             .upsert({
                 userId,
-                gemini_api_key: encryptedKey
+                apiKey: encryptedKey,
+                storePref: KeyStorePref.CLOUD
             })
             .select()
             .single()
 
         if (upsertErr) throw upsertErr
-
-        // update pref in users table
-        const { error: prefError } = await supabase
-            .from("users")
-            .update({ gemini_key_store: KeyStorePref.CLOUD })
-            .eq("id", userId)
-
-        if (prefError) throw prefError
 
         return { success: true }
 

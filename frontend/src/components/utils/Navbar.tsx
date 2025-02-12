@@ -30,10 +30,10 @@ export const Navbar = () => {
       name: "Problems",
       link: "/problem",
     },
-    {
-      name: "Docs",
-      link: "/docs",
-    },
+    // {
+    //   name: "Docs",
+    //   link: "/docs",
+    // },
   ];
 
   const handleSignOut = async () => {

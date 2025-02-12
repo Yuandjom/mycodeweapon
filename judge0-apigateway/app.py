@@ -24,7 +24,7 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JUDGE0_HOST:
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-SUPABASE_RATE_LIMIT_TABLE = "judge0tokens"
+SUPABASE_RATE_LIMIT_TABLE = "judge0_tokens"
 DEFAULT_RATE_LIMIT = 100
 
 @app.route('/ping', methods=['GET'])
@@ -52,16 +52,16 @@ def proxy(path):
             if not result.data:
                 supabase.table(SUPABASE_RATE_LIMIT_TABLE).insert({
                     '"userId"': userId,
-                    '"limit"': DEFAULT_RATE_LIMIT,
+                    '"daylimit"': DEFAULT_RATE_LIMIT,
                     'usage': 1
                 }).execute()
                 
             else:
                 # Check if user has exceeded their limit
                 data = result.data[0]
-                if data['usage'] >= data['limit']:
+                if data['usage'] >= data['daylimit']:
                     return Response(
-                        json.dumps({"error": f"Daily limit of {data['limit']} submissions exceeded. Try again later."}),
+                        json.dumps({"error": f"Daily limit of {data['daylimit']} submissions exceeded. Try again later."}),
                         status=429,
                         mimetype='application/json'
                     )

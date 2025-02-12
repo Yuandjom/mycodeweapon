@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { ProblemState, ProblemStatus } from "@/types/problem"
-
+import { PROBLEMS_TABLE, PROBLEM_IMAGE_BUCKET } from "@/constants/supabase";
 
 
 export const useProblem = (title: string, user: User | null) => {
@@ -67,7 +67,7 @@ export const useProblem = (title: string, user: User | null) => {
 			try {
 				const supabase = await createClient();
 				const { data, error: fetchError } = await supabase
-					.from("Problems")
+					.from(PROBLEMS_TABLE)
 					.select("*")
 					.eq("userId", userId)
 					.eq("title", spacedTitle)
@@ -183,7 +183,7 @@ export const useProblem = (title: string, user: User | null) => {
 				console.log(toInsertData)
 
 				const { data, error: supaError } = await supabase
-					.from("Problems")
+					.from(PROBLEMS_TABLE)
 					.insert(toInsertData)
 					.select("id")
 					.single();
@@ -202,7 +202,7 @@ export const useProblem = (title: string, user: User | null) => {
 				console.log(toInsertData)
 
 				const { data, error: supaError } = await supabase
-					.from("Problems")
+					.from(PROBLEMS_TABLE)
 					.update(toInsertData)
 					.eq("id", problemStates.problemId)
 
@@ -218,7 +218,7 @@ export const useProblem = (title: string, user: User | null) => {
 			if (oldImagePath) {
 
 				const { error: deleteError } = await supabase.storage
-					.from("problemImages")
+					.from(PROBLEM_IMAGE_BUCKET)
 					.remove([oldImagePath])
 
 				if (deleteError) {
@@ -235,7 +235,7 @@ export const useProblem = (title: string, user: User | null) => {
 				const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`
 
 				const { error: UploadError } = await supabase.storage
-					.from("problemImages")
+					.from(PROBLEM_IMAGE_BUCKET)
 					.upload(fileStorePath, problemStates.questionImage, {
 						cacheControl: '3600',
 						upsert: true
@@ -246,11 +246,11 @@ export const useProblem = (title: string, user: User | null) => {
 				}
 
 				const { data: { publicUrl } } = supabase.storage
-					.from("problemImages")
+					.from(PROBLEM_IMAGE_BUCKET)
 					.getPublicUrl(fileStorePath);
 
 				const { error: imageUrlUpdateError } = await supabase
-					.from("Problems")
+					.from(PROBLEMS_TABLE)
 					.update({ imageUrl: publicUrl })
 					.eq("id", problemId)
 					.eq("userId", problemStates.userId)
@@ -262,7 +262,7 @@ export const useProblem = (title: string, user: User | null) => {
 
 			} else { // no image given in this saveProblem() request
 				const { error: imageUrlUpdateError } = await supabase
-					.from("Problems")
+					.from(PROBLEMS_TABLE)
 					.update({ imageUrl: null })
 					.eq("id", problemId)
 					.eq("userId", problemStates.userId)
