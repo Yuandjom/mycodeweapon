@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="google-site-verification" content="sJZ977GImqnF3O1BqDjCYrp1XEOO5QHu3nQMEBDz26g" />
+      </head>
       <body
         className={`antialiased min-h-screen`}
       >
