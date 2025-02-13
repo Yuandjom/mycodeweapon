@@ -3,21 +3,21 @@ import { TimerIcon, Play, Pause, RotateCcw } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Timer = () => {
-  const [seconds, setSeconds] = useState<number>(0);
+  const [seconds, setSeconds] = useState<number>(341);
   const [isTiming, setIsTiming] = useState<boolean>(false);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    if (isTiming) {
-      intervalId = setInterval(() => {
-        setSeconds((prev) => prev + 1);
-      }, 1000);
-    }
+    // if (isTiming) {
+    //   intervalId = setInterval(() => {
+    //     setSeconds((prev) => prev + 1);
+    //   }, 1000);
+    // }
 
-    return () => {
-      if (isTiming) clearInterval(intervalId);
-    };
+    // return () => {
+    //   if (isTiming) clearInterval(intervalId);
+    // };
   }, [isTiming]);
 
   const startTimer = () => {

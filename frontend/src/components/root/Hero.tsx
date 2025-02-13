@@ -8,10 +8,12 @@ import Balancer from "react-wrap-balancer";
 import Link from "next/link";
 import Macbook from "@/components/root/Macbook";
 import { FlipWords } from "@/components/ui/flip-words";
+import { useTheme } from "next-themes";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
   return (
     <div
@@ -105,7 +107,7 @@ export function Hero() {
       >
         <div className="rounded-3xl border border-neutral-200 bg-white p-2 dark:border-neutral-700 dark:bg-black">
           <Image
-            src="/heroImg.png"
+            src={`/mainDemo_${theme === "dark" ? "dark" : "light"}.png`}
             alt="heroImg"
             width={2320}
             height={1080}
@@ -115,7 +117,7 @@ export function Hero() {
       </div>
 
       <div ref={containerRef} className="hidden mx-auto md:flex_center pt-10">
-        <Macbook src="/heroImg.png" />
+        <Macbook src={`/mainDemo_${theme === "dark" ? "dark" : "light"}.png`} />
       </div>
     </div>
   );

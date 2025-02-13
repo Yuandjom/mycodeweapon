@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   ColumnDef,
   flexRender,
@@ -13,7 +13,7 @@ import {
   ColumnFiltersState,
   getFilteredRowModel,
   VisibilityState,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -21,10 +21,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -32,14 +32,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Settings2
-} from "lucide-react"
+  Settings2,
+} from "lucide-react";
 
 import {
   Select,
@@ -47,16 +47,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-import Link from "next/link"
-import { STATUSES_STYLE } from "@/components/table/problem_column"
-
+import Link from "next/link";
+import { STATUSES_STYLE } from "@/components/table/problem_column";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  columnSizes?: Record<string, string>
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  columnSizes?: Record<string, string>;
 }
 
 export function DataTable<TData, TValue>({
@@ -64,10 +63,10 @@ export function DataTable<TData, TValue>({
   data,
   columnSizes,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
   const table = useReactTable({
     data,
     columns,
@@ -85,10 +84,10 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
-    <div className="w-full max-w-[1100px]">
+    <div className="w-full max-w-[1100px] px-4 md:px-8">
       <div className="flex items-center py-4">
         <div className="flex gap-4">
           <Input
@@ -101,43 +100,43 @@ export function DataTable<TData, TValue>({
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Filter status
-              </Button>
+              <Button variant="outline">Filter status</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {STATUSES_STYLE.map((status, i) => (
                 <DropdownMenuCheckboxItem
                   key={`filter_status_${i}`}
-                  checked={(table.getColumn("status")?.getFilterValue() as string[] || []).includes(status.value)}
+                  checked={(
+                    (table.getColumn("status")?.getFilterValue() as string[]) ||
+                    []
+                  ).includes(status.value)}
                   onCheckedChange={(checked) => {
-                    const filterValues = (table.getColumn("status")?.getFilterValue() as string[]) || []
+                    const filterValues =
+                      (table
+                        .getColumn("status")
+                        ?.getFilterValue() as string[]) || [];
                     table
                       .getColumn("status")
                       ?.setFilterValue(
                         checked
                           ? [...filterValues, status.value]
-                          : filterValues.filter((value) => value !== status.value)
-                      )
+                          : filterValues.filter(
+                              (value) => value !== status.value
+                            )
+                      );
                   }}
                 >
                   <div className="flex items-center justify-start">
                     <status.icon className={`${status.css} mr-2 h-w w-4`} />
                     <span className={status.css}>{status.label}</span>
                   </div>
-
                 </DropdownMenuCheckboxItem>
               ))}
-
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-
-        <Button
-          variant="secondary"
-          className="ml-auto"
-        >
+        <Button variant="secondary" className="ml-auto">
           <Link href="/problem/new">New Problem</Link>
         </Button>
         <DropdownMenu>
@@ -158,7 +157,8 @@ export function DataTable<TData, TValue>({
               .getAllColumns()
               .filter(
                 (column) =>
-                  typeof column.accessorFn !== "undefined" && column.getCanHide()
+                  typeof column.accessorFn !== "undefined" &&
+                  column.getCanHide()
               )
               .map((column) => {
                 return (
@@ -166,11 +166,13 @@ export function DataTable<TData, TValue>({
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -186,11 +188,11 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -205,18 +207,22 @@ export function DataTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cn(
-                        columnSizes?.[cell.column.id],
-                      )}
+                      className={cn(columnSizes?.[cell.column.id])}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   <p>You have no problems saved currently</p>
                 </TableCell>
               </TableRow>
@@ -235,11 +241,13 @@ export function DataTable<TData, TValue>({
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
-                table.setPageSize(Number(value))
+                table.setPageSize(Number(value));
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
+                <SelectValue
+                  placeholder={table.getState().pagination.pageSize}
+                />
               </SelectTrigger>
               <SelectContent side="top">
                 {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -295,5 +303,5 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
     </div>
-  )
+  );
 }
