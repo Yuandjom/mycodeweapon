@@ -56,7 +56,7 @@ const CodeOutput = ({
       <div className="space-y-2">
         <p className="font-semibold">Stdout</p>
         <ScrollArea className="w-full min-h-28 rounded-md border p-2 bg-popover text-sm">
-          {codeOutput}
+          <pre className="font-sans">{codeOutput}</pre>
         </ScrollArea>
       </div>
     </div>
