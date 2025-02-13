@@ -18,9 +18,6 @@ For all subsequent interactions:
 The goal is to provide comprehensive assistance in understanding and solving this programming challenge without spoonfeeeding the answer/solution to the user unless explicitly request by the user.
 
 Please provide guidance based on the user prompt in a concise manner with the considerations listed above.
-`
+`;
 
-export const GEMINI_MODELS: string[] = [
-    "gemini-1.5-flash",
-    "gemini-1.5-pro"
-]
+export const GEMINI_MODELS: string[] = ["gemini-1.5-flash", "gemini-1.5-pro"];

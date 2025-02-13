@@ -4,8 +4,8 @@ import { Suspense } from "react";
 import SignInLoading from "@/components/loading/SignInLoading";
 
 export const metadata: Metadata = {
-  title: "Sign In"
-}
+  title: "Sign In",
+};
 
 export default function SignInPage() {
   return (
@@ -16,5 +16,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
-

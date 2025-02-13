@@ -4,8 +4,8 @@ import { Suspense } from "react";
 import SignUpLoading from "@/components/loading/SignUpLoading";
 
 export const metadata: Metadata = {
-  title: "Sign Up"
-}
+  title: "Sign Up",
+};
 
 export default function SignUpPage() {
   return (

@@ -8,9 +8,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: {
     template: "%s | My Code Weapon",
-    default: "My Code Weapon"
-  }
-}
+    default: "My Code Weapon",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -20,11 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="google-site-verification" content="sJZ977GImqnF3O1BqDjCYrp1XEOO5QHu3nQMEBDz26g" />
+        <meta
+          name="google-site-verification"
+          content="sJZ977GImqnF3O1BqDjCYrp1XEOO5QHu3nQMEBDz26g"
+        />
       </head>
-      <body
-        className={`antialiased min-h-screen`}
-      >
+      <body className={`antialiased min-h-screen`}>
         <AuthProvider>
           <ThemeProvider
             attribute="class"
@@ -34,9 +35,7 @@ export default function RootLayout({
           >
             <main className="flex flex-col w-full h-screen">
               <Navbar />
-              <div className="w-full h-full">
-                {children}
-              </div>
+              <div className="w-full h-full">{children}</div>
             </main>
           </ThemeProvider>
         </AuthProvider>

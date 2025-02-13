@@ -1,86 +1,87 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr'
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 const PUBLIC_ROUTES = [
-    "/signup",
-    "/signin",
-    "/signout",
-    "/resetpassword",
-    "/docs"
-]
+  "/signup",
+  "/signin",
+  "/signout",
+  "/resetpassword",
+  "/docs",
+];
 
 export async function middleware(request: NextRequest) {
-    // console.log("[middleware] intercepted request:")
-    // console.log(request);
+  // console.log("[middleware] intercepted request:")
+  // console.log(request);
 
-    if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
-        return NextResponse.next()
+  if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            supabaseResponse.cookies.set(name, value, options);
+          });
+        },
+      },
     }
+  );
 
-    let supabaseResponse = NextResponse.next({
-        request,
-    })
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
+  // console.log("[middleware] user:")
+  // console.log(user);
 
+  if (error) {
+    console.error("Auth error:", error.message);
+  }
 
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return request.cookies.getAll()
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => {
-                        request.cookies.set(name, value)
-                        supabaseResponse.cookies.set(name, value, options)
-                    })
-                },
-            },
-        }
-    )
+  const nxtPathname = request.nextUrl.pathname;
 
-    const {
-        data: { user },
-        error,
-    } = await supabase.auth.getUser()
+  const isPublicRoute =
+    nxtPathname === "/" ||
+    PUBLIC_ROUTES.some((route) => nxtPathname.startsWith(route));
 
-    // console.log("[middleware] user:")
-    // console.log(user);
+  // Handle protected routes
+  if (!isPublicRoute && !user) {
+    console.log("[middleware] redirecting unsigned in user to /signin");
+    const redirectUrl = new URL("/signin", request.url);
 
-    if (error) {
-        console.error('Auth error:', error.message)
-    }
+    redirectUrl.searchParams.set("next", request.nextUrl.pathname);
 
-    const nxtPathname = request.nextUrl.pathname
+    return NextResponse.redirect(redirectUrl);
+  }
 
-    const isPublicRoute = nxtPathname === "/" || PUBLIC_ROUTES.some(route =>
-        nxtPathname.startsWith(route)
-    )
+  // Handle auth routes when user is already logged in
+  if (
+    user &&
+    (request.nextUrl.pathname.startsWith("/signin") ||
+      request.nextUrl.pathname.startsWith("/signup"))
+  ) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
-    // Handle protected routes
-    if (!isPublicRoute && !user) {
-        console.log("[middleware] redirecting unsigned in user to /signin")
-        const redirectUrl = new URL('/signin', request.url)
-
-        redirectUrl.searchParams.set('next', request.nextUrl.pathname)
-
-        return NextResponse.redirect(redirectUrl)
-    }
-
-    // Handle auth routes when user is already logged in
-    if (user && (request.nextUrl.pathname.startsWith('/signin') ||
-        request.nextUrl.pathname.startsWith('/signup'))) {
-        return NextResponse.redirect(new URL('/', request.url))
-    }
-
-    return supabaseResponse
+  return supabaseResponse;
 }
 
 export const config = {
-    matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-    ],
-}
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};

@@ -1,64 +1,56 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { ProblemState } from "@/types/problem"
-import { User } from "@supabase/supabase-js"
-import { createClient } from "@/lib/supabase/client"
-import { PROBLEMS_TABLE } from "@/constants/supabase"
+import { useState, useEffect } from "react";
+import { ProblemState } from "@/types/problem";
+import { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
+import { PROBLEMS_TABLE } from "@/constants/supabase";
 
 export const useProblemsTable = (user: User | null) => {
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
+  const [loadDataError, setLoadDataError] = useState<Error | null>(null);
+  const [problemsData, setProblemsData] = useState<ProblemState[]>([]);
 
-    const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
-    const [loadDataError, setLoadDataError] = useState<Error | null>(null);
-    const [problemsData, setProblemsData] = useState<ProblemState[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) {
+        return;
+      }
 
-    useEffect(()=> {
+      setIsLoadingData(true);
 
-        const fetchData = async () => {
+      try {
+        const supabase = createClient();
 
-            if (!user) {
-                return
-            }
+        const { data, error } = await supabase
+          .from(PROBLEMS_TABLE)
+          .select()
+          .eq("userId", user?.id);
 
-            setIsLoadingData(true);
-
-            try {
-
-                const supabase = createClient();
-
-                const { data, error } = await supabase
-                    .from(PROBLEMS_TABLE)
-                    .select()
-                    .eq("userId", user?.id)
-
-                if (error) {
-                    console.log(error)
-                    throw error
-                }
-
-                console.log("[useProblemsTable] fetchData:")
-                console.log(data);
-
-                setProblemsData(data);
-
-            } catch (err) {
-                setLoadDataError(err instanceof Error ? err : new Error("Error in fetching data"))
-            } finally {
-                setIsLoadingData(false);
-            }
-
-
+        if (error) {
+          console.log(error);
+          throw error;
         }
 
-        fetchData();
+        console.log("[useProblemsTable] fetchData:");
+        console.log(data);
 
-    }, [user])
+        setProblemsData(data);
+      } catch (err) {
+        setLoadDataError(
+          err instanceof Error ? err : new Error("Error in fetching data")
+        );
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
 
+    fetchData();
+  }, [user]);
 
-
-    return {
-        isLoadingData,
-        loadDataError,
-        problemsData,
-    }
-}
+  return {
+    isLoadingData,
+    loadDataError,
+    problemsData,
+  };
+};

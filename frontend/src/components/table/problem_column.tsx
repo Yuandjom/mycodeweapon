@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,46 +10,42 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react"
-import { ProblemState } from "@/types/problem"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Column } from "@tanstack/react-table";
+import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from "lucide-react";
+import { ProblemState } from "@/types/problem";
+import { cn } from "@/lib/utils";
 
-import {
-  CheckCircle,
-  Circle,
-  Timer,
-} from "lucide-react"
+import { CheckCircle, Circle, Timer } from "lucide-react";
 
 export const STATUSES_STYLE = [
   {
     value: "To Do",
     label: "Todo",
     icon: Circle,
-    css: '!text-blue-700 dark:!text-blue-300'
+    css: "!text-blue-700 dark:!text-blue-300",
   },
   {
     value: "In Progress",
     label: "In Progress",
     icon: Timer,
-    css: '!text-yellow-700 dark:!text-yellow-300'
+    css: "!text-yellow-700 dark:!text-yellow-300",
   },
   {
     value: "Completed",
     label: "Completed",
     icon: CheckCircle,
-    css: '!text-emerald-700 dark:!text-emerald-300'
+    css: "!text-emerald-700 dark:!text-emerald-300",
   },
-]
+];
 
 export const COLUMN_SIZES = {
   select: "w-12",
   title: "w-[60%]",
   status: "w-32",
-  actions: "w-20"
-}
+  actions: "w-20",
+};
 
 export const problem_columns: ColumnDef<ProblemState>[] = [
   {
@@ -81,48 +77,53 @@ export const problem_columns: ColumnDef<ProblemState>[] = [
       <DataTableColumnHeader column={column} title="Title" />
     ),
     cell: ({ row }) => {
-      const problemTitle = row.getValue("title") as string
+      const problemTitle = row.getValue("title") as string;
       return (
         <p
           onClick={() => {
-            window.open(`/problem/${problemTitle.replace(/ /g, '-').toLowerCase()}`, '_blank');
+            window.open(
+              `/problem/${problemTitle.replace(/ /g, "-").toLowerCase()}`,
+              "_blank"
+            );
           }}
-          className="capitalize font-bold hover:underline hover:text-blue-500 cursor-pointer">{row.getValue("title")}
+          className="capitalize font-bold hover:underline hover:text-blue-500 cursor-pointer"
+        >
+          {row.getValue("title")}
         </p>
-      )
-    }
+      );
+    },
   },
   {
     accessorKey: "status",
-    header: ({ column }) => (
-      <p>Status</p>
-    ),
+    header: ({ column }) => <p>Status</p>,
     cell: ({ row }) => {
       const status = STATUSES_STYLE.find(
         (status) => status.value == row.getValue("status")
-      )
+      );
 
       if (!status) {
-        return null
+        return null;
       }
 
       return (
         <div className="flex w-[100px] items-center">
           {status.icon && (
-            <status.icon className={`${status.css} mr-2 h-4 w-4 text-muted-foreground`} />
+            <status.icon
+              className={`${status.css} mr-2 h-4 w-4 text-muted-foreground`}
+            />
           )}
           <span className={status.css}>{status.label}</span>
         </div>
-      )
+      );
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const rowData = row.original
+      const rowData = row.original;
 
       return (
         <DropdownMenu>
@@ -144,19 +145,15 @@ export const problem_columns: ColumnDef<ProblemState>[] = [
             <DropdownMenuItem>Delete Problem</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
-
-
-
-
+];
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>
-  title: string
+  column: Column<TData, TValue>;
+  title: string;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -165,7 +162,7 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn(className)}>{title}</div>;
   }
 
   return (
@@ -204,6 +201,5 @@ export function DataTableColumnHeader<TData, TValue>({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }
-

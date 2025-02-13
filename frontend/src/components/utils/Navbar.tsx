@@ -17,7 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { LogOut, User, Settings } from "lucide-react";
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AnimatedButton from "@/components/ui/animated-button";
 
@@ -40,9 +40,9 @@ export const Navbar = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast({ "title": "Signed out successfully" });
+      toast({ title: "Signed out successfully" });
     } catch (error) {
-      toast({ "title": "Failed to sign out" });
+      toast({ title: "Failed to sign out" });
       console.error("Sign out error:", error);
     }
   };
@@ -52,8 +52,7 @@ export const Navbar = () => {
       onMouseLeave={() => {
         setHovered(null);
       }}
-      className=
-      "w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0"
+      className="w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0"
     >
       <Logo withText />
       <div className="flex flex-row flex-1 items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
@@ -99,7 +98,10 @@ export const Navbar = () => {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 rounded-lg shadow-xl border-2 border-border z-101">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 rounded-lg shadow-xl border-2 border-border z-101"
+                >
                   <DropdownMenuLabel>
                     <div className="flex flex-col space-y-1 p-2">
                       <p className="font-semibold leading-none">
@@ -113,7 +115,9 @@ export const Navbar = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={()=>{router.push("/profile/settings")}}
+                    onClick={() => {
+                      router.push("/profile/settings");
+                    }}
                   >
                     <Settings className="h-4 w-4 mr-2" />
                     Settings
@@ -139,7 +143,7 @@ export const Navbar = () => {
               // </Button>
               <AnimatedButton>
                 <Link href="/signin">
-                   <span className="text-sm md:text-base">Get Started!</span>
+                  <span className="text-sm md:text-base">Get Started!</span>
                 </Link>
               </AnimatedButton>
             )}
@@ -149,4 +153,3 @@ export const Navbar = () => {
     </motion.div>
   );
 };
-

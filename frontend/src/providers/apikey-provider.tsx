@@ -1,131 +1,123 @@
-"use client"
+"use client";
 
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from "react"
-import { createClient } from "@/lib/supabase/client"
-import { useAuth } from "./auth-provider"
-import { cloudStoreGeminiKey } from "@/app/actions/gemini"
-import { GEMINI_CONFIG_TABLE } from "@/constants/supabase"
+import { createContext, useContext, useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "./auth-provider";
+import { cloudStoreGeminiKey } from "@/app/actions/gemini";
+import { GEMINI_CONFIG_TABLE } from "@/constants/supabase";
 
 export enum KeyStorePref {
-    UNSET = "UNSET",
-    LOCAL = "LOCAL",
-    CLOUD = "CLOUD"
+  UNSET = "UNSET",
+  LOCAL = "LOCAL",
+  CLOUD = "CLOUD",
 }
 
 interface ApiKeyContextType {
-    geminiKey: string | null,
-    geminiPref: KeyStorePref
-    saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>
-    isSavingPref: boolean
+  geminiKey: string | null;
+  geminiPref: KeyStorePref;
+  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>;
+  isSavingPref: boolean;
 }
 
 const ApiKeyContext = createContext<ApiKeyContextType>({
-    geminiPref: KeyStorePref.UNSET,
-    geminiKey: null,
-    saveGeminiPref: async (pref: KeyStorePref, key: string) => (false),
-    isSavingPref: false,
-})
+  geminiPref: KeyStorePref.UNSET,
+  geminiKey: null,
+  saveGeminiPref: async (pref: KeyStorePref, key: string) => false,
+  isSavingPref: false,
+});
 
 export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
 
-    const { user } = useAuth();
+  const [geminiPref, setGeminiPref] = useState<KeyStorePref>(
+    KeyStorePref.UNSET
+  );
+  const [geminiKey, setGeminiKey] = useState<string | null>(null);
 
-    const [geminiPref, setGeminiPref] = useState<KeyStorePref>(KeyStorePref.UNSET)
-    const [geminiKey, setGeminiKey] = useState<string | null>(null);
+  useEffect(() => {
+    const init = async () => {
+      if (!user) return;
 
-    useEffect(() => {
+      // init the gemini pref
+      console.log("[ApiKeyProvider] init gemini");
+      const supabase = createClient();
 
-        const init = async () => {
-            if (!user) return;
+      const { data, error } = await supabase
+        .from(GEMINI_CONFIG_TABLE)
+        .select("storePref")
+        .eq("id", user.id)
+        .single();
 
-            // init the gemini pref
-            console.log("[ApiKeyProvider] init gemini")
-            const supabase = createClient();
+      const pref = data?.storePref;
 
-            const { data, error } = await supabase
-                .from(GEMINI_CONFIG_TABLE)
-                .select("storePref")
-                .eq("id", user.id)
-                .single()
-
-            const pref = data?.storePref
-
-            if (pref) {
-                setGeminiPref(pref);
-            }
-
-        }
-
-        init();
-
-    }, [user])
-
-    const [isSavingPref, setIsSavingPref] = useState<boolean>(false)
-
-    const saveGeminiPref = async (pref: KeyStorePref, key: string): Promise<boolean> => {
-
-        if (!user) return false;
-
-        setIsSavingPref(true);
+      if (pref) {
         setGeminiPref(pref);
+      }
+    };
 
-        try {
+    init();
+  }, [user]);
 
-            const supabase = createClient();
+  const [isSavingPref, setIsSavingPref] = useState<boolean>(false);
 
-            const { error } = await supabase
-                .from(GEMINI_CONFIG_TABLE)
-                .update({ storePref: pref })
-                .eq('id', user.id)
+  const saveGeminiPref = async (
+    pref: KeyStorePref,
+    key: string
+  ): Promise<boolean> => {
+    if (!user) return false;
 
-            if (error) throw error
+    setIsSavingPref(true);
+    setGeminiPref(pref);
 
-            if (pref === KeyStorePref.CLOUD) {
-                await cloudStoreGeminiKey(user.id, key);
-            } else {
-                // set to local option so delete away past api keys
-                await supabase
-                    .from(GEMINI_CONFIG_TABLE)
-                    .delete()
-                    .eq('userId', user.id)
+    try {
+      const supabase = createClient();
 
-                //TODO: fix losing key when refresh
-                setGeminiKey(key)
-            }
+      const { error } = await supabase
+        .from(GEMINI_CONFIG_TABLE)
+        .update({ storePref: pref })
+        .eq("id", user.id);
 
-        } catch (err) {
-            console.log(err)
-            return false;
-        } finally {
-            setIsSavingPref(false);
-        }
+      if (error) throw error;
 
-        return true;
+      if (pref === KeyStorePref.CLOUD) {
+        await cloudStoreGeminiKey(user.id, key);
+      } else {
+        // set to local option so delete away past api keys
+        await supabase.from(GEMINI_CONFIG_TABLE).delete().eq("userId", user.id);
+
+        //TODO: fix losing key when refresh
+        setGeminiKey(key);
+      }
+    } catch (err) {
+      console.log(err);
+      return false;
+    } finally {
+      setIsSavingPref(false);
     }
 
-    return (
-        <ApiKeyContext.Provider value={{
-            geminiKey,
-            geminiPref,
-            saveGeminiPref,
-            isSavingPref,
-        }}>
-            {children}
-        </ApiKeyContext.Provider>
-    )
+    return true;
+  };
+
+  return (
+    <ApiKeyContext.Provider
+      value={{
+        geminiKey,
+        geminiPref,
+        saveGeminiPref,
+        isSavingPref,
+      }}
+    >
+      {children}
+    </ApiKeyContext.Provider>
+  );
 }
 
 export function useApiKey() {
-    const context = useContext(ApiKeyContext)
+  const context = useContext(ApiKeyContext);
 
-    if (!context) {
-        throw new Error("useApiKey must be used within an ApiKeyProvider")
-    }
+  if (!context) {
+    throw new Error("useApiKey must be used within an ApiKeyProvider");
+  }
 
-    return context;
+  return context;
 }
