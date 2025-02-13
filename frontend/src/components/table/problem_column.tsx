@@ -142,7 +142,7 @@ export const problem_columns: ColumnDef<ProblemState>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>TODO: Mark as [enum status]</DropdownMenuItem>
-            <DropdownMenuItem>Delete Problem</DropdownMenuItem>
+            <DropdownMenuItem>TODO: Delete Problem</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

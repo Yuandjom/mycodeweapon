@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AvailLanguage } from "@/types/judge0";
 import { judge0ToMonacoMap } from "@/constants/judge0";
 import { submitCodeParams } from "@/hooks/useJudge0";
-import { useEffect } from "react";
+import Timer from "@/components/utils/Timer";
 
 type Props = {
   languages: AvailLanguage[];
@@ -40,48 +40,55 @@ const CodeEditor = (props: Props) => {
 
   return (
     <div className="w-full h-full flex flex-col gap-4">
-      <div className="flex justify-start items-center gap-2">
-        <Combobox
-          keyword={"language"}
-          selections={props.languages.map((lang) => {
-            return { value: lang.id, label: lang.name };
-          })}
-          defaultValue={props.languageId}
-          onSelectChange={props.onLanguageIdChange}
-        />
-        <Button
-          onClick={handleCodeSubmit}
-          className="bg-secondary hover:bg-secondary/80"
-          disabled={props.isSubmitting}
-        >
-          <div className="flex_center gap-1.5">
-            {props.isSubmitting ? (
-              <Loader2 className="text-blue-600 hover:text-blue-500 h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="text-green-600 hover:text-green-500 h-4 w-4" />
-            )}
-            <span className="font-semibold text-green-600 hover:text-green-500">
-              {props.isSubmitting ? "Running..." : "Run Code"}
-            </span>
-          </div>
-        </Button>
-        <Button
-          onClick={props.onSaveProblem}
-          className="bg-secondary hover:bg-secondary/80"
-          disabled={props.isSaving}
-        >
-          <div className="flex_center gap-1.5">
-            {props.isSaving ? (
-              <Loader2 className="text-blue-600 hover:text-blue-500 h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="text-blue-600 hover:text-blue-500 h-4 w-4" />
-            )}
-            <span className="font-semibold text-blue-600 hover:text-blue-500">
-              {props.isSaving ? "Saving..." : "Save Problem"}
-            </span>
-          </div>
-        </Button>
+      <div className="w-full flex justify-between items-center">
+        <div className="flex justify-start items-center w-full gap-3">
+          <Combobox
+            keyword={"language"}
+            selections={props.languages.map((lang) => {
+              return { value: lang.id, label: lang.name };
+            })}
+            defaultValue={props.languageId}
+            onSelectChange={props.onLanguageIdChange}
+          />
+          <Timer />
+        </div>
+
+        <div className="flex justify-end items-center w-full gap-3">
+          <Button
+            onClick={handleCodeSubmit}
+            className="bg-green-800 hover:bg-green-800/80 px-4"
+            disabled={props.isSubmitting}
+          >
+            <div className="flex_center gap-1.5">
+              {props.isSubmitting ? (
+                <Loader2 className="text-green-400 h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="text-green-400 h-4 w-4" />
+              )}
+              <span className="font-semibold text-green-400">
+                {props.isSubmitting ? "Running..." : "Run"}
+              </span>
+            </div>
+          </Button>
+          <Button
+            onClick={props.onSaveProblem}
+            className="bg-blue-800 hover:bg-blue-800/80 px-4"
+            disabled={props.isSaving}
+          >
+            <div className="flex_center gap-1.5">
+              {props.isSaving ? (
+                <Loader2 className="text-blue-400 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="text-blue-400 h-4 w-4" />
+              )}
+              <span className="font-semibold text-blue-400">
+                {props.isSaving ? "Saving..." : "Save"}
+              </span>
+            </div>
+          </Button>
+        </div>
       </div>
+
       <div className="border rounded-md">
         <Editor
           height="100vh"
