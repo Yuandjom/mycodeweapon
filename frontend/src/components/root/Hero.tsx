@@ -16,7 +16,7 @@ export function Hero() {
   return (
     <div
       ref={parentRef}
-      className="relative flex md:min-h-screen flex-col items-center justify-start overflow-hidden px-4 py-20 md:px-8 md:pt-30"
+      className="relative flex min-h-screen flex-col items-center justify-start overflow-hidden px-8 py-20 md:px-12 md:pt-30"
     >
       <BackgroundGrids />
       <CollisionMechanism

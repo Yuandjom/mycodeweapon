@@ -32,10 +32,10 @@ const LanguageSupport = () => {
     <section className="w-full max-w-6xl mx-auto px-8 lg:px-4 py-16 space-y-8">
       {/* Title container */}
       <div className="flex flex-col space-y-2">
-        <h2 className="text-2xl md:text-4xl font-semibold tracking-tight text-center">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-center">
           We support
         </h2>
-        <h3 className="text-xl md:text-3xl font-semibold text-muted-foreground text-center">
+        <h3 className="text-xl md:text-3xl lg:text-4xl font-semibold text-muted-foreground text-center">
           {hoveredLanguage || "your favourite languages!"}
         </h3>
       </div>
