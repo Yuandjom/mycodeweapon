@@ -75,7 +75,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase
         .from(GEMINI_CONFIG_TABLE)
         .update({ storePref: pref })
-        .eq("id", user.id);
+        .eq("userId", user.id);
 
       if (error) throw error;
 
