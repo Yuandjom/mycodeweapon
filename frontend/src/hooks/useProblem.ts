@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { ProblemState, ProblemStatus } from "@/types/problem";
 import { PROBLEMS_TABLE, PROBLEM_IMAGE_BUCKET } from "@/constants/supabase";
+import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/constants/timestamp";
 
 export const useProblem = (title: string, user: User | null) => {
   const DEFAULT_PROBLEM_STATE: ProblemState = {
@@ -17,6 +18,7 @@ export const useProblem = (title: string, user: User | null) => {
     questionImage: null,
     imageUrl: null,
     imagePreview: "",
+    updated_at: "",
   };
 
   // for updating user details when user are loaded asynchronously
@@ -119,7 +121,15 @@ export const useProblem = (title: string, user: User | null) => {
           status: data.status,
           code: data.code,
           languageId: data.languageId,
+          updated_at: data.updated_at,
         });
+
+        // if there is a prev code saved in local storage, we use that
+        handleProblemCodeConflicts(data.id, data.updated_at, data.code);
+        const cachedCode = getCodeLocally(data.id);
+        if (cachedCode) {
+          updateProblemStates({ code: cachedCode });
+        }
 
         console.log("[useProblem] fetched & processe data:");
         console.table(data);
@@ -153,6 +163,7 @@ export const useProblem = (title: string, user: User | null) => {
 
   const setCode = (code: string) => {
     updateProblemStates({ code });
+    saveCodeLocally(problemStates.problemId, code);
   };
 
   const setLanguageId = (languageId: string) => {
@@ -166,6 +177,9 @@ export const useProblem = (title: string, user: User | null) => {
     console.log(
       `[useProblem] Saving problem with userId: ${problemStates.userId}`
     );
+
+    // save code locally
+    saveCodeLocally(problemStates.problemId, problemStates.code);
 
     try {
       const supabase = createClient();
@@ -307,4 +321,59 @@ export const useProblem = (title: string, user: User | null) => {
     isSaving,
     error,
   };
+};
+
+// utility functions
+
+/*
+  Since old user's code may be cached in local storage, we compare which is later version and use it
+  
+  Note: If user previously saved code to cloud in device B and logs into device A with "older" code, we will overwrite A's local storage with server code
+*/
+const handleProblemCodeConflicts = (
+  problemId: string,
+  serverUpdatedTimeIso: string,
+  code: string
+) => {
+  const key = getLocalStorageKey(problemId);
+
+  const serverLastUpdated = convertIsoTimeToUnix(serverUpdatedTimeIso);
+  const localLastUpdated = Number(localStorage.getItem(`${key}-updated`)) || 0;
+
+  // server has newer code so overwrite local storage with it
+  if (localLastUpdated < serverLastUpdated) {
+    console.log("Server has newer code");
+    saveCodeLocally(problemId, code);
+  } else {
+    console.log("Local has newer code");
+  }
+};
+
+const saveCodeLocally = (problemId: string, code: string) => {
+  const key = getLocalStorageKey(problemId);
+
+  localStorage.setItem(`${key}-code`, code);
+  localStorage.setItem(`${key}-updated`, String(getCurrentUTCTime()));
+};
+
+const getCodeLocally = (problemId: string): string => {
+  const key = getLocalStorageKey(problemId);
+
+  const cachedCode = localStorage.getItem(`${key}-code`);
+
+  return cachedCode || "";
+};
+
+const deleteCodeLocally = (problemId: string) => {
+  const key = getLocalStorageKey(problemId);
+
+  localStorage.removeItem(`${key}-code`);
+  localStorage.removeItem(`${key}-updated`);
+};
+
+const getLocalStorageKey = (problemId: string): string => {
+  if (problemId !== "-1") {
+    return `problem-${problemId}`;
+  }
+  return "problem-unsaved";
 };
