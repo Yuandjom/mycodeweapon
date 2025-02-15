@@ -52,8 +52,8 @@ const Skeleton = () => {
             src="/companyIcons/openai.svg"
             className="rounded-full"
             alt="openai"
-            height={iconSize}
-            width={iconSize}
+            height={iconSize + 4}
+            width={iconSize + 4}
           />
         </Container>
         <Container className="h-8 w-8 circle-5">
@@ -67,9 +67,9 @@ const Skeleton = () => {
         </Container>
         <Container className="h-12 w-12 circle-4">
           <Image
-            src="/companyIcons/openai.svg"
+            src="/companyIcons/perplexity.svg"
             className="rounded-full"
-            alt="openai"
+            alt="perplexity"
             height={iconSize}
             width={iconSize}
           />
