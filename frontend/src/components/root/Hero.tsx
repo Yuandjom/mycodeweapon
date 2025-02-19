@@ -94,10 +94,16 @@ export function Hero() {
           Start Now
         </Link>
         <Link
-          href="#features"
-          className="group relative z-20 flex h-10 w-full cursor-pointer items-center justify-center space-x-2 rounded-lg bg-white p-px px-4 py-2 text-sm font-semibold leading-6 text-black no-underline shadow-input transition duration-200 hover:-translate-y-0.5 dark:bg-neutral-800 dark:text-white sm:w-52"
+          href="https://youtu.be/5MWtwzAzZOQ?si=BShLtKKsJir9NqVT"
+          className="group relative z-20 flex h-10 w-full cursor-pointer items-center gap-2 justify-center space-x-2 rounded-lg bg-gray-100 p-px px-4 py-2 text-sm font-semibold leading-6 text-black no-underline shadow-input transition duration-200 hover:-translate-y-0.5 dark:bg-neutral-800 dark:text-white sm:w-52"
         >
-          Explore Features
+          <Image
+            src="/companyIcons/youtube.svg"
+            alt="yt"
+            height={24}
+            width={24}
+          />
+          Watch Demo
         </Link>
       </div>
 
