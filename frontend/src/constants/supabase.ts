@@ -7,6 +7,7 @@ export const GEMINI_CONFIG_TABLE: string = "gemini_config";
 
 // Object Storage Buckets
 export const PROBLEM_IMAGE_BUCKET: string = "problemImages";
+export const MAXIMUM_IMAGE_SIZE_KB: number = 300; //kB
 
 // error codes to rendered messages
 const authErrorCodes: Record<string, string> = {

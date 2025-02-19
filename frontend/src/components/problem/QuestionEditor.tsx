@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { STATUSES_STYLE } from "@/components/table/problem_column";
+import { MAXIMUM_IMAGE_SIZE_KB } from "@/constants/supabase";
 
 interface QuestionEditorProps {
   imageUrl: string | null;
@@ -56,11 +57,22 @@ const QuestionEditor = ({
   const handleImageUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
+
       if (!file || !file.type.includes("image/")) {
         toast({
           variant: "destructive",
           title: "Invalid image selected",
           description: "Only png/jpg image file accepted!",
+        });
+        return;
+      }
+
+      if (file.size >= MAXIMUM_IMAGE_SIZE_KB * 1024) {
+        const fileSizeInKB = Math.round(file.size / 1024);
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: `Image must be less than ${MAXIMUM_IMAGE_SIZE_KB}KB Current size: ${fileSizeInKB}KB`,
         });
         return;
       }
@@ -72,7 +84,7 @@ const QuestionEditor = ({
       };
       reader.readAsDataURL(file);
     },
-    []
+    [toast]
   );
 
   const handleImageDelete = () => {
@@ -228,6 +240,9 @@ const ImageUploadSection = ({
               <p className="text-sm text-center text-muted-foreground group-hover:text-primary">
                 Click to upload problem img (png, jpg)
               </p>
+              <span className="text-xs text-muted-foreground group-hover:text-primary">
+                Only img {"<"}300KB accepted
+              </span>
             </div>
             <input
               id="image-upload"
