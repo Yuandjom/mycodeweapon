@@ -35,7 +35,7 @@ export function Hero() {
         beamOptions={{
           initialX: -200,
           translateX: 800,
-          duration: 4,
+          duration: 7,
           repeatDelay: 3,
         }}
         containerRef={containerRef}
@@ -45,7 +45,7 @@ export function Hero() {
         beamOptions={{
           initialX: 200,
           translateX: 1200,
-          duration: 5,
+          duration: 7,
           repeatDelay: 3,
         }}
         containerRef={containerRef}
@@ -57,11 +57,11 @@ export function Hero() {
         beamOptions={{
           initialX: 400,
           translateX: 1400,
-          duration: 6,
+          duration: 7,
           repeatDelay: 3,
         }}
       />
-      <span className="mb-4 z-10 bg-card shadow-slate-500 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm ">
+      <span className="mb-4 z-10 bg-card shadow-slate-500 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm">
         We are still in development phase! If you face any bugs/issue, raise
         them{" "}
         <Link
@@ -116,7 +116,7 @@ export function Hero() {
         </div>
       </div>
 
-      <div ref={containerRef} className="hidden mx-auto md:flex_center pt-10">
+      <div ref={containerRef} className="hidden mx-auto md:flex_center pt-4">
         <Macbook src={`/mainDemo_${theme === "dark" ? "dark" : "light"}.png`} />
       </div>
     </div>

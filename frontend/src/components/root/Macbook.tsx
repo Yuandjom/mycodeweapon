@@ -49,31 +49,12 @@ export const Macbook = ({
     }
   }, []);
 
-  const scaleX = useTransform(
-    scrollYProgress,
-    [0, 0.3],
-    [1.2, isMobile ? 1 : 1.5]
-  );
-  const scaleY = useTransform(
-    scrollYProgress,
-    [0, 0.3],
-    [0.6, isMobile ? 1 : 1.5]
-  );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
-  const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
-
   return (
     <div
       ref={ref}
-      className="min-h-[130vh] lg:min-h-[140vh] xl:min-h-[155vh] xl:pt-40 flex flex-col items-center justify-start flex-shrink-0 [perspective:800px] transform xl:scale-125"
+      className="h-[155vh] lg:h-[195vh] xl:h-[188vh] xl:pt-48 flex flex-col items-center justify-start flex-shrink-0 [perspective:800px] transform xl:scale-125"
     >
-      <Lid
-        src={src}
-        scaleX={scaleX}
-        scaleY={scaleY}
-        rotate={rotate}
-        translate={translate}
-      />
+      <Lid src={src} />
       {/* Base area */}
       <div className="h-[22rem] w-[32rem] bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
         {/* above keyboard bar */}
@@ -102,30 +83,23 @@ export const Macbook = ({
   );
 };
 
-export const Lid = ({
-  scaleX,
-  scaleY,
-  rotate,
-  translate,
-  src,
-}: {
-  scaleX: MotionValue<number>;
-  scaleY: MotionValue<number>;
-  rotate: MotionValue<number>;
-  translate: MotionValue<number>;
-  src?: string;
-}) => {
+export const Lid = ({ src }: { src?: string }) => {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
 
+  const scaleX = useTransform(scrollYProgress, [0, 0.3], [1.2, 1.5]);
+  const scaleY = useTransform(scrollYProgress, [0, 0.2], [0.6, 1.5]);
+  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
+  const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
+
   // Modify the translate value to stop at a certain scroll point
   const clampedTranslate = useTransform(
     scrollYProgress,
     [0.1, 0.35, 0.75], // Adjust these values to control when it stops
-    [0, 600, 600] // The last two numbers being the same makes it "stick"
+    [0, 850, 850] // The last two numbers being the same makes it "stick"
   );
 
   return (
