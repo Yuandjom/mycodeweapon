@@ -3,7 +3,7 @@ import { TimerIcon, Play, Pause, RotateCcw } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Timer = () => {
-  const [seconds, setSeconds] = useState<number>(341);
+  const [seconds, setSeconds] = useState<number>(0);
   const [isTiming, setIsTiming] = useState<boolean>(false);
 
   useEffect(() => {
