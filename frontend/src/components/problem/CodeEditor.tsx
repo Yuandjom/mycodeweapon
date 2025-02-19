@@ -99,7 +99,7 @@ const CodeEditor = (props: Props) => {
           options={{
             minimap: { enabled: false },
             fontSize: 14,
-            tabSize: 2,
+            tabSize: 4,
             scrollbar: {
               vertical: "visible",
               horizontal: "visible",

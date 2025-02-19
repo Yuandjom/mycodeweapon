@@ -328,7 +328,7 @@ const AiSettings = ({
                 id="apiKey"
                 name="apiKey"
                 parentClassName="relative"
-                eyeClassName="absolute right-0 top-1/2 -translate-y-1/2 hover:bg-transparent"
+                eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
               />
               <p className="text-sm text-muted-foreground">
                 For security reasons, your API key is never displayed (& fetched
