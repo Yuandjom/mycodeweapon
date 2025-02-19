@@ -40,20 +40,18 @@ export const useProfileSettings = (
   }, [user]);
 
   const updateUsername = (username: string) => {
-    console.log("debugging setting username:", username);
     setProfileState((prev) => ({ ...prev, username }));
   };
   const updateEmail = (email: string) => {
-    console.log("debugging setting email:", email);
     setProfileState((prev) => ({ ...prev, email }));
   };
   const updatePassword = (password: string) => {
-    console.log("debugging setting password:", password);
     setProfileState((prev) => ({ ...prev, password }));
   };
 
   const [saveProfileError, setSaveProfileError] = useState<Error | null>(null);
   const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
+
   const saveProfileSettings = async () => {
     try {
       setIsSavingProfile(true);
@@ -72,6 +70,8 @@ export const useProfileSettings = (
       );
 
       if (updateError) {
+        console.log("update error:");
+        console.log(updateError);
         throw updateError;
       }
     } catch (err) {

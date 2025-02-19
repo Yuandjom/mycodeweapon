@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 export interface SettingFormField {
   id: string;
   label: string;
+  desc?: string;
   type: string;
   placeholder?: string;
   initValue: string;
@@ -32,7 +33,7 @@ export const SettingForm = ({
         return (
           <div
             key={`profileSetting-${field.id}-${i}`}
-            className="flex flex-col justify-center items-start gap-1.5"
+            className="flex flex-col justify-start items-start gap-1.5"
           >
             {field.label && (
               <Label
@@ -42,7 +43,7 @@ export const SettingForm = ({
                 {field.label}:
               </Label>
             )}
-            <div className="flex justify-start items-center w-[200px]">
+            <div className="flex justify-start items-center w-[220px]">
               {renderField ? (
                 renderField(field)
               ) : (

@@ -49,7 +49,12 @@ const SettingsContent = () => {
       </div>
 
       <div className="flex flex-col justify-center items-start gap-2">
-        <h2 className="text-lg font-bold ">AI Settings</h2>
+        <h2 className="text-lg font-bold">
+          AI Settings{" "}
+          <span className="ml-3 px-2 py-1 font-bold text-xs rounded-full bg-amber-600 text-gray-100">
+            Coming Soon!
+          </span>
+        </h2>
         <Separator className="w-[90%] mb-2" />
 
         {/* 
@@ -63,7 +68,7 @@ const SettingsContent = () => {
 
       <div className="flex flex-col justify-center items-start gap-2">
         <h2 className="text-lg font-bold">
-          Code Settings{" "}
+          Code Editor Settings{" "}
           <span className="ml-3 px-2 py-1 font-bold text-xs rounded-full bg-amber-600 text-gray-100">
             Coming Soon!
           </span>

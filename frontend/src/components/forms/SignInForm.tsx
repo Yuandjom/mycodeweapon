@@ -19,6 +19,7 @@ import {
 import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { PasswordInput } from "../utils/PasswordInput";
 import { displayErrorCode } from "@/constants/supabase";
+import SignInLoading from "../loading/SignInLoading";
 
 const SignInForm = () => {
   const { signIn, resetPassword } = useAuth();
@@ -28,6 +29,16 @@ const SignInForm = () => {
   const [displayError, setDisplayError] = useState<string>("");
 
   const { toast } = useToast();
+
+  const { user, authLoading } = useAuth();
+
+  if (authLoading) {
+    return <SignInLoading />;
+  }
+
+  if (user) {
+    router.push("/problem");
+  }
 
   const fields = [
     {

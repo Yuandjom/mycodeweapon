@@ -10,6 +10,7 @@ import { AuthForm, AuthFormField } from "@/components/utils/AuthForm";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/utils/PasswordInput";
 import { displayErrorCode } from "@/constants/supabase";
+import SignUpLoading from "../loading/SignUpLoading";
 
 const SignUpForm = () => {
   const { signUp } = useAuth();
@@ -17,6 +18,15 @@ const SignUpForm = () => {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [displayError, setDisplayError] = useState("");
   const { toast } = useToast();
+  const { user, authLoading } = useAuth();
+
+  if (authLoading) {
+    return <SignUpLoading />;
+  }
+
+  if (user) {
+    router.push("/problem");
+  }
 
   const fields = [
     {

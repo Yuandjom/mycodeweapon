@@ -27,34 +27,43 @@ const ProfileSettingsForm = ({
   const renderField = (field: SettingFormField) => {
     if (field.type === "password") {
       return (
-        <PasswordInput
-          id={field.id}
-          name={field.id}
-          placeholder={field.placeholder}
-          value={field.initValue}
-          required
-          disabled={isSaving}
-          parentClassName="col-span-2 flex justify-start items-center w-full relative"
-          eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
-          handleUpdate={updatePassword}
-        />
+        <div className="flex flex-col justify-start items-start">
+          <PasswordInput
+            id={field.id}
+            name={field.id}
+            placeholder={field.placeholder}
+            value={field.initValue}
+            required
+            disabled={isSaving}
+            parentClassName="col-span-2 flex justify-start items-center w-full relative"
+            eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
+            handleUpdate={updatePassword}
+          />
+        </div>
       );
     }
 
     return (
-      <Input
-        id={field.id}
-        name={field.id}
-        type={field.type}
-        placeholder={field.placeholder}
-        value={field.initValue}
-        required
-        disabled={isSaving}
-        onChange={(e) => {
-          console.log("changing input: ", e.target.value);
-          field.handleUpdate(e.target.value);
-        }}
-      />
+      <div className="flex flex-col justify-start items-start w-full">
+        <Input
+          id={field.id}
+          name={field.id}
+          type={field.type}
+          placeholder={field.placeholder}
+          value={field.initValue}
+          required
+          disabled={isSaving}
+          onChange={(e) => {
+            console.log("changing input: ", e.target.value);
+            field.handleUpdate(e.target.value);
+          }}
+        />
+        {field.desc && (
+          <span className="text-xs px-2 pt-1 text-muted-foreground">
+            {field.desc}
+          </span>
+        )}
+      </div>
     );
   };
 
@@ -71,6 +80,7 @@ const ProfileSettingsForm = ({
       id: "email",
       label: "Email",
       type: "email",
+      desc: "You will need to confirm change on both emails for security",
       placeholder: "",
       initValue: email,
       handleUpdate: updateEmail,
