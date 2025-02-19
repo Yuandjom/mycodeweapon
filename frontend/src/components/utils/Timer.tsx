@@ -9,15 +9,15 @@ const Timer = () => {
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
 
-    // if (isTiming) {
-    //   intervalId = setInterval(() => {
-    //     setSeconds((prev) => prev + 1);
-    //   }, 1000);
-    // }
+    if (isTiming) {
+      intervalId = setInterval(() => {
+        setSeconds((prev) => prev + 1);
+      }, 1000);
+    }
 
-    // return () => {
-    //   if (isTiming) clearInterval(intervalId);
-    // };
+    return () => {
+      if (isTiming) clearInterval(intervalId);
+    };
   }, [isTiming]);
 
   const startTimer = () => {
