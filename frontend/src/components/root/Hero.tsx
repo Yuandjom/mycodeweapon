@@ -25,7 +25,7 @@ export function Hero() {
         beamOptions={{
           initialX: -400,
           translateX: 600,
-          duration: 7,
+          duration: 3,
           repeatDelay: 3,
         }}
         containerRef={containerRef}
@@ -35,7 +35,7 @@ export function Hero() {
         beamOptions={{
           initialX: -200,
           translateX: 800,
-          duration: 7,
+          duration: 4,
           repeatDelay: 3,
         }}
         containerRef={containerRef}
@@ -45,8 +45,8 @@ export function Hero() {
         beamOptions={{
           initialX: 200,
           translateX: 1200,
-          duration: 7,
-          repeatDelay: 3,
+          duration: 5,
+          repeatDelay: 2,
         }}
         containerRef={containerRef}
         parentRef={parentRef}
@@ -57,8 +57,8 @@ export function Hero() {
         beamOptions={{
           initialX: 400,
           translateX: 1400,
-          duration: 7,
-          repeatDelay: 3,
+          duration: 6,
+          repeatDelay: 4,
         }}
       />
       <span className="mb-4 z-10 bg-card shadow-slate-500 font-medium text-primary px-4 py-2 rounded-full text-sm shadow-sm">
