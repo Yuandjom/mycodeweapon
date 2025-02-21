@@ -73,7 +73,10 @@ const SignUpForm = () => {
         throw new Error(displayErrorCode(result.errorCode));
       }
 
-      toast({ title: "Account created successfully!" });
+      toast({
+        title: "Account created successfully!",
+        description: "Please check your email inbox for a confirmation",
+      });
 
       if (result.data?.message?.includes("verification")) {
         toast({ title: result.data.message });

@@ -17,10 +17,18 @@ export async function signUp_SA({
 }: SignUpCredentials): Promise<AuthResult> {
   const supabase = await createClient();
 
+  const url =
+    process.env.NODE_ENV === "production"
+      ? process.env.NEXT_PUBLIC_PRODUCTION_URL
+      : process.env.NEXT_PUBLIC_DEVELOPMENT_URL;
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { username } },
+    options: {
+      data: { username },
+      emailRedirectTo: `${url}/api/auth/verified`,
+    },
   });
 
   if (error) {

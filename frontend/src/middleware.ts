@@ -10,11 +10,16 @@ const PUBLIC_ROUTES = [
   "/docs",
 ];
 
+const API_ROUTES = ["/api/auth/verified"];
+
 export async function middleware(request: NextRequest) {
   // console.log("[middleware] intercepted request:")
   // console.log(request);
 
-  if (PUBLIC_ROUTES.includes(request.nextUrl.pathname)) {
+  if (
+    PUBLIC_ROUTES.includes(request.nextUrl.pathname) ||
+    API_ROUTES.includes(request.nextUrl.pathname)
+  ) {
     return NextResponse.next();
   }
 
