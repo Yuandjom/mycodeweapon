@@ -45,7 +45,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase
         .from(GEMINI_CONFIG_TABLE)
         .select("storePref")
-        .eq("id", user.id)
+        .eq("userId", user.id)
         .single();
 
       const pref = data?.storePref;

@@ -44,6 +44,13 @@ export const useGemini = ({
     const cachedPrompt = prompt;
     setPrompt("");
 
+    // check if there is api key set for local unless user using CLOUD
+    if (geminiPref !== KeyStorePref.CLOUD && !geminiKey) {
+      setChatHistory((prev) => [...prev, "You have not set an API Key!"]);
+      setIsPrompting(false);
+      return;
+    }
+
     let context = "";
 
     if (chatHistory.length === 1) {
