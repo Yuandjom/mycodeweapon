@@ -9,6 +9,7 @@ import Link from "next/link";
 import Macbook from "@/components/root/Macbook";
 import { FlipWords } from "@/components/ui/flip-words";
 import { useTheme } from "next-themes";
+import { GITHUB_URL } from "@/constants/global";
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +67,7 @@ export function Hero() {
         them{" "}
         <Link
           className="underline hover:text-blue-500 hover:scale-150"
-          href="https://github.com/LimJiaEarn/mycodeweapon/issues"
+          href={`${GITHUB_URL}/issues`}
         >
           here
         </Link>
