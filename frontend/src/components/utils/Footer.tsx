@@ -1,5 +1,4 @@
 import Link from "next/link";
-import React from "react";
 import { footerLegals, footerPages, footerAuths } from "@/constants/footer";
 import { GITHUB_URL } from "@/constants/global";
 import Logo from "@/components/utils/Logo";
@@ -10,15 +9,8 @@ export default function Footer() {
       <div className="mx-auto text-sm text-muted-foreground flex sm:flex-row flex-col justify-between items-start md:px-8">
         <div>
           <div className="mr-0 md:mr-2 md:flex md:justify-start md:items-center mb-2">
-            <Link
-              href="/"
-              className="font-normal flex space-x-2 justify-start items-center text-sm text-foreground px-2 py-1 z-20"
-            >
-              <Logo />
-              <span className="font-medium text-foreground">
-                My Code Weapon
-              </span>
-            </Link>
+            <Logo />
+            <span className="font-medium text-foreground">My Code Weapon</span>
           </div>
 
           <div className="mt-2">

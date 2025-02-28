@@ -36,7 +36,9 @@ export default function BentoBox() {
             <div className="w-full p-5 mx-auto shadow-2xl group h-full">
               <div className="flex flex-1 w-full h-full flex-col space-y-2  ">
                 <Image
-                  src={`/problemsTable_${theme === "dark" ? "dark" : "light"}.png`}
+                  src={`/problemsTable_${
+                    theme === "dark" ? "dark" : "light"
+                  }.png`}
                   alt="table"
                   width={800}
                   height={800}
@@ -62,19 +64,6 @@ export default function BentoBox() {
             <CompareCard theme={theme} />
           </CardSkeletonBody>
         </Card>
-
-        {/* <Card className="flex flex-col justify-between md:col-span-2">
-          <CardContent className="h-40">
-            <CardTitle>Hosting over the edge</CardTitle>
-            <CardDescription>
-              With our edge network, we host your website by going into each
-              city by ourselves.
-            </CardDescription>
-          </CardContent>
-          <CardSkeletonBody>
-            <SkeletonTwo />
-          </CardSkeletonBody>
-        </Card> */}
 
         <Card className="flex flex-col justify-between row-span-2 md:col-span-2">
           <CardContent className="h-40">
