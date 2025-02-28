@@ -11,8 +11,6 @@ interface UseGeminiProps {
   language: string;
   geminiPref: KeyStorePref;
   geminiKey: string | null;
-  includeCode: boolean;
-  includeQuestionImg: boolean;
 }
 
 export const useGemini = ({
@@ -21,18 +19,14 @@ export const useGemini = ({
   language,
   geminiPref,
   geminiKey,
-  includeCode,
-  includeQuestionImg,
 }: UseGeminiProps) => {
   const askGemini = async ({
     prompt,
-    setPrompt,
     chatHistory,
+    includeCode,
+    includeQuestionImg,
   }: promptAiParams): Promise<string> => {
     if (!prompt.trim()) return "You did not send anything";
-
-    const cachedPrompt = prompt;
-    setPrompt("");
 
     // check if there is api key set for local unless user using CLOUD
     if (geminiPref !== KeyStorePref.CLOUD && !geminiKey) {
@@ -64,7 +58,7 @@ export const useGemini = ({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt: cachedPrompt,
+            prompt,
             context,
             chatHistory,
             questionImage: includeQuestionImg ? imageData : null,
@@ -109,12 +103,12 @@ export const useGemini = ({
               },
             },
             {
-              text: context ? `${context}\n\n${cachedPrompt}` : cachedPrompt,
+              text: context ? `${context}\n\n${prompt}` : prompt,
             },
           ]);
         } else {
           result = await chat.sendMessage(
-            context ? `${context}\n\n${cachedPrompt}` : cachedPrompt
+            context ? `${context}\n\n${prompt}` : prompt
           );
         }
 

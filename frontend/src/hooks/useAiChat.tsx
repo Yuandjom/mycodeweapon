@@ -19,8 +19,9 @@ interface useAiChatProps {
 
 export interface promptAiParams {
   prompt: string;
-  setPrompt: (p: string) => void;
   chatHistory: string[];
+  includeCode: boolean;
+  includeQuestionImg: boolean;
 }
 
 export const useAiChat = ({
@@ -45,15 +46,21 @@ export const useAiChat = ({
     language,
     geminiPref: keyPref,
     geminiKey: apiKey,
-    includeCode,
-    includeQuestionImg,
   });
 
   const submitPrompt = async () => {
     try {
       setIsPrompting(true);
-      setChatHistory((prev) => [...prev, prompt]);
-      const reply = await askGemini({ prompt, setPrompt, chatHistory });
+      const cachedPrompt: string = prompt;
+      setChatHistory((prev) => [...prev, cachedPrompt]);
+      setPrompt("");
+
+      const reply = await askGemini({
+        prompt: cachedPrompt,
+        chatHistory,
+        includeCode,
+        includeQuestionImg,
+      });
 
       setChatHistory((prev) => [...prev, reply]);
     } catch (err) {

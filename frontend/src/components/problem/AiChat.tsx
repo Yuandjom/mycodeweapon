@@ -122,7 +122,11 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
               className="resize-none pr-32"
               disabled={isPrompting}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (
+                  e.key === "Enter" &&
+                  !e.shiftKey &&
+                  prompt.trim().length !== 0
+                ) {
                   e.preventDefault();
                   submitPrompt();
                 }
