@@ -1,17 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { KeyStorePref } from "@/providers/apikey-provider";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GEMINI_INSTRUCTIONS } from "@/constants/gemini";
-
-interface SubmitPromptParams {
-  prompt: string;
-}
-
-const HARDCODE = [
-  "Hello! I am Gemini, I am here to help answer your questions!",
-];
+import { promptAiParams } from "../useAiChat";
 
 interface UseGeminiProps {
   questionImage: File | null;
@@ -19,6 +11,8 @@ interface UseGeminiProps {
   language: string;
   geminiPref: KeyStorePref;
   geminiKey: string | null;
+  includeCode: boolean;
+  includeQuestionImg: boolean;
 }
 
 export const useGemini = ({
@@ -27,28 +21,22 @@ export const useGemini = ({
   language,
   geminiPref,
   geminiKey,
+  includeCode,
+  includeQuestionImg,
 }: UseGeminiProps) => {
-  const [prompt, setPrompt] = useState<string>("");
-  const [isPrompting, setIsPrompting] = useState<boolean>(false);
+  const askGemini = async ({
+    prompt,
+    setPrompt,
+    chatHistory,
+  }: promptAiParams): Promise<string> => {
+    if (!prompt.trim()) return "You did not send anything";
 
-  const [chatHistory, setChatHistory] = useState<string[]>(HARDCODE);
-
-  const [includeCode, setIncludeCode] = useState<boolean>(false);
-  const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
-
-  const submitPrompt = async () => {
-    if (!prompt.trim()) return;
-
-    setIsPrompting(true);
-    setChatHistory((prev) => [...prev, prompt]);
     const cachedPrompt = prompt;
     setPrompt("");
 
     // check if there is api key set for local unless user using CLOUD
     if (geminiPref !== KeyStorePref.CLOUD && !geminiKey) {
-      setChatHistory((prev) => [...prev, "You have not set an API Key!"]);
-      setIsPrompting(false);
-      return;
+      return "You have not set an API Key!";
     }
 
     let context = "";
@@ -84,7 +72,9 @@ export const useGemini = ({
         });
 
         if (!response.ok) throw new Error("Failed to get response");
-        response = await response.text();
+        const reply = response.text();
+
+        return reply;
       } else {
         if (!geminiKey) {
           throw new Error("No API key set!");
@@ -128,31 +118,18 @@ export const useGemini = ({
           );
         }
 
-        response = result.response.text();
-      }
+        const reply = result.response.text();
 
-      setChatHistory((prev) => [...prev, response]);
+        return reply;
+      }
     } catch (err) {
       console.log(err);
-      setChatHistory((prev) => [
-        ...prev,
-        "I apologize, I am currently unavailable. Try again later!",
-      ]);
-    } finally {
-      setIsPrompting(false);
+      return "I apologize, I am currently unavailable. Try again later!";
     }
   };
 
   return {
-    chatHistory,
-    prompt,
-    includeCode,
-    setIncludeCode,
-    includeQuestionImg,
-    setIncludeQuestionImg,
-    setPrompt,
-    isPrompting,
-    submitPrompt,
+    askGemini,
   };
 };
 

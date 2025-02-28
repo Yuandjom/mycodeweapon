@@ -16,8 +16,8 @@ import { aiStateType } from "@/hooks/useAccSettings";
 import { KeyStorePref } from "@/providers/apikey-provider";
 
 const STORAGE_OPTIONS = [
-  { label: "Local Storage", value: "LOCAL" },
-  { label: "Cloud Storage", value: "CLOUD" },
+  { label: "Local Storage", value: KeyStorePref.LOCAL },
+  { label: "Cloud Storage", value: KeyStorePref.CLOUD },
 ];
 
 interface AiSettingsFormProps {

@@ -4,13 +4,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useGemini } from "@/hooks/useGemini";
 import { Loader2, SettingsIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { useApiKey, KeyStorePref } from "@/providers/apikey-provider";
+import { AiModels } from "@/types/problem";
 import {
   Dialog,
   DialogContent,
@@ -24,13 +24,13 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
 import { PasswordInput } from "@/components/utils/PasswordInput";
 import { useToast } from "@/hooks/use-toast";
+import { useAiChat } from "@/hooks/useAiChat";
 
 interface ChatHistoryProps {
   messages: string[];
@@ -55,7 +55,14 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
     includeQuestionImg,
     setIncludeQuestionImg,
     submitPrompt,
-  } = useGemini({ questionImage, code, language, geminiPref, geminiKey });
+  } = useAiChat({
+    questionImage,
+    code,
+    language,
+    aiModel: AiModels.Gemini,
+    keyPref: geminiPref,
+    apiKey: geminiKey,
+  });
 
   return (
     <div className="flex flex-col h-full gap-2">
@@ -298,8 +305,8 @@ const AiSettings = ({
                     {storageOption === KeyStorePref.LOCAL
                       ? "Local Storage"
                       : storageOption === KeyStorePref.CLOUD
-                        ? "Cloud Storage"
-                        : "Select storage option"}
+                      ? "Cloud Storage"
+                      : "Select storage option"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>

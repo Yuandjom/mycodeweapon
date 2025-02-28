@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { ProblemState, ProblemStatus } from "@/types/problem";
 import { PROBLEMS_TABLE, PROBLEM_IMAGE_BUCKET } from "@/constants/supabase";
-import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/constants/timestamp";
+import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/utils/timestamp";
 
 export const useProblem = (title: string, user: User | null) => {
   const DEFAULT_PROBLEM_STATE: ProblemState = {
