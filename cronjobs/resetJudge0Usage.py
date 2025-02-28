@@ -17,7 +17,7 @@ SUPABASE_RATE_LIMIT_TABLE = "judge0_tokens"
 
 def reset_usage():
     try:
-        supabase.table(SUPABASE_RATE_LIMIT_TABLE).update({'usage': 0}).execute()
+        supabase.table(SUPABASE_RATE_LIMIT_TABLE).update({'usage': 0}).filter('usage', 'gt', 0).execute()
         print("Successfully reset all usage counts")
     except Exception as e:
         print(f"Error resetting usage counts: {str(e)}")
