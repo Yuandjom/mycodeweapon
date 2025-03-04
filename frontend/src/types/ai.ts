@@ -4,3 +4,9 @@ export enum AiOption {
   Claude = "CLAUDE",
   DeepSeek = "DEEPSEEK",
 }
+
+export enum KeyStorePref {
+  UNSET = "UNSET",
+  LOCAL = "LOCAL",
+  CLOUD = "CLOUD",
+}

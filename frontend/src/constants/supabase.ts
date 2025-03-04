@@ -1,3 +1,5 @@
+import { AiOption } from "@/types/ai";
+
 // Postgres Tables
 export const PROBLEMS_TABLE: string = "problems";
 export const USERS_TABLE: string = "users";
@@ -52,7 +54,7 @@ export const displayErrorCode = (errorCode: string): string => {
   );
 };
 
-export const getAiConfigTable = (aiChoice: string): string => {
+export const getAiConfigTable = (aiChoice: AiOption): string => {
   switch (aiChoice) {
     case "GEMINI":
       return GEMINI_CONFIG_TABLE;

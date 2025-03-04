@@ -3,15 +3,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "./auth-provider";
-import { AI_CONFIG_TABLE, GEMINI_CONFIG_TABLE } from "@/constants/supabase";
+import { AI_CONFIG_TABLE } from "@/constants/supabase";
 import { useAiSettings } from "@/hooks/useAiSettings";
 import { SimpleResponse } from "@/types/global";
-
-export enum KeyStorePref {
-  UNSET = "UNSET",
-  LOCAL = "LOCAL",
-  CLOUD = "CLOUD",
-}
+import { AiOption, KeyStorePref } from "@/types/ai";
 
 interface ApiKeyContextType {
   geminiKey: string | null;
@@ -33,7 +28,7 @@ const ApiKeyContext = createContext<ApiKeyContextType>({
 export function AiProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
-  const { updateApiKey } = useAiSettings(user);
+  const { getApiKeyStorePref, updateApiKey } = useAiSettings(user);
 
   const [geminiPref, setGeminiPref] = useState<KeyStorePref>(
     KeyStorePref.UNSET
@@ -54,20 +49,16 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
         .eq("userId", user.id)
         .single();
 
-      //TODO: fetch relevant api key & store pref
+      console.log("[ApiProvider] init aiConfig:", aiConfig);
 
-      // init the gemini pref
-      const { data, error } = await supabase
-        .from(GEMINI_CONFIG_TABLE)
-        .select("storePref")
-        .eq("userId", user.id)
-        .single();
+      // set pref based on user's selection
+      const { storePref } =
+        (await getApiKeyStorePref(aiConfig?.defaultAiOption)) ||
+        KeyStorePref.UNSET;
 
-      const pref = data?.storePref;
+      console.log("[ApiProvider] init storePref: ", storePref);
 
-      if (pref) {
-        setGeminiPref(pref);
-      }
+      setGeminiPref(storePref);
     };
 
     init();
@@ -88,7 +79,10 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
       setGeminiKey(key);
     }
 
-    const { success, message } = await updateApiKey(key, pref, "GEMINI");
+    console.log(
+      `[saveGeminiPref] calling updateApiKey(${key}, ${pref}, ${AiOption.Gemini})`
+    );
+    const { success, message } = await updateApiKey(key, pref, AiOption.Gemini);
 
     setIsSavingPref(false);
 

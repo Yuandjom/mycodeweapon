@@ -342,10 +342,8 @@ const handleProblemCodeConflicts = (
 
   // server has newer code so overwrite local storage with it
   if (localLastUpdated < serverLastUpdated) {
-    console.log("Server has newer code");
     saveCodeLocally(problemId, code);
   } else {
-    console.log("Local has newer code");
   }
 };
 

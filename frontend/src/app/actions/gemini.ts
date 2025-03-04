@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { encryptKey, decryptKey } from "./encryption";
-import { KeyStorePref } from "@/providers/ai-provider";
+import { KeyStorePref } from "@/types/ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GEMINI_CONFIG_TABLE } from "@/constants/supabase";
 
@@ -59,19 +59,22 @@ export async function cloudStoreApiKey(
 
     const encryptedKey = await encryptKey(key);
 
+    console.log(
+      `[cloudStoreApiKey] upserting to ${tableName} api-key: ${key} pref: ${KeyStorePref.CLOUD}`
+    );
+
     // upsert encrypted key to userkeys table
-    const { error: upsertErr } = await supabase
-      .from(tableName)
-      .upsert({
-        userId,
-        apiKey: encryptedKey,
-        storePref: KeyStorePref.CLOUD,
-      })
-      .select()
-      .single();
+    const { error: upsertErr } = await supabase.from(tableName).upsert({
+      userId,
+      apiKey: encryptedKey,
+      storePref: "CLOUD",
+      defaultModel: "gemini-1.5-pro",
+    });
 
-    if (upsertErr) throw upsertErr;
-
+    if (upsertErr) {
+      console.log("[cloudStoreApiKey] error: ", upsertErr);
+      return { success: false };
+    }
     return { success: true };
   } catch (error) {
     return { success: false, error };

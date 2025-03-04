@@ -1,5 +1,6 @@
 "use client";
 
+import { AiOption, KeyStorePref } from "@/types/ai";
 import {
   AI_CONFIG_TABLE,
   GEMINI_CONFIG_TABLE,
@@ -7,9 +8,12 @@ import {
   DEEPSEEK_CONFIG_TABLE,
   getAiConfigTable,
 } from "@/constants/supabase";
-import { PRE_PROMPT, DEFAULT_AI_MODEL } from "@/constants/aiSettings";
+import {
+  PRE_PROMPT,
+  DEFAULT_AI_MODEL,
+  AI_CHOICES,
+} from "@/constants/aiSettings";
 import { createClient } from "@/lib/supabase/client";
-import { KeyStorePref } from "@/providers/ai-provider";
 import { User } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
 import { cloudStoreApiKey } from "@/app/actions/gemini";
@@ -57,55 +61,79 @@ export const useAiSettings = (user: User | null) => {
       }
 
       // fetch gemini details
-      const { data: geminiData, error: geminiError } = await supabase
-        .from(GEMINI_CONFIG_TABLE)
-        .select("storePref, defaultModel")
-        .eq("userId", userId)
-        .single();
-      if (!geminiError) {
-        setStorePrefGemini((prev) => ({
+      try {
+        const { storePref, defaultModel } = await getApiKeyStorePref(
+          AiOption.Gemini
+        );
+        setStorePrefDeepseek((prev) => ({
           ...prev,
-          storePref: geminiData?.storePref,
-          defaultModel: geminiData?.defaultModel || "",
+          storePref: storePref,
+          defaultModel: defaultModel || "",
         }));
+      } catch (error) {
+        console.log("Error in fetching deepseek details");
       }
 
       // fetch openai details
-      const { data: openaiData, error: openaiError } = await supabase
-        .from(OPENAI_CONFIG_TABLE)
-        .select("storePref, defaultModel")
-        .eq("userId", userId)
-        .single();
-      if (!openaiError) {
-        setStorePrefOpenai((prev) => ({
+      try {
+        const { storePref, defaultModel } = await getApiKeyStorePref(
+          AiOption.OpenAi
+        );
+        setStorePrefDeepseek((prev) => ({
           ...prev,
-          storePref: openaiData?.storePref,
-          defaultModel: openaiData?.defaultModel || "",
+          storePref: storePref,
+          defaultModel: defaultModel || "",
         }));
+      } catch (error) {
+        console.log("Error in fetching deepseek details");
       }
 
       // fetch deepseek details
-      const { data: deepseekData, error: deepseekError } = await supabase
-        .from(DEEPSEEK_CONFIG_TABLE)
-        .select("storePref, defaultModel")
-        .eq("userId", userId)
-        .single();
-      if (!deepseekError) {
+      try {
+        const { storePref, defaultModel } = await getApiKeyStorePref(
+          AiOption.DeepSeek
+        );
         setStorePrefDeepseek((prev) => ({
           ...prev,
-          storePref: deepseekData?.storePref,
-          defaultModel: deepseekData?.defaultModel || "",
+          storePref: storePref,
+          defaultModel: defaultModel || "",
         }));
+      } catch (error) {
+        console.log("Error in fetching deepseek details");
       }
     };
 
     retrieveApiDetails();
   }, [user]);
 
+  const getApiKeyStorePref = async (
+    aiChoice: AiOption
+  ): Promise<AiConfigDetails> => {
+    const tableName = getAiConfigTable(aiChoice);
+    if (!user || !tableName)
+      return { storePref: KeyStorePref.UNSET, defaultModel: "" };
+
+    const supabase = createClient();
+
+    const { data, error } = await supabase
+      .from(tableName)
+      .select("storePref, defaultModel")
+      .eq("userId", user.id)
+      .single();
+
+    if (error) {
+      console.log("[getApiKeyStorePref] error: ", error);
+      return { storePref: KeyStorePref.UNSET, defaultModel: "" };
+    }
+
+    console.log("[getApiKeyStorePref] data: ", data);
+    return { storePref: data.storePref, defaultModel: data.defaultModel };
+  };
+
   const updateApiKey = async (
     apiKey: string,
     storePref: KeyStorePref,
-    aiChoice: string
+    aiChoice: AiOption
   ): Promise<SimpleResponse> => {
     if (!user) return { success: false, message: "Auth Error" };
 
@@ -140,7 +168,7 @@ export const useAiSettings = (user: User | null) => {
 
   const updateDefaultModel = async (
     defaultModel: string,
-    aiChoice: string
+    aiChoice: AiOption
   ): Promise<SimpleResponse> => {
     if (!user) return { success: false, message: "Auth Error" };
 
@@ -173,6 +201,7 @@ export const useAiSettings = (user: User | null) => {
     storePrefOpenai,
     storePrefDeepseek,
 
+    getApiKeyStorePref,
     updateApiKey,
     updateDefaultModel,
   };

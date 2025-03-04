@@ -9,8 +9,8 @@ import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
-import { useApiKey, KeyStorePref } from "@/providers/ai-provider";
-import { AiOption } from "@/types/ai";
+import { useApiKey } from "@/providers/ai-provider";
+import { AiOption, KeyStorePref } from "@/types/ai";
 import {
   Dialog,
   DialogContent,
