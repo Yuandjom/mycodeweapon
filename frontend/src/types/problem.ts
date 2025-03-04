@@ -4,13 +4,6 @@ export enum ProblemStatus {
   ToDo = "To Do",
 }
 
-export enum AiModels {
-  OpenAi = "OPENAI",
-  Gemini = "GEMINI",
-  Claude = "CLAUDE",
-  DeepSeek = "DEEPSEEK",
-}
-
 export interface ProblemState {
   problemId: string;
   userId: string;

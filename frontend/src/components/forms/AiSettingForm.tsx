@@ -12,8 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { aiStateType } from "@/hooks/useAccSettings";
-import { KeyStorePref } from "@/providers/apikey-provider";
+import { KeyStorePref } from "@/providers/ai-provider";
+
+interface aiStateType {
+  geminiKey: string;
+  geminiStore: KeyStorePref;
+}
 
 const STORAGE_OPTIONS = [
   { label: "Local Storage", value: KeyStorePref.LOCAL },

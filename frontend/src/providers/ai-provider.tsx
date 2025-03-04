@@ -3,8 +3,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "./auth-provider";
-import { cloudStoreGeminiKey } from "@/app/actions/gemini";
-import { GEMINI_CONFIG_TABLE } from "@/constants/supabase";
+import { AI_CONFIG_TABLE, GEMINI_CONFIG_TABLE } from "@/constants/supabase";
+import { useAiSettings } from "@/hooks/useAiSettings";
+import { SimpleResponse } from "@/types/global";
 
 export enum KeyStorePref {
   UNSET = "UNSET",
@@ -15,19 +16,24 @@ export enum KeyStorePref {
 interface ApiKeyContextType {
   geminiKey: string | null;
   geminiPref: KeyStorePref;
-  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>;
+  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<SimpleResponse>;
   isSavingPref: boolean;
 }
 
 const ApiKeyContext = createContext<ApiKeyContextType>({
   geminiPref: KeyStorePref.UNSET,
   geminiKey: null,
-  saveGeminiPref: async (pref: KeyStorePref, key: string) => false,
+  saveGeminiPref: async (pref: KeyStorePref, key: string) => ({
+    success: false,
+    message: "",
+  }),
   isSavingPref: false,
 });
 
-export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
+export function AiProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+
+  const { updateApiKey } = useAiSettings(user);
 
   const [geminiPref, setGeminiPref] = useState<KeyStorePref>(
     KeyStorePref.UNSET
@@ -36,12 +42,21 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
+      console.log("[ApiKeyProvider] init api keys");
       if (!user) return;
 
-      // init the gemini pref
-      console.log("[ApiKeyProvider] init gemini");
       const supabase = createClient();
 
+      // fetch user ai pref
+      const { data: aiConfig, error: aiConfigError } = await supabase
+        .from(AI_CONFIG_TABLE)
+        .select("prePrompt, defaultAiOption, defaultAiModel")
+        .eq("userId", user.id)
+        .single();
+
+      //TODO: fetch relevant api key & store pref
+
+      // init the gemini pref
       const { data, error } = await supabase
         .from(GEMINI_CONFIG_TABLE)
         .select("storePref")
@@ -63,39 +78,21 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
   const saveGeminiPref = async (
     pref: KeyStorePref,
     key: string
-  ): Promise<boolean> => {
-    if (!user) return false;
+  ): Promise<SimpleResponse> => {
+    if (!user) return { success: false, message: "Auth Error" };
 
     setIsSavingPref(true);
     setGeminiPref(pref);
 
-    try {
-      const supabase = createClient();
-
-      const { error } = await supabase
-        .from(GEMINI_CONFIG_TABLE)
-        .update({ storePref: pref })
-        .eq("userId", user.id);
-
-      if (error) throw error;
-
-      if (pref === KeyStorePref.CLOUD) {
-        await cloudStoreGeminiKey(user.id, key);
-      } else {
-        // set to local option so delete away past api keys
-        await supabase.from(GEMINI_CONFIG_TABLE).delete().eq("userId", user.id);
-
-        //TODO: fix losing key when refresh
-        setGeminiKey(key);
-      }
-    } catch (err) {
-      console.log(err);
-      return false;
-    } finally {
-      setIsSavingPref(false);
+    if (pref === KeyStorePref.LOCAL) {
+      setGeminiKey(key);
     }
 
-    return true;
+    const { success, message } = await updateApiKey(key, pref, "GEMINI");
+
+    setIsSavingPref(false);
+
+    return { success, message };
   };
 
   return (

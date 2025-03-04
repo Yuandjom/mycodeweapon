@@ -2,12 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { encryptKey, decryptKey } from "./encryption";
-import { KeyStorePref } from "@/providers/apikey-provider";
+import { KeyStorePref } from "@/providers/ai-provider";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GEMINI_CONFIG_TABLE } from "@/constants/supabase";
 
-export async function cloudGetGeminiKey(userId: string) {
-  console.log("[cloudGetGeminiKey]");
+export async function cloudGetApiKey(userId: string) {
+  console.log("[cloudGetApiKey]");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -23,10 +23,10 @@ export async function cloudGetGeminiKey(userId: string) {
   return { success: true, error: null, data };
 }
 
-export async function cloudCheckGeminiKey(userId: string) {
-  console.log("[cloudCheckGeminiKey]");
+export async function cloudCheckApiKey(userId: string) {
+  console.log("[cloudCheckApiKey]");
 
-  const response = await cloudGetGeminiKey(userId);
+  const response = await cloudGetApiKey(userId);
 
   if (!response.success) {
     return {
@@ -49,7 +49,11 @@ export async function cloudCheckGeminiKey(userId: string) {
   };
 }
 
-export async function cloudStoreGeminiKey(userId: string, key: string) {
+export async function cloudStoreApiKey(
+  userId: string,
+  key: string,
+  tableName: string
+) {
   try {
     const supabase = await createClient();
 
@@ -57,7 +61,7 @@ export async function cloudStoreGeminiKey(userId: string, key: string) {
 
     // upsert encrypted key to userkeys table
     const { error: upsertErr } = await supabase
-      .from(GEMINI_CONFIG_TABLE)
+      .from(tableName)
       .upsert({
         userId,
         apiKey: encryptedKey,
@@ -84,7 +88,7 @@ export async function cloudPromptGemini(
   console.log("[cloudPromptGemini]");
 
   try {
-    const keyFetchResponse = await cloudGetGeminiKey(userId);
+    const keyFetchResponse = await cloudGetApiKey(userId);
 
     if (!keyFetchResponse.success || !keyFetchResponse.data) {
       throw new Error("Unable to fetch API key");

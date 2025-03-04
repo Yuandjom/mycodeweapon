@@ -1,5 +1,5 @@
 export const DEFAULT_AI_MODEL: string = "GEMINI";
-export const AI_CHOICES: string[] = ["Gemini", "Deepseek", "OpenAI"];
+export const AI_CHOICES: string[] = ["Gemini", "OpenAI", "Deepseek"];
 
 export const GEMINI_MODELS: string[] = ["gemini-1.5-flash", "gemini-1.5-pro"];
 

@@ -1,10 +1,10 @@
-import { ApiKeyProvider } from "@/providers/apikey-provider";
+import { AiProvider } from "@/providers/ai-provider";
 
 const SignedInLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ApiKeyProvider>
+    <AiProvider>
       <div className="w-full h-full">{children}</div>
-    </ApiKeyProvider>
+    </AiProvider>
   );
 };
 

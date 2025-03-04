@@ -1,8 +1,8 @@
 "use client";
 
-import { AiModels } from "@/types/problem";
+import { AiOption } from "@/types/ai";
 import { useGemini } from "@/hooks/AiModels/useGemini";
-import { KeyStorePref } from "@/providers/apikey-provider";
+import { KeyStorePref } from "@/providers/ai-provider";
 import { useState } from "react";
 
 const FIRST_MESSAGE: string =
@@ -12,7 +12,7 @@ interface useAiChatProps {
   questionImage: File | null;
   code: string;
   language: string;
-  aiModel: AiModels;
+  aiModel: AiOption;
   keyPref: KeyStorePref;
   apiKey: string | null;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyStorePref } from "@/providers/apikey-provider";
+import { KeyStorePref } from "@/providers/ai-provider";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { PRE_PROMPT } from "@/constants/aiSettings";
 import { promptAiParams } from "../useAiChat";

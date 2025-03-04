@@ -51,3 +51,15 @@ export const displayErrorCode = (errorCode: string): string => {
     authErrorCodes[key] || "An unexpected error occurred. Please try again"
   );
 };
+
+export const getAiConfigTable = (aiChoice: string): string => {
+  switch (aiChoice) {
+    case "GEMINI":
+      return GEMINI_CONFIG_TABLE;
+    case "OPENAI":
+      return OPENAI_CONFIG_TABLE;
+    case "DEEPSEEK":
+      return DEEPSEEK_CONFIG_TABLE;
+  }
+  return "";
+};

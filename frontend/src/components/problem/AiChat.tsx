@@ -9,8 +9,8 @@ import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
-import { useApiKey, KeyStorePref } from "@/providers/apikey-provider";
-import { AiModels } from "@/types/problem";
+import { useApiKey, KeyStorePref } from "@/providers/ai-provider";
+import { AiOption } from "@/types/ai";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ import { useState } from "react";
 import { PasswordInput } from "@/components/utils/PasswordInput";
 import { useToast } from "@/hooks/use-toast";
 import { useAiChat } from "@/hooks/useAiChat";
+import { SimpleResponse } from "@/types/global";
 
 interface ChatHistoryProps {
   messages: string[];
@@ -59,7 +60,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
     questionImage,
     code,
     language,
-    aiModel: AiModels.Gemini,
+    aiModel: AiOption.Gemini,
     keyPref: geminiPref,
     apiKey: geminiKey,
   });
@@ -240,7 +241,7 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
 
 interface AiSettingsProps {
   geminiPref: KeyStorePref;
-  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<boolean>;
+  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<SimpleResponse>;
   isSavingPref: boolean;
 }
 
