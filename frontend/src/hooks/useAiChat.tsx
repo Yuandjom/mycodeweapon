@@ -2,7 +2,7 @@
 
 import { AiOption } from "@/types/ai";
 import { useGemini } from "@/hooks/AiModels/useGemini";
-import { KeyStorePref } from "@/providers/ai-provider";
+import { KeyStorePref } from "@/types/ai";
 import { useState } from "react";
 
 const FIRST_MESSAGE: string =

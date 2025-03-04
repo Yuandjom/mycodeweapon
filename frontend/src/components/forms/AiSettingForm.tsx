@@ -1,7 +1,6 @@
 "use client";
 
 import { PasswordInput } from "@/components/utils/PasswordInput";
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { SettingForm, SettingFormField } from "@/components/utils/SettingForm";
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { KeyStorePref } from "@/providers/ai-provider";
+import { KeyStorePref } from "@/types/ai";
 
 interface aiStateType {
   geminiKey: string;

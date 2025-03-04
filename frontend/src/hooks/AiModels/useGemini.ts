@@ -1,9 +1,9 @@
 "use client";
 
-import { KeyStorePref } from "@/providers/ai-provider";
+import { KeyStorePref } from "@/types/ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { PRE_PROMPT } from "@/constants/aiSettings";
-import { promptAiParams } from "../useAiChat";
+import { promptAiParams } from "@/hooks/useAiChat";
 
 interface UseGeminiProps {
   questionImage: File | null;
