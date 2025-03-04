@@ -1,4 +1,9 @@
-export const GEMINI_INSTRUCTIONS = `
+export const DEFAULT_AI_MODEL: string = "GEMINI";
+export const AI_CHOICES: string[] = ["Gemini", "Deepseek", "OpenAI"];
+
+export const GEMINI_MODELS: string[] = ["gemini-1.5-flash", "gemini-1.5-pro"];
+
+export const PRE_PROMPT = `
 You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.
 
 Key points to consider:
@@ -19,5 +24,3 @@ The goal is to provide comprehensive assistance in understanding and solving thi
 
 Please provide guidance based on the user prompt in a concise manner with the considerations listed above.
 `;
-
-export const GEMINI_MODELS: string[] = ["gemini-1.5-flash", "gemini-1.5-pro"];

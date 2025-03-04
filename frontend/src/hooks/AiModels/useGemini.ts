@@ -2,7 +2,7 @@
 
 import { KeyStorePref } from "@/providers/apikey-provider";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEMINI_INSTRUCTIONS } from "@/constants/gemini";
+import { PRE_PROMPT } from "@/constants/aiSettings";
 import { promptAiParams } from "../useAiChat";
 
 interface UseGeminiProps {
@@ -36,7 +36,7 @@ export const useGemini = ({
     let context = "";
 
     if (chatHistory.length === 1) {
-      context += GEMINI_INSTRUCTIONS;
+      context += PRE_PROMPT;
     }
 
     let imageData = null;

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/auth-provider";
 import { useProfileSettings } from "@/hooks/useProfileSettings";
+import { useAiSettings } from "@/hooks/useAiSettings";
 
 const SettingsContent = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  // profile handlers
   const {
     profileState,
     saveProfileSettings,
@@ -21,6 +23,15 @@ const SettingsContent = () => {
     isSavingProfile,
     saveProfileError,
   } = useProfileSettings(user);
+
+  // api key handlers
+  const {
+    defaultAi,
+    prePrompt,
+    storePrefGemini,
+    storePrefOpenai,
+    storePrefDeepseek,
+  } = useAiSettings(user);
 
   const handleSaveAllSettings = async () => {
     await saveProfileSettings();
@@ -57,13 +68,12 @@ const SettingsContent = () => {
         </h2>
         <Separator className="w-[90%] mb-2" />
 
-        {/* 
-            <AiSettingsForm 
-                aiKeysState={aiKeysState}
-                updateGeminiKey={updateGeminiKey}
-                updateGeminiStore={updateGeminiStore}
-                isSaving={isSaving}
-            /> */}
+        {/* <AiSettingsForm
+          aiKeysState={aiKeysState}
+          updateGeminiKey={updateGeminiKey}
+          updateGeminiStore={updateGeminiStore}
+          isSaving={isSaving}
+        /> */}
       </div>
 
       <div className="flex flex-col justify-center items-start gap-2">
