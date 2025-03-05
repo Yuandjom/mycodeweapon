@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 import { useApiKey } from "@/providers/ai-provider";
 import { AiOption, KeyStorePref } from "@/types/ai";
+import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,8 @@ import { PasswordInput } from "@/components/utils/PasswordInput";
 import { useToast } from "@/hooks/use-toast";
 import { useAiChat } from "@/hooks/useAiChat";
 import { SimpleResponse } from "@/types/global";
+import Link from "next/link";
+import { displayAiOption } from "@/hooks/useAiSettings";
 
 interface ChatHistoryProps {
   messages: string[];
@@ -44,7 +47,15 @@ interface AiChatProps {
 }
 
 const AiChat = ({ questionImage, code, language }: AiChatProps) => {
-  const { geminiKey, saveGeminiPref, geminiPref, isSavingPref } = useApiKey();
+  const {
+    prePrompt,
+    defaultAiOption,
+    defaultAiModel,
+    apiKey,
+    saveBasicSettings,
+    keyPref,
+    isSavingPref,
+  } = useApiKey();
 
   const {
     chatHistory,
@@ -57,12 +68,13 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
     setIncludeQuestionImg,
     submitPrompt,
   } = useAiChat({
+    aiOption: defaultAiOption,
+    aiModel: defaultAiModel,
     questionImage,
     code,
     language,
-    aiModel: AiOption.Gemini,
-    keyPref: geminiPref,
-    apiKey: geminiKey,
+    keyPref: keyPref,
+    apiKey: apiKey,
   });
 
   return (
@@ -92,9 +104,11 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
         </div>
 
         <div className="flex-1 flex justify-end">
-          <AiSettings
-            saveGeminiPref={saveGeminiPref}
-            geminiPref={geminiPref}
+          <AiSettingsModal
+            defaultAiModel={defaultAiModel}
+            defaultAiOption={defaultAiOption}
+            saveBasicSettings={saveBasicSettings}
+            keyPref={keyPref}
             isSavingPref={isSavingPref}
           />
         </div>
@@ -239,23 +253,37 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
   );
 };
 
-interface AiSettingsProps {
-  geminiPref: KeyStorePref;
-  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<SimpleResponse>;
+interface AiSettingsModalProps {
+  defaultAiOption: AiOption;
+  defaultAiModel: string;
+  keyPref: KeyStorePref;
+  saveBasicSettings: (
+    pref: KeyStorePref,
+    key: string,
+    model: string
+  ) => Promise<SimpleResponse>;
   isSavingPref: boolean;
 }
 
-const AiSettings = ({
-  saveGeminiPref,
-  geminiPref,
+const AiSettingsModal = ({
+  defaultAiOption,
+  defaultAiModel,
+  saveBasicSettings,
+  keyPref,
   isSavingPref,
-}: AiSettingsProps) => {
+}: AiSettingsModalProps) => {
   const { toast } = useToast();
 
-  const [storageOption, setStorageOption] = useState(geminiPref);
+  const [storageOption, setStorageOption] = useState<KeyStorePref>(keyPref);
+  const [modelOption, setModelOption] = useState<string>(defaultAiModel);
+
   useEffect(() => {
-    setStorageOption(geminiPref);
-  }, [geminiPref]);
+    setStorageOption(keyPref);
+  }, [keyPref]);
+
+  useEffect(() => {
+    setModelOption(defaultAiModel);
+  }, [defaultAiModel]);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -267,7 +295,11 @@ const AiSettings = ({
 
       const newApiKey = formData.get("apiKey") as string;
 
-      const success = await saveGeminiPref(storageOption, newApiKey);
+      const success = await saveBasicSettings(
+        storageOption,
+        newApiKey,
+        modelOption
+      );
       if (!success) {
         throw new Error("Failed to save storage preference");
       }
@@ -289,18 +321,57 @@ const AiSettings = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>AI Settings</DialogTitle>
+          <DialogTitle>
+            {displayAiOption(defaultAiOption)}'s' Settings
+          </DialogTitle>
+          <span className="text-sm text-muted-foreground">
+            Change to another model{" "}
+            <Link
+              href="/profile/settings"
+              className="text-secondary-foreground hover:underline"
+            >
+              here
+            </Link>
+            !
+          </span>
         </DialogHeader>
 
         <form onSubmit={handleSave}>
           <div className="flex flex-col gap-6 py-6">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="storage" className="font-medium">
-                API Key Storage
+              <Label htmlFor="model" className="font-semibold px-0.5">
+                {displayAiOption(defaultAiOption)} Model:
+              </Label>
+              <Select
+                value={modelOption}
+                defaultValue={modelOption}
+                onValueChange={(value: string) => setModelOption(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue>{modelOption}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {AI_OPTIONS_AND_MODELS[defaultAiOption].map((model, i) => (
+                      <SelectItem key={`ai_model-${i}`} value={model}>
+                        {model}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground px-0.5">
+                Models may have differing usage cost
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="storage" className="font-semibold px-0.5">
+                API Key Store Preference:
               </Label>
               <Select
                 value={storageOption}
-                defaultValue={geminiPref}
+                defaultValue={keyPref}
                 onValueChange={(value: KeyStorePref) =>
                   setStorageOption(value as KeyStorePref)
                 }
@@ -325,7 +396,7 @@ const AiSettings = ({
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground px-0.5">
                 {storageOption === KeyStorePref.LOCAL
                   ? "API key will not be stored and cleared after every session."
                   : "API key will be encrypted & stored securely in our database"}
@@ -333,8 +404,8 @@ const AiSettings = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="apiKey" className="font-medium">
-                Gemini API Key
+              <Label htmlFor="apiKey" className="font-semibold px-0.5">
+                {displayAiOption(defaultAiOption)} API Key:
               </Label>
               <PasswordInput
                 id="apiKey"
@@ -342,9 +413,10 @@ const AiSettings = ({
                 parentClassName="relative"
                 eyeClassName="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-transparent"
               />
-              <p className="text-sm text-muted-foreground">
-                For security reasons, your API key is never displayed (& fetched
-                to client)
+              <p className="text-sm text-muted-foreground px-0.5">
+                For security reasons, your API key is{" "}
+                <span className="underline">never</span> displayed (& fetched to
+                your browser)
               </p>
             </div>
           </div>

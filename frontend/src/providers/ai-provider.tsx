@@ -9,16 +9,30 @@ import { SimpleResponse } from "@/types/global";
 import { AiOption, KeyStorePref } from "@/types/ai";
 
 interface ApiKeyContextType {
-  geminiKey: string | null;
-  geminiPref: KeyStorePref;
-  saveGeminiPref: (pref: KeyStorePref, key: string) => Promise<SimpleResponse>;
+  prePrompt: string;
+  defaultAiOption: AiOption;
+  defaultAiModel: string;
+  keyPref: KeyStorePref;
+  apiKey: string | null;
+  saveBasicSettings: (
+    pref: KeyStorePref,
+    key: string,
+    model: string
+  ) => Promise<SimpleResponse>;
   isSavingPref: boolean;
 }
 
 const ApiKeyContext = createContext<ApiKeyContextType>({
-  geminiPref: KeyStorePref.UNSET,
-  geminiKey: null,
-  saveGeminiPref: async (pref: KeyStorePref, key: string) => ({
+  prePrompt: "",
+  defaultAiOption: AiOption.Gemini,
+  defaultAiModel: "",
+  keyPref: KeyStorePref.UNSET,
+  apiKey: null,
+  saveBasicSettings: async (
+    pref: KeyStorePref,
+    key: string,
+    model: string
+  ) => ({
     success: false,
     message: "",
   }),
@@ -28,16 +42,21 @@ const ApiKeyContext = createContext<ApiKeyContextType>({
 export function AiProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
-  const { getApiKeyStorePref, updateApiKey } = useAiSettings(user);
+  const {
+    prePrompt,
+    defaultAiOption,
+    defaultAiModel,
+    getApiKeyStorePref,
+    updateApiKey,
+    updateAiOptionDefaultModel,
+    updateAiChatDefaultSettings,
+  } = useAiSettings(user);
 
-  const [geminiPref, setGeminiPref] = useState<KeyStorePref>(
-    KeyStorePref.UNSET
-  );
-  const [geminiKey, setGeminiKey] = useState<string | null>(null);
+  const [keyPref, setKeyPref] = useState<KeyStorePref>(KeyStorePref.UNSET);
+  const [apiKey, setApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
-      console.log("[ApiKeyProvider] init api keys");
       if (!user) return;
 
       const supabase = createClient();
@@ -49,16 +68,12 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
         .eq("userId", user.id)
         .single();
 
-      console.log("[ApiProvider] init aiConfig:", aiConfig);
-
       // set pref based on user's selection
       const { storePref } =
         (await getApiKeyStorePref(aiConfig?.defaultAiOption)) ||
         KeyStorePref.UNSET;
 
-      console.log("[ApiProvider] init storePref: ", storePref);
-
-      setGeminiPref(storePref);
+      setKeyPref(storePref);
     };
 
     init();
@@ -66,35 +81,62 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
 
   const [isSavingPref, setIsSavingPref] = useState<boolean>(false);
 
-  const saveGeminiPref = async (
+  const saveBasicSettings = async (
     pref: KeyStorePref,
-    key: string
+    key: string,
+    model: string
   ): Promise<SimpleResponse> => {
     if (!user) return { success: false, message: "Auth Error" };
 
     setIsSavingPref(true);
-    setGeminiPref(pref);
+    setKeyPref(pref);
 
     if (pref === KeyStorePref.LOCAL) {
-      setGeminiKey(key);
+      setApiKey(key);
     }
 
-    console.log(
-      `[saveGeminiPref] calling updateApiKey(${key}, ${pref}, ${AiOption.Gemini})`
+    const { success: update1Success, message: msg1 } = await updateApiKey(
+      key,
+      pref,
+      AiOption.Gemini
     );
-    const { success, message } = await updateApiKey(key, pref, AiOption.Gemini);
+    if (!update1Success) {
+      return {
+        success: false,
+        message: msg1,
+      };
+    }
+
+    const { success: update2Success, message: msg2 } =
+      // update ai_config table
+      await updateAiChatDefaultSettings(defaultAiOption, model);
+
+    // update {aimodel}_config table
+    await updateAiOptionDefaultModel(model, AiOption.Gemini);
+    if (!update2Success) {
+      return {
+        success: false,
+        message: msg2,
+      };
+    }
 
     setIsSavingPref(false);
 
-    return { success, message };
+    return {
+      success: true,
+      message: "Successfully Updateda!",
+    };
   };
 
   return (
     <ApiKeyContext.Provider
       value={{
-        geminiKey,
-        geminiPref,
-        saveGeminiPref,
+        prePrompt,
+        defaultAiOption,
+        defaultAiModel,
+        apiKey,
+        keyPref,
+        saveBasicSettings,
         isSavingPref,
       }}
     >

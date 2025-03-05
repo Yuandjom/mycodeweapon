@@ -12,12 +12,14 @@ interface useAiChatProps {
   questionImage: File | null;
   code: string;
   language: string;
-  aiModel: AiOption;
+  aiOption: AiOption;
+  aiModel: string;
   keyPref: KeyStorePref;
   apiKey: string | null;
 }
 
 export interface promptAiParams {
+  aiModel: string;
   prompt: string;
   chatHistory: string[];
   includeCode: boolean;
@@ -28,6 +30,7 @@ export const useAiChat = ({
   questionImage,
   code,
   language,
+  aiOption,
   aiModel,
   keyPref,
   apiKey,
@@ -41,6 +44,7 @@ export const useAiChat = ({
   const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
 
   const { askGemini } = useGemini({
+    aiModel,
     questionImage,
     code,
     language,
@@ -55,12 +59,21 @@ export const useAiChat = ({
       setChatHistory((prev) => [...prev, cachedPrompt]);
       setPrompt("");
 
-      const reply = await askGemini({
-        prompt: cachedPrompt,
-        chatHistory,
-        includeCode,
-        includeQuestionImg,
-      });
+      let reply = "";
+
+      switch (aiOption) {
+        case AiOption.Gemini:
+          reply = await askGemini({
+            aiModel,
+            prompt: cachedPrompt,
+            chatHistory,
+            includeCode,
+            includeQuestionImg,
+          });
+          break;
+        default:
+          throw new Error("Invalid AI model chosen");
+      }
 
       setChatHistory((prev) => [...prev, reply]);
     } catch (err) {

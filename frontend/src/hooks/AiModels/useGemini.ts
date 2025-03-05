@@ -6,6 +6,7 @@ import { PRE_PROMPT } from "@/constants/aiSettings";
 import { promptAiParams } from "@/hooks/useAiChat";
 
 interface UseGeminiProps {
+  aiModel: string;
   questionImage: File | null;
   code: string;
   language: string;
@@ -14,6 +15,7 @@ interface UseGeminiProps {
 }
 
 export const useGemini = ({
+  aiModel,
   questionImage,
   code,
   language,
@@ -21,6 +23,7 @@ export const useGemini = ({
   geminiKey,
 }: UseGeminiProps) => {
   const askGemini = async ({
+    aiModel,
     prompt,
     chatHistory,
     includeCode,
@@ -58,6 +61,7 @@ export const useGemini = ({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            aiModel,
             prompt,
             context,
             chatHistory,
@@ -78,7 +82,7 @@ export const useGemini = ({
 
         // Direct client-side call using local key
         const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: aiModel });
 
         const processedHistory = chatHistory.slice(1).map((m, i) => ({
           role: i % 2 === 0 ? "user" : "model",

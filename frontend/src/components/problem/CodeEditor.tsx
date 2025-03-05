@@ -61,11 +61,11 @@ const CodeEditor = (props: Props) => {
           >
             <div className="flex_center gap-1.5">
               {props.isSubmitting ? (
-                <Loader2 className="text-green-400 h-4 w-4 animate-spin" />
+                <Loader2 className="text-green-200 h-4 w-4 animate-spin" />
               ) : (
-                <Play className="text-green-400 h-4 w-4" />
+                <Play className="text-green-200 h-4 w-4" />
               )}
-              <span className="font-semibold text-green-400">
+              <span className="font-semibold text-green-200">
                 {props.isSubmitting ? "Running..." : "Run"}
               </span>
             </div>
@@ -77,11 +77,11 @@ const CodeEditor = (props: Props) => {
           >
             <div className="flex_center gap-1.5">
               {props.isSaving ? (
-                <Loader2 className="text-blue-400 h-4 w-4 animate-spin" />
+                <Loader2 className="text-blue-200 h-4 w-4 animate-spin" />
               ) : (
-                <Save className="text-blue-400 h-4 w-4" />
+                <Save className="text-blue-200 h-4 w-4" />
               )}
-              <span className="font-semibold text-blue-400">
+              <span className="font-semibold text-blue-200">
                 {props.isSaving ? "Saving..." : "Save"}
               </span>
             </div>

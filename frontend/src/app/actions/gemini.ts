@@ -24,8 +24,6 @@ export async function cloudGetApiKey(userId: string) {
 }
 
 export async function cloudCheckApiKey(userId: string) {
-  console.log("[cloudCheckApiKey]");
-
   const response = await cloudGetApiKey(userId);
 
   if (!response.success) {
@@ -59,21 +57,16 @@ export async function cloudStoreApiKey(
 
     const encryptedKey = await encryptKey(key);
 
-    console.log(
-      `[cloudStoreApiKey] upserting to ${tableName} api-key: ${key} pref: ${KeyStorePref.CLOUD}`
-    );
-
     // upsert encrypted key to userkeys table
     const { error: upsertErr } = await supabase.from(tableName).upsert({
       userId,
       apiKey: encryptedKey,
-      storePref: "CLOUD",
+      storePref: KeyStorePref.CLOUD,
       defaultModel: "gemini-1.5-pro",
     });
 
     if (upsertErr) {
-      console.log("[cloudStoreApiKey] error: ", upsertErr);
-      return { success: false };
+      throw upsertErr;
     }
     return { success: true };
   } catch (error) {

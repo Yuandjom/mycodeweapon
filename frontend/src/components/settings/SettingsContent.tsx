@@ -26,7 +26,7 @@ const SettingsContent = () => {
 
   // api key handlers
   const {
-    defaultAi,
+    defaultAiModel,
     prePrompt,
     storePrefGemini,
     storePrefOpenai,

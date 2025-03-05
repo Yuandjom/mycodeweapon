@@ -1,7 +1,10 @@
 export const DEFAULT_AI_MODEL: string = "GEMINI";
-export const AI_CHOICES: string[] = ["Gemini", "OpenAI", "Deepseek"];
 
-export const GEMINI_MODELS: string[] = ["gemini-1.5-flash", "gemini-1.5-pro"];
+export const AI_OPTIONS_AND_MODELS: Record<string, string[]> = {
+  GEMINI: ["gemini-1.5-pro", "gemini-1.5-flash"],
+  OPENAI: ["todo1", "todo2", "todo3"],
+  DEEPSEEK: ["todo1", "todo2", "todo3"],
+};
 
 export const PRE_PROMPT = `
 You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.

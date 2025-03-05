@@ -8,11 +8,7 @@ import {
   DEEPSEEK_CONFIG_TABLE,
   getAiConfigTable,
 } from "@/constants/supabase";
-import {
-  PRE_PROMPT,
-  DEFAULT_AI_MODEL,
-  AI_CHOICES,
-} from "@/constants/aiSettings";
+import { PRE_PROMPT, AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
@@ -24,9 +20,26 @@ interface AiConfigDetails {
   defaultModel: string;
 }
 
+export const displayAiOption = (aiChoice: AiOption) => {
+  switch (aiChoice) {
+    case "GEMINI":
+      return "Gemini";
+    case "OPENAI":
+      return "OpenAI";
+    case "DEEPSEEK":
+      return "DeepSeek";
+  }
+  return "";
+};
+
 export const useAiSettings = (user: User | null) => {
   const [prePrompt, setPrePrompt] = useState<string>("");
-  const [defaultAi, setDefaultAi] = useState<string>("");
+  const [defaultAiOption, setDefaultAiOption] = useState<AiOption>(
+    AiOption.Gemini
+  );
+  const [defaultAiModel, setDefaultAiModel] = useState<string>(
+    AI_OPTIONS_AND_MODELS[AiOption.Gemini][0]
+  );
 
   const [storePrefGemini, setStorePrefGemini] = useState<AiConfigDetails>({
     storePref: KeyStorePref.UNSET,
@@ -51,13 +64,16 @@ export const useAiSettings = (user: User | null) => {
       // fetch ai config
       const { data: aiConfig, error: aiConfigError } = await supabase
         .from(AI_CONFIG_TABLE)
-        .select("prePrompt, defaultAi")
+        .select("prePrompt, defaultAiOption, defaultAiModel")
         .eq("userId", userId)
         .single();
 
       if (!aiConfigError) {
         setPrePrompt(aiConfig?.prePrompt || PRE_PROMPT);
-        setDefaultAi(aiConfig?.defaultAi || DEFAULT_AI_MODEL);
+        setDefaultAiOption(aiConfig?.defaultAiOption || AiOption.Gemini);
+        setDefaultAiModel(
+          aiConfig?.defaultAiModel || AI_OPTIONS_AND_MODELS[AiOption.Gemini][0]
+        );
       }
 
       // fetch gemini details
@@ -65,13 +81,13 @@ export const useAiSettings = (user: User | null) => {
         const { storePref, defaultModel } = await getApiKeyStorePref(
           AiOption.Gemini
         );
-        setStorePrefDeepseek((prev) => ({
+        setStorePrefGemini((prev) => ({
           ...prev,
           storePref: storePref,
           defaultModel: defaultModel || "",
         }));
       } catch (error) {
-        console.log("Error in fetching deepseek details");
+        console.log("Error in fetching gemini details");
       }
 
       // fetch openai details
@@ -79,13 +95,13 @@ export const useAiSettings = (user: User | null) => {
         const { storePref, defaultModel } = await getApiKeyStorePref(
           AiOption.OpenAi
         );
-        setStorePrefDeepseek((prev) => ({
+        setStorePrefOpenai((prev) => ({
           ...prev,
           storePref: storePref,
           defaultModel: defaultModel || "",
         }));
       } catch (error) {
-        console.log("Error in fetching deepseek details");
+        console.log("Error in fetching openai details");
       }
 
       // fetch deepseek details
@@ -122,11 +138,9 @@ export const useAiSettings = (user: User | null) => {
       .single();
 
     if (error) {
-      console.log("[getApiKeyStorePref] error: ", error);
       return { storePref: KeyStorePref.UNSET, defaultModel: "" };
     }
 
-    console.log("[getApiKeyStorePref] data: ", data);
     return { storePref: data.storePref, defaultModel: data.defaultModel };
   };
 
@@ -166,7 +180,7 @@ export const useAiSettings = (user: User | null) => {
     return { success: true, message: "API Key updated!" };
   };
 
-  const updateDefaultModel = async (
+  const updateAiOptionDefaultModel = async (
     defaultModel: string,
     aiChoice: AiOption
   ): Promise<SimpleResponse> => {
@@ -194,15 +208,41 @@ export const useAiSettings = (user: User | null) => {
     };
   };
 
+  const updateAiChatDefaultSettings = async (
+    defaultAiOption: AiOption,
+    defaultAiModel: string
+  ): Promise<SimpleResponse> => {
+    if (!user) return { success: false, message: "Auth Error" };
+
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from(AI_CONFIG_TABLE)
+      .upsert({ userId: user.id, defaultAiOption, defaultAiModel });
+
+    if (error) {
+      console.log("[useAiSettings] updateDefaultModel error:");
+      console.error(error);
+      return { success: false, message: "Backend Error" };
+    }
+
+    return {
+      success: true,
+      message: "Settings Updated!",
+    };
+  };
+
   return {
     prePrompt,
-    defaultAi,
+    defaultAiOption,
+    defaultAiModel,
     storePrefGemini,
     storePrefOpenai,
     storePrefDeepseek,
 
     getApiKeyStorePref,
     updateApiKey,
-    updateDefaultModel,
+    updateAiOptionDefaultModel,
+    updateAiChatDefaultSettings,
   };
 };

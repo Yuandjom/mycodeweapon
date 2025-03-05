@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface RequestBody {
+  aiModel: string;
   prompt: string;
   context: string;
   chatHistory: string[];
@@ -21,11 +22,17 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { prompt, context, chatHistory, questionImage }: RequestBody = body;
+    const {
+      aiModel,
+      prompt,
+      context,
+      chatHistory,
+      questionImage,
+    }: RequestBody = body;
 
     const MAX_OUTPUT_TOKENS = 2048;
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ model: aiModel });
 
     const processedHistory = chatHistory.slice(1).map((m, i) => ({
       role: i % 2 === 0 ? "user" : "model",
