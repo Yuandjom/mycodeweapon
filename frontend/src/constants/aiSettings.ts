@@ -2,12 +2,20 @@ export const DEFAULT_AI_MODEL: string = "GEMINI";
 
 export const AI_OPTIONS_AND_MODELS: Record<string, string[]> = {
   GEMINI: ["gemini-1.5-pro", "gemini-1.5-flash"],
-  OPENAI: ["todo1", "todo2", "todo3"],
-  DEEPSEEK: ["todo1", "todo2", "todo3"],
+  OPENAI: [
+    "gpt-4",
+    "o1",
+    "o1-mini",
+    "o3-mini",
+    "gpt-4o",
+    "gpt-4o-mini",
+    "gpt-3.5-turbo",
+    "gpt-4-turbo",
+  ],
+  DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
 };
 
-export const PRE_PROMPT = `
-You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.
+export const PRE_PROMPT = `You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.
 
 Key points to consider:
 1. This is a programming challenge that needs to be solved by code

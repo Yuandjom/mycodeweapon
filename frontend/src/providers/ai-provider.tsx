@@ -49,7 +49,7 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
     getApiKeyStorePref,
     updateApiKey,
     updateAiOptionDefaultModel,
-    updateAiChatDefaultSettings,
+    saveAiChatDefaultSettings,
   } = useAiSettings(user);
 
   const [keyPref, setKeyPref] = useState<KeyStorePref>(KeyStorePref.UNSET);
@@ -109,7 +109,7 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
 
     const { success: update2Success, message: msg2 } =
       // update ai_config table
-      await updateAiChatDefaultSettings(defaultAiOption, model);
+      await saveAiChatDefaultSettings(defaultAiOption, model);
 
     // update {aimodel}_config table
     await updateAiOptionDefaultModel(model, AiOption.Gemini);

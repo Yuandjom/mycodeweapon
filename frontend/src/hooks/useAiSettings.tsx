@@ -1,13 +1,7 @@
 "use client";
 
 import { AiOption, KeyStorePref } from "@/types/ai";
-import {
-  AI_CONFIG_TABLE,
-  GEMINI_CONFIG_TABLE,
-  OPENAI_CONFIG_TABLE,
-  DEEPSEEK_CONFIG_TABLE,
-  getAiConfigTable,
-} from "@/constants/supabase";
+import { AI_CONFIG_TABLE, getAiConfigTable } from "@/constants/supabase";
 import { PRE_PROMPT, AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -41,17 +35,21 @@ export const useAiSettings = (user: User | null) => {
     AI_OPTIONS_AND_MODELS[AiOption.Gemini][0]
   );
 
-  const [storePrefGemini, setStorePrefGemini] = useState<AiConfigDetails>({
-    storePref: KeyStorePref.UNSET,
-    defaultModel: "",
-  });
-  const [storePrefOpenai, setStorePrefOpenai] = useState<AiConfigDetails>({
-    storePref: KeyStorePref.UNSET,
-    defaultModel: "",
-  });
-  const [storePrefDeepseek, setStorePrefDeepseek] = useState<AiConfigDetails>({
-    storePref: KeyStorePref.UNSET,
-    defaultModel: "",
+  const [AiOptionConfigDetails, setAiOptionConfigDetails] = useState<
+    Partial<Record<AiOption, AiConfigDetails>>
+  >({
+    [AiOption.Gemini]: {
+      storePref: KeyStorePref.UNSET,
+      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.Gemini][0],
+    },
+    [AiOption.OpenAi]: {
+      storePref: KeyStorePref.UNSET,
+      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.OpenAi][0],
+    },
+    [AiOption.DeepSeek]: {
+      storePref: KeyStorePref.UNSET,
+      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.DeepSeek][0],
+    },
   });
 
   useEffect(() => {
@@ -76,46 +74,38 @@ export const useAiSettings = (user: User | null) => {
         );
       }
 
-      // fetch gemini details
+      // fetch every aiOption details from all tables
       try {
-        const { storePref, defaultModel } = await getApiKeyStorePref(
-          AiOption.Gemini
-        );
-        setStorePrefGemini((prev) => ({
-          ...prev,
-          storePref: storePref,
-          defaultModel: defaultModel || "",
-        }));
-      } catch (error) {
-        console.log("Error in fetching gemini details");
-      }
+        const allAiOptions: AiOption[] = Object.values(AiOption);
 
-      // fetch openai details
-      try {
-        const { storePref, defaultModel } = await getApiKeyStorePref(
-          AiOption.OpenAi
-        );
-        setStorePrefOpenai((prev) => ({
-          ...prev,
-          storePref: storePref,
-          defaultModel: defaultModel || "",
-        }));
-      } catch (error) {
-        console.log("Error in fetching openai details");
-      }
+        const allFetchPromises = allAiOptions.map(async (option) => {
+          try {
+            const config = await getApiKeyStorePref(option);
+            return { option, config };
+          } catch (err) {
+            console.log(
+              `[retrieveApiDetails] error in fetching from ${option}_config table`
+            );
+            return {
+              option,
+              config: {
+                storePref: KeyStorePref.UNSET,
+                defaultModel: AI_OPTIONS_AND_MODELS[option][0],
+              },
+            };
+          }
+        });
 
-      // fetch deepseek details
-      try {
-        const { storePref, defaultModel } = await getApiKeyStorePref(
-          AiOption.DeepSeek
-        );
-        setStorePrefDeepseek((prev) => ({
-          ...prev,
-          storePref: storePref,
-          defaultModel: defaultModel || "",
-        }));
-      } catch (error) {
-        console.log("Error in fetching deepseek details");
+        const allFetchedPromises = await Promise.all(allFetchPromises);
+        const latestAiOptionConfigDetails = { ...AiOptionConfigDetails };
+
+        allFetchedPromises.forEach((details) => {
+          latestAiOptionConfigDetails[details.option] = details.config;
+        });
+
+        setAiOptionConfigDetails(latestAiOptionConfigDetails);
+      } catch (err) {
+        console.log("Error fetching AI configs");
       }
     };
 
@@ -208,7 +198,8 @@ export const useAiSettings = (user: User | null) => {
     };
   };
 
-  const updateAiChatDefaultSettings = async (
+  // used by AiChat modal only
+  const saveAiChatDefaultSettings = async (
     defaultAiOption: AiOption,
     defaultAiModel: string
   ): Promise<SimpleResponse> => {
@@ -232,17 +223,37 @@ export const useAiSettings = (user: User | null) => {
     };
   };
 
+  // used in
+  const saveAiSettings = async (): Promise<SimpleResponse> => {
+    if (!user) return { success: false, message: "Auth Error" };
+
+    const supabase = createClient();
+
+    // update in ai_configs
+    const { error } = await supabase
+      .from(AI_CONFIG_TABLE)
+      .upsert({ userId: user.id, defaultAiOption, defaultAiModel, prePrompt });
+
+    if (error) return { success: false, message: "Error saving AI configs" };
+
+    return { success: true, message: "Successfully saved AI settings!" };
+  };
+
   return {
     prePrompt,
     defaultAiOption,
     defaultAiModel,
-    storePrefGemini,
-    storePrefOpenai,
-    storePrefDeepseek,
+    AiOptionConfigDetails,
 
     getApiKeyStorePref,
     updateApiKey,
     updateAiOptionDefaultModel,
-    updateAiChatDefaultSettings,
+    saveAiChatDefaultSettings,
+
+    setPrePrompt,
+    setDefaultAiOption,
+    setDefaultAiModel,
+
+    saveAiSettings,
   };
 };
