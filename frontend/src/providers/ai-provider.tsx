@@ -47,8 +47,8 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
     defaultAiOption,
     defaultAiModel,
     getApiKeyStorePref,
-    updateApiKey,
-    updateAiOptionDefaultModel,
+    saveApiKey,
+    saveAiOptionDefaultModel,
     saveAiChatDefaultSettings,
   } = useAiSettings(user);
 
@@ -94,37 +94,41 @@ export function AiProvider({ children }: { children: React.ReactNode }) {
     if (pref === KeyStorePref.LOCAL) {
       setApiKey(key);
     }
+    try {
+      const { success: update1Success, message: msg1 } = await saveApiKey(
+        key,
+        pref,
+        AiOption.Gemini
+      );
+      if (!update1Success) {
+        throw Error("Error in saving api key");
+      }
 
-    const { success: update1Success, message: msg1 } = await updateApiKey(
-      key,
-      pref,
-      AiOption.Gemini
-    );
-    if (!update1Success) {
-      return {
-        success: false,
-        message: msg1,
-      };
-    }
-
-    const { success: update2Success, message: msg2 } =
       // update ai_config table
-      await saveAiChatDefaultSettings(defaultAiOption, model);
+      const { success: update2Success, message: msg2 } =
+        await saveAiChatDefaultSettings(defaultAiOption, model);
+      if (!update2Success) {
+        throw Error("Error in updating ai_configs table");
+      }
 
-    // update {aimodel}_config table
-    await updateAiOptionDefaultModel(model, AiOption.Gemini);
-    if (!update2Success) {
+      // update {aimodel}_config table
+      const { success: update3Success, message: msg3 } =
+        await saveAiOptionDefaultModel(model, AiOption.Gemini);
+      if (!update3Success) {
+        throw Error("Error in updating {aiopton}_config table");
+      }
+    } catch (error) {
       return {
         success: false,
-        message: msg2,
+        message: "Something went wrong",
       };
+    } finally {
+      setIsSavingPref(false);
     }
-
-    setIsSavingPref(false);
 
     return {
       success: true,
-      message: "Successfully Updateda!",
+      message: "Successfully Updated!",
     };
   };
 

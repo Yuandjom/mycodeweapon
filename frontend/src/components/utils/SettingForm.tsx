@@ -13,7 +13,7 @@ import {
 
 type SelectOption = {
   value: string;
-  display: string;
+  label: string;
 };
 export interface SettingFormField {
   id: string;
@@ -92,8 +92,8 @@ const renderField = (field: SettingFormField) => {
         <SelectTrigger>{field.value || field.placeholder}</SelectTrigger>
         <SelectContent>
           {field.selectOptions?.map((opt, i) => (
-            <SelectItem key={`select-${i}-${opt.display}`} value={opt.value}>
-              {opt.display}
+            <SelectItem key={`select-${i}-${opt.label}`} value={opt.value}>
+              {opt.label}
             </SelectItem>
           ))}
         </SelectContent>

@@ -12,6 +12,7 @@ import { SimpleResponse } from "@/types/global";
 interface AiConfigDetails {
   storePref: KeyStorePref;
   defaultModel: string;
+  apiKey: string;
 }
 
 export const displayAiOption = (aiChoice: AiOption) => {
@@ -25,6 +26,11 @@ export const displayAiOption = (aiChoice: AiOption) => {
   }
   return "";
 };
+
+export const STORAGE_OPTIONS = [
+  { label: "Local Storage", value: KeyStorePref.LOCAL },
+  { label: "Cloud Storage", value: KeyStorePref.CLOUD },
+];
 
 export const useAiSettings = (user: User | null) => {
   const [prePrompt, setPrePrompt] = useState<string>("");
@@ -41,16 +47,21 @@ export const useAiSettings = (user: User | null) => {
     [AiOption.Gemini]: {
       storePref: KeyStorePref.UNSET,
       defaultModel: AI_OPTIONS_AND_MODELS[AiOption.Gemini][0],
+      apiKey: "",
     },
     [AiOption.OpenAi]: {
       storePref: KeyStorePref.UNSET,
       defaultModel: AI_OPTIONS_AND_MODELS[AiOption.OpenAi][0],
+      apiKey: "",
     },
     [AiOption.DeepSeek]: {
       storePref: KeyStorePref.UNSET,
       defaultModel: AI_OPTIONS_AND_MODELS[AiOption.DeepSeek][0],
+      apiKey: "",
     },
   });
+
+  const [isSavingAiSettings, setIsSavingAiSettings] = useState<boolean>(false);
 
   useEffect(() => {
     const retrieveApiDetails = async () => {
@@ -59,7 +70,7 @@ export const useAiSettings = (user: User | null) => {
       const supabase = createClient();
       const userId = user.id;
 
-      // fetch ai config
+      // fetch ai_configs
       const { data: aiConfig, error: aiConfigError } = await supabase
         .from(AI_CONFIG_TABLE)
         .select("prePrompt, defaultAiOption, defaultAiModel")
@@ -74,7 +85,7 @@ export const useAiSettings = (user: User | null) => {
         );
       }
 
-      // fetch every aiOption details from all tables
+      // fetch every aiOption_config from all tables
       try {
         const allAiOptions: AiOption[] = Object.values(AiOption);
 
@@ -91,6 +102,7 @@ export const useAiSettings = (user: User | null) => {
               config: {
                 storePref: KeyStorePref.UNSET,
                 defaultModel: AI_OPTIONS_AND_MODELS[option][0],
+                apiKey: "",
               },
             };
           }
@@ -117,7 +129,7 @@ export const useAiSettings = (user: User | null) => {
   ): Promise<AiConfigDetails> => {
     const tableName = getAiConfigTable(aiChoice);
     if (!user || !tableName)
-      return { storePref: KeyStorePref.UNSET, defaultModel: "" };
+      return { storePref: KeyStorePref.UNSET, defaultModel: "", apiKey: "" };
 
     const supabase = createClient();
 
@@ -128,13 +140,17 @@ export const useAiSettings = (user: User | null) => {
       .single();
 
     if (error) {
-      return { storePref: KeyStorePref.UNSET, defaultModel: "" };
+      return { storePref: KeyStorePref.UNSET, defaultModel: "", apiKey: "" };
     }
 
-    return { storePref: data.storePref, defaultModel: data.defaultModel };
+    return {
+      storePref: data.storePref,
+      defaultModel: data.defaultModel,
+      apiKey: "",
+    };
   };
 
-  const updateApiKey = async (
+  const saveApiKey = async (
     apiKey: string,
     storePref: KeyStorePref,
     aiChoice: AiOption
@@ -170,7 +186,7 @@ export const useAiSettings = (user: User | null) => {
     return { success: true, message: "API Key updated!" };
   };
 
-  const updateAiOptionDefaultModel = async (
+  const saveAiOptionDefaultModel = async (
     defaultModel: string,
     aiChoice: AiOption
   ): Promise<SimpleResponse> => {
@@ -198,6 +214,29 @@ export const useAiSettings = (user: User | null) => {
     };
   };
 
+  const setApiKeyByAiOption = (aiOption: AiOption, apiKey: string): void => {
+    setAiOptionConfigDetails((prev) => ({
+      ...prev,
+      [aiOption]: {
+        ...prev[aiOption],
+        apiKey,
+      },
+    }));
+  };
+
+  const setStorePrefByAiOption = (
+    aiOption: AiOption,
+    storePref: string
+  ): void => {
+    setAiOptionConfigDetails((prev) => ({
+      ...prev,
+      [aiOption]: {
+        ...prev[aiOption],
+        storePref,
+      },
+    }));
+  };
+
   // used by AiChat modal only
   const saveAiChatDefaultSettings = async (
     defaultAiOption: AiOption,
@@ -223,18 +262,70 @@ export const useAiSettings = (user: User | null) => {
     };
   };
 
-  // used in
+  // used in /profile/settings
   const saveAiSettings = async (): Promise<SimpleResponse> => {
     if (!user) return { success: false, message: "Auth Error" };
+    setIsSavingAiSettings(true);
 
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    // update in ai_configs
-    const { error } = await supabase
-      .from(AI_CONFIG_TABLE)
-      .upsert({ userId: user.id, defaultAiOption, defaultAiModel, prePrompt });
+      // update in ai_configs
+      const { error } = await supabase.from(AI_CONFIG_TABLE).upsert({
+        userId: user.id,
+        defaultAiOption,
+        defaultAiModel,
+        prePrompt,
+      });
+      if (error) throw error;
 
-    if (error) return { success: false, message: "Error saving AI configs" };
+      // update in all aiOption_config
+      // todo: implement local storage for keystorepref.local
+      const allAiOptions: AiOption[] = Object.values(AiOption);
+
+      const allSavePromises = allAiOptions.map(
+        async (option): Promise<SimpleResponse> => {
+          const tableName = getAiConfigTable(option);
+
+          const { error } = await supabase.from(tableName).upsert({
+            userId: user.id,
+            apiKey:
+              AiOptionConfigDetails[option]?.storePref === KeyStorePref.CLOUD
+                ? AiOptionConfigDetails[option]?.apiKey
+                : "",
+            defaultModel: AiOptionConfigDetails[option]?.defaultModel || "",
+            storePref: AiOptionConfigDetails[option]?.storePref || "",
+          });
+
+          if (error) {
+            console.log(error);
+            return {
+              success: false,
+              message: `Error in updating ${displayAiOption(option)} settings`,
+            };
+          }
+
+          return {
+            success: true,
+            message: `Successful in updating ${displayAiOption(
+              option
+            )} settings`,
+          };
+        }
+      );
+
+      const allFetchedPromises = await Promise.all(allSavePromises);
+
+      allFetchedPromises.forEach((res) => {
+        if (!res.success) {
+          throw new Error(res.message);
+        }
+      });
+    } catch (error) {
+      return { success: false, message: "Error saving AI configs" };
+    } finally {
+      setIsSavingAiSettings(false);
+    }
 
     return { success: true, message: "Successfully saved AI settings!" };
   };
@@ -246,14 +337,18 @@ export const useAiSettings = (user: User | null) => {
     AiOptionConfigDetails,
 
     getApiKeyStorePref,
-    updateApiKey,
-    updateAiOptionDefaultModel,
+    saveApiKey,
+    saveAiOptionDefaultModel,
     saveAiChatDefaultSettings,
 
     setPrePrompt,
     setDefaultAiOption,
     setDefaultAiModel,
 
+    setApiKeyByAiOption,
+    setStorePrefByAiOption,
+
     saveAiSettings,
+    isSavingAiSettings,
   };
 };

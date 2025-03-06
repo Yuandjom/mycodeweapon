@@ -4,11 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, SettingsIcon } from "lucide-react";
+import { Loader2, SettingsIcon, SendIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
-import Image from "next/image";
 import { useApiKey } from "@/providers/ai-provider";
 import { AiOption, KeyStorePref } from "@/types/ai";
 import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
@@ -134,7 +133,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
               onChange={(e) => setPrompt(e.target.value)}
               value={prompt}
               placeholder="Ask a question"
-              className="resize-none pr-32"
+              className="resize-none h-[80px]"
               disabled={isPrompting}
               onKeyDown={(e) => {
                 if (
@@ -147,7 +146,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
                 }
               }}
             />
-            <div className="absolute right-2 bottom-0 flex items-center opacity-70">
+            {/* <div className="absolute right-2 bottom-0 flex items-center opacity-70">
               <span className="text-xs bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-400 bg-clip-text text-transparent pr-2">
                 Powered By
               </span>
@@ -158,19 +157,14 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
                 width={38}
                 className="pb-1"
               />
-            </div>
+            </div> */}
           </div>
           <Button
             onClick={submitPrompt}
             disabled={isPrompting || prompt.trim().length === 0}
-            className="bg-slate-50 disabled:bg-slate-100"
+            className="bg-slate-50 disabled:bg-slate-100 h-[40px]"
           >
-            <Image
-              src="/companyIcons/gemini.png"
-              alt="ai"
-              height={10}
-              width={25}
-            />
+            <SendIcon className="h-16 w-16" />
           </Button>
         </div>
       </div>

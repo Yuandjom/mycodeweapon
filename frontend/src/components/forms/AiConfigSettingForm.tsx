@@ -28,13 +28,13 @@ const AiConfigSettingForm = ({
 }: AiConfigSettingFormProps) => {
   const aiOptionSelections = Object.values(AiOption).map((opt) => ({
     value: opt,
-    display: displayAiOption(opt),
+    label: displayAiOption(opt),
   }));
 
   const aiModelSelections = AI_OPTIONS_AND_MODELS[defaultAiOption].map(
     (mod) => ({
       value: mod,
-      display: mod,
+      label: mod,
     })
   );
 

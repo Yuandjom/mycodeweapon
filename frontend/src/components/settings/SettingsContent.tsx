@@ -3,13 +3,13 @@
 import { Separator } from "@/components/ui/separator";
 import ProfileSettingsForm from "@/components/forms/ProfileSettingForm";
 import AiConfigSettingForm from "@/components/forms/AiConfigSettingForm";
-import AiSettingsForm from "@/components/forms/AiSettingForm";
+import AiOptionSettingForm from "@/components/forms/AiOptionSettingForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/providers/auth-provider";
 import { useProfileSettings } from "@/hooks/useProfileSettings";
 import { useAiSettings } from "@/hooks/useAiSettings";
-import { AiOption } from "@/types/ai";
+import { AiOption, KeyStorePref } from "@/types/ai";
 
 const SettingsContent = () => {
   const { toast } = useToast();
@@ -36,6 +36,10 @@ const SettingsContent = () => {
     setDefaultAiOption,
     setDefaultAiModel,
 
+    setApiKeyByAiOption,
+    setStorePrefByAiOption,
+
+    isSavingAiSettings,
     saveAiSettings,
   } = useAiSettings(user);
 
@@ -51,7 +55,7 @@ const SettingsContent = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-start items-start gap-12 ">
+    <div className="w-full h-full flex flex-col justify-start items-start gap-16">
       {/* <div className="w-full flex flex-col justify-center items-start">
         <p className="text-semibold py-2">DEBUG:</p>
         {Object.entries(AiOptionConfigDetails).map(([key, value]) => (
@@ -73,7 +77,7 @@ const SettingsContent = () => {
           updateEmail={updateEmail}
           password={profileState.password}
           updatePassword={updatePassword}
-          isSaving={isSavingProfile}
+          isSaving={isSavingProfile || isSavingAiSettings}
         />
       </div>
 
@@ -87,14 +91,32 @@ const SettingsContent = () => {
           updatePrePrompt={setPrePrompt}
           updateDefaultAiOption={setDefaultAiOption}
           updateDefaultAiModel={setDefaultAiModel}
-          isSaving={isSavingProfile}
+          isSaving={isSavingProfile || isSavingAiSettings}
         />
-        {/* <AiSettingsForm
-          aiKeysState={aiKeysState}
-          updateGeminiKey={updateGeminiKey}
-          updateGeminiStore={updateGeminiStore}
-          isSaving={isSaving}
-        /> */}
+      </div>
+
+      <div className="flex flex-col justify-start items-start gap-2">
+        <h2 className="text-lg font-bold">API Keys</h2>
+        <Separator className="w-[90%] mb-2" />
+        {Object.values(AiOption).map((ao, i) => {
+          return (
+            <div
+              className="flex flex-col justify-start items-start gap-8 my-2"
+              key={`aiOption-settings-${ao}-${i}`}
+            >
+              <AiOptionSettingForm
+                aiOption={ao}
+                apiKey={AiOptionConfigDetails[ao]?.apiKey || ""}
+                storePref={
+                  AiOptionConfigDetails[ao]?.storePref || KeyStorePref.UNSET
+                }
+                updateApiKey={(val) => setApiKeyByAiOption(ao, val)}
+                updateStorePref={(val) => setStorePrefByAiOption(ao, val)}
+                isSaving={isSavingProfile || isSavingAiSettings}
+              />
+            </div>
+          );
+        })}
       </div>
 
       <div className="flex flex-col justify-center items-start gap-2">
