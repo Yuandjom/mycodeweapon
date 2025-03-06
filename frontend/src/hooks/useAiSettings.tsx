@@ -163,18 +163,19 @@ export const useAiSettings = (user: User | null) => {
       return { success: false, message: "Unsupported AI Model Chosen" };
 
     const supabase = createClient();
+    const userId = user.id;
 
     try {
       // store in cloud so we send it for encryption
       if (storePref === KeyStorePref.CLOUD) {
-        const { error } = await cloudStoreApiKey(user.id, apiKey, tableName);
+        const { error } = await cloudStoreApiKey(userId, apiKey, tableName);
         if (error) throw error;
       } else {
-        // store in local, delete the entire entry
-        const { error } = await supabase
-          .from(tableName)
-          .delete()
-          .eq("userId", user.id);
+        // store in local, delete prev stored key if exist
+        const { error } = await supabase.from(tableName).upsert({
+          userId,
+          apiKey: "",
+        });
         if (error) throw error;
       }
     } catch (error) {
@@ -289,13 +290,15 @@ export const useAiSettings = (user: User | null) => {
 
           const { error } = await supabase.from(tableName).upsert({
             userId: user.id,
-            apiKey:
-              AiOptionConfigDetails[option]?.storePref === KeyStorePref.CLOUD
-                ? AiOptionConfigDetails[option]?.apiKey
-                : "",
             defaultModel: AiOptionConfigDetails[option]?.defaultModel || "",
             storePref: AiOptionConfigDetails[option]?.storePref || "",
           });
+
+          await saveApiKey(
+            AiOptionConfigDetails[option]?.apiKey || "",
+            AiOptionConfigDetails[option]?.storePref || KeyStorePref.LOCAL,
+            option
+          );
 
           if (error) {
             console.log(error);

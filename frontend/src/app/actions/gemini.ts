@@ -62,7 +62,6 @@ export async function cloudStoreApiKey(
       userId,
       apiKey: encryptedKey,
       storePref: KeyStorePref.CLOUD,
-      defaultModel: "gemini-1.5-pro",
     });
 
     if (upsertErr) {
