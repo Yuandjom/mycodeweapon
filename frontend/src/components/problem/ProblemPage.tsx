@@ -128,6 +128,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                   collapsedSize={5}
                 >
                   <AiChat
+                    userId={user?.id || ""}
                     questionImage={problemStates.questionImage}
                     code={problemStates.code}
                     language={

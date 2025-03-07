@@ -42,10 +42,6 @@ export const getAvailableLanguages_SA = async (
   userId: string
 ): Promise<AvailLanguage[]> => {
   try {
-    console.log(
-      "[getAvailableLanguages_SA] GET Methd to: ",
-      `${process.env.JUDGE0_API_GATEWAY}/judge0/languages`
-    );
     const response = await fetch(`${process.env.JUDGE0_URL}/languages`, {
       method: "GET",
       headers: {

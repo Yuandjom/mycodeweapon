@@ -2,25 +2,23 @@
 
 import { KeyStorePref } from "@/types/ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { PRE_PROMPT } from "@/constants/aiSettings";
+import { SYSTEM_PROMPT } from "@/constants/aiSettings";
 import { promptAiParams } from "@/hooks/useAiChat";
 
 interface UseGeminiProps {
-  aiModel: string;
   questionImage: File | null;
   code: string;
   language: string;
-  geminiPref: KeyStorePref;
-  geminiKey: string | null;
+  storePref: KeyStorePref;
+  apiKey: string | null;
 }
 
 export const useGemini = ({
-  aiModel,
   questionImage,
   code,
   language,
-  geminiPref,
-  geminiKey,
+  storePref,
+  apiKey,
 }: UseGeminiProps) => {
   const askGemini = async ({
     aiModel,
@@ -31,15 +29,10 @@ export const useGemini = ({
   }: promptAiParams): Promise<string> => {
     if (!prompt.trim()) return "You did not send anything";
 
-    // check if there is api key set for local unless user using CLOUD
-    if (geminiPref !== KeyStorePref.CLOUD && !geminiKey) {
-      return "You have not set an API Key!";
-    }
-
     let context = "";
 
     if (chatHistory.length === 1) {
-      context += PRE_PROMPT;
+      context += SYSTEM_PROMPT;
     }
 
     let imageData = null;
@@ -55,7 +48,7 @@ export const useGemini = ({
     try {
       let response;
 
-      if (geminiPref === KeyStorePref.CLOUD) {
+      if (storePref === KeyStorePref.CLOUD) {
         // Use server-side API call
         response = await fetch("/api/gemini", {
           method: "POST",
@@ -74,14 +67,12 @@ export const useGemini = ({
 
         return reply;
       } else {
-        if (!geminiKey) {
+        if (!apiKey) {
           throw new Error("No API key set!");
         }
 
-        console.log("[useGemini] local version with key:", geminiKey);
-
         // Direct client-side call using local key
-        const genAI = new GoogleGenerativeAI(geminiKey);
+        const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: aiModel });
 
         const processedHistory = chatHistory.slice(1).map((m, i) => ({

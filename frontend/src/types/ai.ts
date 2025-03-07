@@ -10,3 +10,19 @@ export enum KeyStorePref {
   LOCAL = "LOCAL",
   CLOUD = "CLOUD",
 }
+
+export interface OpenAiInitParams {
+  apiKey: string;
+  baseURL?: string;
+}
+
+export enum AiChatRole {
+  System = "system",
+  User = "user",
+  Ai = "assistant",
+}
+
+export type AiChatMessage = {
+  role: AiChatRole;
+  content: string;
+};

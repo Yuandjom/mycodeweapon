@@ -2,11 +2,11 @@
 
 import { AiOption, KeyStorePref } from "@/types/ai";
 import { AI_CONFIG_TABLE, getAiConfigTable } from "@/constants/supabase";
-import { PRE_PROMPT, AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
+import { SYSTEM_PROMPT, AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
-import { cloudStoreApiKey } from "@/app/actions/gemini";
+import { cloudStoreApiKey } from "@/app/actions/apiKeys";
 import { SimpleResponse } from "@/types/global";
 
 interface AiConfigDetails {
@@ -78,7 +78,7 @@ export const useAiSettings = (user: User | null) => {
         .single();
 
       if (!aiConfigError) {
-        setPrePrompt(aiConfig?.prePrompt || PRE_PROMPT);
+        setPrePrompt(aiConfig?.prePrompt || SYSTEM_PROMPT);
         setDefaultAiOption(aiConfig?.defaultAiOption || AiOption.Gemini);
         setDefaultAiModel(
           aiConfig?.defaultAiModel || AI_OPTIONS_AND_MODELS[AiOption.Gemini][0]

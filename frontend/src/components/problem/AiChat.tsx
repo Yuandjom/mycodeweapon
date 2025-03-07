@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import ReactMarkdown from "react-markdown";
 import { useApiKey } from "@/providers/ai-provider";
-import { AiOption, KeyStorePref } from "@/types/ai";
+import { AiChatMessage, AiChatRole, AiOption, KeyStorePref } from "@/types/ai";
 import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import {
   Dialog,
@@ -35,17 +35,14 @@ import { SimpleResponse } from "@/types/global";
 import Link from "next/link";
 import { displayAiOption } from "@/hooks/useAiSettings";
 
-interface ChatHistoryProps {
-  messages: string[];
-}
-
 interface AiChatProps {
+  userId: string;
   questionImage: File | null;
   code: string;
   language: string;
 }
 
-const AiChat = ({ questionImage, code, language }: AiChatProps) => {
+const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
   const {
     prePrompt,
     defaultAiOption,
@@ -57,7 +54,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
   } = useApiKey();
 
   const {
-    chatHistory,
+    aiChatHistory,
     prompt,
     setPrompt,
     isPrompting,
@@ -67,12 +64,13 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
     setIncludeQuestionImg,
     submitPrompt,
   } = useAiChat({
+    userId,
     aiOption: defaultAiOption,
     aiModel: defaultAiModel,
     questionImage,
     code,
     language,
-    keyPref: keyPref,
+    storePref: keyPref,
     apiKey: apiKey,
   });
 
@@ -114,7 +112,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
       </div>
 
       <div className="flex-1 min-h-0">
-        <ChatHistory messages={chatHistory} />
+        <ChatHistory messages={aiChatHistory} />
       </div>
 
       <div className="p-4 border-t">
@@ -133,7 +131,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
               onChange={(e) => setPrompt(e.target.value)}
               value={prompt}
               placeholder="Ask a question"
-              className="resize-none h-[80px]"
+              className="resize-none h-[60px]"
               disabled={isPrompting}
               onKeyDown={(e) => {
                 if (
@@ -146,18 +144,6 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
                 }
               }}
             />
-            {/* <div className="absolute right-2 bottom-0 flex items-center opacity-70">
-              <span className="text-xs bg-gradient-to-r from-cyan-600 via-blue-500 to-indigo-400 bg-clip-text text-transparent pr-2">
-                Powered By
-              </span>
-              <Image
-                src="/geminiText.svg"
-                alt="gemini"
-                height={25}
-                width={38}
-                className="pb-1"
-              />
-            </div> */}
           </div>
           <Button
             onClick={submitPrompt}
@@ -172,7 +158,7 @@ const AiChat = ({ questionImage, code, language }: AiChatProps) => {
   );
 };
 
-const ChatHistory = ({ messages }: ChatHistoryProps) => {
+const ChatHistory = ({ messages }: { messages: AiChatMessage[] }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -194,7 +180,8 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
     <ScrollArea className="h-full w-full pr-4">
       <div className="space-y-4 p-4">
         {messages.map((m, i) => {
-          const fromAI = i % 2 === 0;
+          const fromAI = m.role === AiChatRole.Ai;
+
           return (
             <div
               className={`flex ${fromAI ? "justify-start" : "justify-end"}`}
@@ -235,7 +222,7 @@ const ChatHistory = ({ messages }: ChatHistoryProps) => {
                       ),
                   }}
                 >
-                  {cleanMessage(m)}
+                  {cleanMessage(m.content)}
                 </ReactMarkdown>
               </div>
             </div>

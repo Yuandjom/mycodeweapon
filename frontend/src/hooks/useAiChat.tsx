@@ -1,20 +1,29 @@
 "use client";
 
-import { AiOption } from "@/types/ai";
-import { useGemini } from "@/hooks/AiModels/useGemini";
-import { KeyStorePref } from "@/types/ai";
+import {
+  AiChatMessage,
+  AiOption,
+  AiChatRole,
+  KeyStorePref,
+  OpenAiInitParams,
+} from "@/types/ai";
 import { useState } from "react";
-
-const FIRST_MESSAGE: string =
-  "Hello! I am your assistant, I am here to help answer your questions!";
+import {
+  FIRST_MESSAGE,
+  getAiOptionBaseUrl,
+  SYSTEM_PROMPT,
+} from "@/constants/aiSettings";
+import { cloudPromptAi } from "@/actions/prompting";
+import OpenAi from "openai";
 
 interface useAiChatProps {
+  userId: string;
   questionImage: File | null;
   code: string;
   language: string;
   aiOption: AiOption;
   aiModel: string;
-  keyPref: KeyStorePref;
+  storePref: KeyStorePref;
   apiKey: string | null;
 }
 
@@ -27,55 +36,93 @@ export interface promptAiParams {
 }
 
 export const useAiChat = ({
+  userId,
   questionImage,
   code,
   language,
   aiOption,
   aiModel,
-  keyPref,
+  storePref,
   apiKey,
 }: useAiChatProps) => {
   const [prompt, setPrompt] = useState<string>("");
   const [isPrompting, setIsPrompting] = useState<boolean>(false);
 
-  const [chatHistory, setChatHistory] = useState<string[]>([FIRST_MESSAGE]);
+  const [aiChatHistory, setAiChatHistory] = useState<AiChatMessage[]>([
+    { role: AiChatRole.Ai, content: FIRST_MESSAGE },
+  ]);
 
   const [includeCode, setIncludeCode] = useState<boolean>(false);
   const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
 
-  const { askGemini } = useGemini({
-    aiModel,
-    questionImage,
-    code,
-    language,
-    geminiPref: keyPref,
-    geminiKey: apiKey,
-  });
-
   const submitPrompt = async () => {
+    let reply = "";
     try {
       setIsPrompting(true);
       const cachedPrompt: string = prompt;
-      setChatHistory((prev) => [...prev, cachedPrompt]);
+      const chatMessages = [
+        ...aiChatHistory,
+        {
+          role: AiChatRole.User,
+          content: cachedPrompt,
+        },
+      ];
+      setAiChatHistory((prev) => [
+        ...prev,
+        {
+          role: AiChatRole.User,
+          content: cachedPrompt,
+        },
+      ]);
       setPrompt("");
 
-      let reply = "";
+      if (storePref === KeyStorePref.CLOUD) {
+        const { success, message, data } = await cloudPromptAi({
+          userId,
+          aiOption,
+          aiModel,
+          chatMessages,
+        });
 
-      switch (aiOption) {
-        case AiOption.Gemini:
-          reply = await askGemini({
-            aiModel,
-            prompt: cachedPrompt,
-            chatHistory,
-            includeCode,
-            includeQuestionImg,
-          });
-          break;
-        default:
-          throw new Error("Invalid AI model chosen");
+        reply = data;
+
+        if (!success) throw new Error(message);
+      } else {
+        if (!apiKey) {
+          throw new Error("No API Key set");
+        }
+
+        let aiInitParams: OpenAiInitParams = {
+          apiKey,
+        };
+        if (aiOption !== AiOption.OpenAi) {
+          aiInitParams = {
+            ...aiInitParams,
+            baseURL: getAiOptionBaseUrl(aiOption),
+          };
+        }
+        const openai = new OpenAi(aiInitParams);
+
+        const completion = await openai.chat.completions.create({
+          model: aiModel,
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            ...aiChatHistory.slice(1), // first input is hello message
+          ],
+        });
+
+        reply = completion.choices[0].message.content || "";
       }
-
-      setChatHistory((prev) => [...prev, reply]);
+      if (!reply) {
+        throw new Error("Reply of length 0 received");
+      }
+      setAiChatHistory((prev) => [
+        ...prev,
+        {
+          role: AiChatRole.Ai,
+          content: reply,
+        },
+      ]);
     } catch (err) {
       console.log("[submitPrompt] error: ", err);
     } finally {
@@ -84,7 +131,7 @@ export const useAiChat = ({
   };
 
   return {
-    chatHistory,
+    aiChatHistory,
     prompt,
     includeCode,
     setIncludeCode,

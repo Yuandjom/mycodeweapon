@@ -1,21 +1,14 @@
+import { AiOption } from "@/types/ai";
+
 export const DEFAULT_AI_MODEL: string = "GEMINI";
 
 export const AI_OPTIONS_AND_MODELS: Record<string, string[]> = {
   GEMINI: ["gemini-1.5-pro", "gemini-1.5-flash"],
-  OPENAI: [
-    "gpt-4",
-    "o1",
-    "o1-mini",
-    "o3-mini",
-    "gpt-4o",
-    "gpt-4o-mini",
-    "gpt-3.5-turbo",
-    "gpt-4-turbo",
-  ],
+  OPENAI: ["o1", "o1-mini", "o3-mini", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
   DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
 };
 
-export const PRE_PROMPT = `You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.
+export const SYSTEM_PROMPT: string = `You are an AI coding assistant for a user. He will ask you for assistance. He may attach his question image and also his code with the language of his choice.
 
 Key points to consider:
 1. This is a programming challenge that needs to be solved by code
@@ -35,3 +28,19 @@ The goal is to provide comprehensive assistance in understanding and solving thi
 
 Please provide guidance based on the user prompt in a concise manner with the considerations listed above.
 `;
+
+export const FIRST_MESSAGE: string =
+  "Hello! I am your assistant, I am here to help answer your questions!";
+
+export const DEFAULT_ERROR_MESSAGE: string =
+  "Something went wrong, please try again later!";
+
+export const BASE_URLS: Record<string, string> = {
+  GEMINI: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  OPENAI: "",
+  DEEPSEEK: "https://api.deepseek.com/v1",
+};
+
+export const getAiOptionBaseUrl = (aiOption: AiOption): string => {
+  return BASE_URLS[aiOption];
+};

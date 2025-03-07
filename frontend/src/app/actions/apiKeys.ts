@@ -2,12 +2,51 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { encryptKey, decryptKey } from "./encryption";
-import { KeyStorePref } from "@/types/ai";
+import { AiOption, KeyStorePref } from "@/types/ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEMINI_CONFIG_TABLE } from "@/constants/supabase";
+import { GEMINI_CONFIG_TABLE, getAiConfigTable } from "@/constants/supabase";
+import { SimpleDataResponse } from "@/types/global";
+
+export async function fetchDecryptedApiKey(
+  userId: string,
+  aiOption: AiOption
+): Promise<SimpleDataResponse<string>> {
+  const tableName = getAiConfigTable(aiOption);
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from(tableName)
+    .select("apiKey")
+    .eq("userId", userId)
+    .single();
+
+  if (error) {
+    return {
+      success: false,
+      message: "Error in fetching data from supabase",
+      data: "",
+    };
+  }
+
+  if (data?.apiKey == "") {
+    return {
+      success: false,
+      message: "User did not store api key",
+      data: "",
+    };
+  }
+
+  const decryptedKey: string = await decryptKey(data.apiKey);
+
+  return {
+    success: true,
+    message: "Successfully retrieved and decrypted key",
+    data: decryptedKey,
+  };
+}
 
 export async function cloudGetApiKey(userId: string) {
-  console.log("[cloudGetApiKey]");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -80,8 +119,6 @@ export async function cloudPromptGemini(
   chatHistory?: string[],
   questionImage?: any
 ) {
-  console.log("[cloudPromptGemini]");
-
   try {
     const keyFetchResponse = await cloudGetApiKey(userId);
 
