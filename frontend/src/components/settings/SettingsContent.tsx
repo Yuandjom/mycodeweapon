@@ -10,6 +10,7 @@ import { useAuth } from "@/providers/auth-provider";
 import { useProfileSettings } from "@/hooks/useProfileSettings";
 import { useAiSettings } from "@/hooks/useAiSettings";
 import { AiOption, KeyStorePref } from "@/types/ai";
+import { SimpleResponse } from "@/types/global";
 
 const SettingsContent = () => {
   const { toast } = useToast();
@@ -23,7 +24,6 @@ const SettingsContent = () => {
     updateEmail,
     updatePassword,
     isSavingProfile,
-    saveProfileError,
   } = useProfileSettings(user);
 
   // api key handlers
@@ -44,11 +44,19 @@ const SettingsContent = () => {
   } = useAiSettings(user);
 
   const handleSaveAllSettings = async () => {
-    await saveProfileSettings();
-    await saveAiSettings();
+    const allSavePromises = [saveProfileSettings(), saveAiSettings()];
 
-    if (saveProfileError) {
-      toast({ title: "Something went wrong updating settings" });
+    const allSaveResponses = await Promise.all(allSavePromises);
+
+    let errorFlag = false;
+    allSaveResponses.forEach((res) => {
+      if (!res.success) {
+        errorFlag = true;
+      }
+    });
+
+    if (errorFlag) {
+      toast({ title: "Something went wrong!" });
     } else {
       toast({ title: "Profile settings saved!" });
     }
@@ -56,17 +64,6 @@ const SettingsContent = () => {
 
   return (
     <div className="w-full h-full flex flex-col justify-start items-start gap-16">
-      {/* <div className="w-full flex flex-col justify-center items-start">
-        <p className="text-semibold py-2">DEBUG:</p>
-        {Object.entries(AiOptionConfigDetails).map(([key, value]) => (
-          <div className="flex_center gap-4">
-            <span>Ai Option: {key}</span>
-            <span>Ai Option: {value.defaultModel}</span>
-            <span>Ai Option: {value.storePref}</span>
-          </div>
-        ))}
-      </div> */}
-
       <div className="flex flex-col justify-center items-start gap-2">
         <h2 className="text-lg font-bold ">Profile Settings</h2>
         <Separator className="w-[90%] mb-2" />

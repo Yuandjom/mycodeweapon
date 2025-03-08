@@ -17,11 +17,11 @@ interface AiConfigDetails {
 
 export const displayAiOption = (aiChoice: AiOption) => {
   switch (aiChoice) {
-    case "GEMINI":
+    case AiOption.Gemini:
       return "Gemini";
-    case "OPENAI":
+    case AiOption.OpenAi:
       return "OpenAI";
-    case "DEEPSEEK":
+    case AiOption.DeepSeek:
       return "DeepSeek";
   }
   return "";
@@ -167,10 +167,11 @@ export const useAiSettings = (user: User | null) => {
 
     try {
       // store in cloud so we send it for encryption
-      if (storePref === KeyStorePref.CLOUD) {
+      if (storePref === KeyStorePref.CLOUD && apiKey.length > 0) {
+        console.log(`[saveApiKey] saving in CLOUD for ${aiChoice}`);
         const { error } = await cloudStoreApiKey(userId, apiKey, tableName);
         if (error) throw error;
-      } else {
+      } else if (storePref === KeyStorePref.LOCAL && apiKey.length > 0) {
         // store in local, delete prev stored key if exist
         const { error } = await supabase.from(tableName).upsert({
           userId,
@@ -239,6 +240,7 @@ export const useAiSettings = (user: User | null) => {
   };
 
   // used by AiChat modal only
+  // TODO: add save key
   const saveAiChatDefaultSettings = async (
     defaultAiOption: AiOption,
     defaultAiModel: string

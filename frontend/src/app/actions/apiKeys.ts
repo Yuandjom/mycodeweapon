@@ -36,7 +36,7 @@ export async function fetchDecryptedApiKey(
       data: "",
     };
   }
-
+  console.log("[fetchDecryptedApiKey] Encrypted Key: ", data.apiKey);
   const decryptedKey: string = await decryptKey(data.apiKey);
 
   return {

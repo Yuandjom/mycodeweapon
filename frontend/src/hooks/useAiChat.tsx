@@ -107,7 +107,7 @@ export const useAiChat = ({
           model: aiModel,
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
-            ...aiChatHistory.slice(1), // first input is hello message
+            ...aiChatHistory,
           ],
         });
 

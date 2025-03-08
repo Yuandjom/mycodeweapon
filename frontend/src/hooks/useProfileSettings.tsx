@@ -1,18 +1,18 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { SimpleResponse } from "@/types/global";
 import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 interface ProfileSettingDetails {
   profileState: profileStateType;
-  saveProfileSettings: () => Promise<void>;
+  saveProfileSettings: () => Promise<SimpleResponse>;
   updateUsername: (username: string) => void;
   updateEmail: (email: string) => void;
   updatePassword: (password: string) => void;
 
   isSavingProfile: boolean;
-  saveProfileError: Error | null;
 }
 
 export interface profileStateType {
@@ -49,13 +49,11 @@ export const useProfileSettings = (
     setProfileState((prev) => ({ ...prev, password }));
   };
 
-  const [saveProfileError, setSaveProfileError] = useState<Error | null>(null);
   const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
 
-  const saveProfileSettings = async () => {
+  const saveProfileSettings = async (): Promise<SimpleResponse> => {
     try {
       setIsSavingProfile(true);
-      setSaveProfileError(null);
       const supabase = createClient();
 
       const updateUserData = {
@@ -74,12 +72,18 @@ export const useProfileSettings = (
         console.log(updateError);
         throw updateError;
       }
+
+      return {
+        success: true,
+        message: "Profile saved successfully",
+      };
     } catch (err) {
       console.log("[useProfileSettings] saveProfileSettings error:");
       console.log(err);
-      setSaveProfileError(
-        err instanceof Error ? err : new Error("Something went wrong")
-      );
+      return {
+        success: false,
+        message: "Something went wrong saving profile",
+      };
     } finally {
       setIsSavingProfile(false);
     }
@@ -93,6 +97,5 @@ export const useProfileSettings = (
     updatePassword,
 
     isSavingProfile,
-    saveProfileError,
   };
 };

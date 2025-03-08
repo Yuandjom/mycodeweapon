@@ -21,6 +21,7 @@ export const cloudPromptAi = async ({
   try {
     const { data: apiKey } = await fetchDecryptedApiKey(userId, aiOption);
 
+    console.log(`[cloudPromptAi] aiOption: ${aiOption}, aiModel: ${aiModel}`);
     console.log(`[cloudPromptAi] decrypted key: ${apiKey}`);
 
     let aiInitParams: OpenAiInitParams = {
@@ -36,10 +37,7 @@ export const cloudPromptAi = async ({
 
     const response = await openai.chat.completions.create({
       model: aiModel,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        ...chatMessages.slice(1),
-      ],
+      messages: [{ role: "system", content: SYSTEM_PROMPT }, ...chatMessages],
     });
 
     const reply = response.choices[0].message.content;

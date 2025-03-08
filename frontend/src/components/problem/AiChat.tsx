@@ -2,14 +2,12 @@
 
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, SettingsIcon, SendIcon } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
-import ReactMarkdown from "react-markdown";
 import { useApiKey } from "@/providers/ai-provider";
-import { AiChatMessage, AiChatRole, AiOption, KeyStorePref } from "@/types/ai";
+import { AiOption, KeyStorePref } from "@/types/ai";
 import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import {
   Dialog,
@@ -34,6 +32,7 @@ import { useAiChat } from "@/hooks/useAiChat";
 import { SimpleResponse } from "@/types/global";
 import Link from "next/link";
 import { displayAiOption } from "@/hooks/useAiSettings";
+import ChatMessages from "./ChatMessages";
 
 interface AiChatProps {
   userId: string;
@@ -112,7 +111,7 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
       </div>
 
       <div className="flex-1 min-h-0">
-        <ChatHistory messages={aiChatHistory} />
+        <ChatMessages aiOption={defaultAiOption} messages={aiChatHistory} />
       </div>
 
       <div className="p-4 border-t">
@@ -155,82 +154,6 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
         </div>
       </div>
     </div>
-  );
-};
-
-const ChatHistory = ({ messages }: { messages: AiChatMessage[] }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Function to clean message text
-  const cleanMessage = (text: string) => {
-    return (
-      text
-        // Replace literal \n with actual newlines
-        .replace(/\\n/g, "\n")
-        // Remove any extra spaces around newlines
-        .trim()
-    );
-  };
-
-  return (
-    <ScrollArea className="h-full w-full pr-4">
-      <div className="space-y-4 p-4">
-        {messages.map((m, i) => {
-          const fromAI = m.role === AiChatRole.Ai;
-
-          return (
-            <div
-              className={`flex ${fromAI ? "justify-start" : "justify-end"}`}
-              key={`aichat-${i}`}
-            >
-              <div
-                className={`max-w-[75%] px-4 py-2 rounded-2xl
-                                    ${
-                                      fromAI
-                                        ? "bg-blue-200 text-foreground rounded-tl-none"
-                                        : "bg-green-200 text-primary-foreground rounded-br-none"
-                                    }
-                                `}
-              >
-                {/* TODO: add font size selector in settings */}
-                <ReactMarkdown
-                  className="prose max-w-none break-words text-sm
-                                        [&>*]:text-current
-                                        prose-p:my-1 prose-p:first:mt-0 prose-p:last:mb-0
-                                        prose-pre:my-2 
-                                        prose-code:text-current
-                                        prose-li:my-0"
-                  components={{
-                    pre: ({ children }) => (
-                      <div className="not-prose my-2 w-full">
-                        <pre className="bg-card/20 p-4 rounded-md overflow-x-auto whitespace-pre-wrap break-words">
-                          {children}
-                        </pre>
-                      </div>
-                    ),
-                    code: ({ inline, children }: any) =>
-                      inline ? (
-                        <code className="px-1.5 py-0.5 rounded-md break-words">
-                          {children}
-                        </code>
-                      ) : (
-                        <code className="break-words">{children}</code>
-                      ),
-                  }}
-                >
-                  {cleanMessage(m.content)}
-                </ReactMarkdown>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={scrollRef} />
-      </div>
-    </ScrollArea>
   );
 };
 

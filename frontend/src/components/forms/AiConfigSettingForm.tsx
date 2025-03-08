@@ -1,7 +1,7 @@
 "use client";
 
 import { AiOption } from "@/types/ai";
-import { AI_OPTIONS_AND_MODELS, PRE_PROMPT } from "@/constants/aiSettings";
+import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
 import { SettingForm, SettingFormField } from "@/components/utils/SettingForm";
 import { displayAiOption } from "@/hooks/useAiSettings";
 import { Textarea } from "@/components/ui/textarea";
