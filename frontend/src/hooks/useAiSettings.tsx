@@ -23,6 +23,10 @@ export const displayAiOption = (aiChoice: AiOption) => {
       return "OpenAI";
     case AiOption.DeepSeek:
       return "DeepSeek";
+    case AiOption.Claude:
+      return "Claude";
+    case AiOption.Perplexity:
+      return "Perplexity";
   }
   return "";
 };
@@ -42,24 +46,19 @@ export const useAiSettings = (user: User | null) => {
   );
 
   const [AiOptionConfigDetails, setAiOptionConfigDetails] = useState<
-    Partial<Record<AiOption, AiConfigDetails>>
-  >({
-    [AiOption.Gemini]: {
-      storePref: KeyStorePref.UNSET,
-      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.Gemini][0],
-      apiKey: "",
-    },
-    [AiOption.OpenAi]: {
-      storePref: KeyStorePref.UNSET,
-      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.OpenAi][0],
-      apiKey: "",
-    },
-    [AiOption.DeepSeek]: {
-      storePref: KeyStorePref.UNSET,
-      defaultModel: AI_OPTIONS_AND_MODELS[AiOption.DeepSeek][0],
-      apiKey: "",
-    },
-  });
+    Record<AiOption, AiConfigDetails>
+  >(
+    Object.values(AiOption).reduce((acc, option) => {
+      return {
+        ...acc,
+        [option]: {
+          storePref: KeyStorePref.UNSET,
+          defaultModel: AI_OPTIONS_AND_MODELS[option][0],
+          apiKey: "",
+        },
+      };
+    }, {} as Record<AiOption, AiConfigDetails>)
+  );
 
   const [isSavingAiSettings, setIsSavingAiSettings] = useState<boolean>(false);
 

@@ -2,7 +2,8 @@ export enum AiOption {
   OpenAi = "OPENAI",
   Gemini = "GEMINI",
   DeepSeek = "DEEPSEEK",
-  // Claude = "CLAUDE",
+  Claude = "CLAUDE",
+  Perplexity = "PERPLEXITY",
 }
 
 export enum KeyStorePref {

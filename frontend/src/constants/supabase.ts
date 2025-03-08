@@ -8,6 +8,8 @@ export const AI_CONFIG_TABLE: string = "ai_configs";
 export const GEMINI_CONFIG_TABLE: string = "gemini_config";
 export const OPENAI_CONFIG_TABLE: string = "openai_config";
 export const DEEPSEEK_CONFIG_TABLE: string = "deepseek_config";
+export const CLAUDE_CONFIG_TABLE: string = "claude_config"; //TODO: RLS Policies
+export const PERPLEXITY_CONFIG_TABLE: string = "perplexity_config"; //TODO: RLS Policies
 
 // Object Storage Buckets
 export const PROBLEM_IMAGE_BUCKET: string = "problemImages";
@@ -56,12 +58,16 @@ export const displayErrorCode = (errorCode: string): string => {
 
 export const getAiConfigTable = (aiChoice: AiOption): string => {
   switch (aiChoice) {
-    case "GEMINI":
+    case AiOption.Gemini:
       return GEMINI_CONFIG_TABLE;
-    case "OPENAI":
+    case AiOption.OpenAi:
       return OPENAI_CONFIG_TABLE;
-    case "DEEPSEEK":
+    case AiOption.DeepSeek:
       return DEEPSEEK_CONFIG_TABLE;
+    case AiOption.Claude:
+      return CLAUDE_CONFIG_TABLE;
+    case AiOption.Perplexity:
+      return PERPLEXITY_CONFIG_TABLE;
   }
   return "";
 };

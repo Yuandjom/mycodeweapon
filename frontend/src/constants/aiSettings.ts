@@ -1,8 +1,6 @@
 import { AiOption } from "@/types/ai";
 
-export const DEFAULT_AI_MODEL: string = "GEMINI";
-
-export const AI_OPTIONS_AND_MODELS: Record<string, string[]> = {
+export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
   GEMINI: [
     "gemini-1.5-pro",
     "gemini-1.5-flash",
@@ -11,7 +9,31 @@ export const AI_OPTIONS_AND_MODELS: Record<string, string[]> = {
   ],
   OPENAI: ["o1", "o1-mini", "o3-mini", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
   DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
+  CLAUDE: [
+    "claude-3-7-sonnet-20250219",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-opus-20240229",
+    "claude-3-sonnet-20240229",
+    "claude-3-haiku-20240307",
+  ],
+  PERPLEXITY: [
+    "sonar",
+    "sonar-pro",
+    "sonar-reasoning",
+    "sonar-reasoning-pro",
+    "sonar-deep-research",
+  ],
 };
+
+export const BASE_URLS: Record<AiOption, string> = {
+  GEMINI: "https://generativelanguage.googleapis.com/v1beta/openai/",
+  OPENAI: "",
+  DEEPSEEK: "https://api.deepseek.com/v1",
+  CLAUDE: "https://api.anthropic.com/v1/",
+  PERPLEXITY: "https://api.perplexity.ai",
+};
+
+export const DEFAULT_AI_MODEL: string = "GEMINI";
 
 export const SYSTEM_PROMPT: string = `You are an AI coding assistant for a user working on programming challenges. You will receive questions that may include an image of a programming problem and/or the user's code written in various languages.
 
@@ -71,12 +93,6 @@ export const FIRST_MESSAGE: string =
 
 export const DEFAULT_ERROR_MESSAGE: string =
   "Something went wrong, please try again later!";
-
-export const BASE_URLS: Record<string, string> = {
-  GEMINI: "https://generativelanguage.googleapis.com/v1beta/openai/",
-  OPENAI: "",
-  DEEPSEEK: "https://api.deepseek.com/v1",
-};
 
 export const getAiOptionBaseUrl = (aiOption: AiOption): string => {
   return BASE_URLS[aiOption];

@@ -53,7 +53,7 @@ const AiOptionSettingForm = ({
             src={`/companyIcons/${aiOption.toLowerCase()}.svg`}
             height={28}
             width={28}
-            className="rounded-full bg-white p-0.5"
+            className="rounded-full bg-white"
           />
           <span className="text-sm text-center text-muted-foreground">
             {displayAiOption(aiOption)}
