@@ -1,5 +1,6 @@
 "use client";
-import { TimerIcon, Play, Pause, RotateCcw } from "lucide-react";
+
+import { Play, Pause, RotateCcw, AlarmClock } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Timer = () => {
@@ -35,30 +36,26 @@ const Timer = () => {
 
   return (
     <div className="flex_center px-2 py-0.5 bg-secondary text-secondary-foreground rounded-md">
-      <div className="flex items-center gap-2 px-2">
-        <TimerIcon className="w-4 h-4" />
-        <span className="font-mono text-sm font-medium min-w-16">
+      <div className="flex items-center gap-2 px-2 flex-auto">
+        <AlarmClock size={18} />
+        <span className="font-mono text-sm font-medium">
           {formatTime(seconds)}
         </span>
       </div>
 
-      <div className="flex gap-1">
+      <div className="flex items-center">
         <div
           className="h-8 w-8 hover:bg-secondary-foreground/10 cursor-pointer rounded-md flex_center"
           onClick={isTiming ? pauseTimer : startTimer}
         >
-          {isTiming ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
+          {isTiming ? <Pause size={14} /> : <Play size={14} />}
         </div>
 
         <div
           className="h-8 w-8 hover:bg-secondary-foreground/10 cursor-pointer rounded-md flex_center"
           onClick={resetTimer}
         >
-          <RotateCcw className="h-4 w-4" />
+          <RotateCcw size={14} />
         </div>
       </div>
     </div>
@@ -70,7 +67,15 @@ const formatTime = (seconds: number) => {
   const minutes = Math.floor((seconds % 3600) / 60);
   const remainingSeconds = seconds % 60;
 
-  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  }
+
+  return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 export default Timer;
