@@ -9,6 +9,7 @@ interface cloudPromptAiProps {
   userId: string;
   aiOption: AiOption;
   aiModel: string;
+  apiKey: string;
   chatMessages: AiChatMessage[];
 }
 
@@ -16,10 +17,14 @@ export const cloudPromptAi = async ({
   userId,
   aiOption,
   aiModel,
+  apiKey,
   chatMessages,
 }: cloudPromptAiProps): Promise<SimpleDataResponse<string>> => {
   try {
-    const { data: apiKey } = await fetchDecryptedApiKey(userId, aiOption);
+    if (!apiKey) {
+      const { data } = await fetchDecryptedApiKey(userId, aiOption);
+      apiKey = data;
+    }
 
     let aiInitParams: OpenAiInitParams = {
       apiKey,

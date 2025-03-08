@@ -1,20 +1,9 @@
 "use client";
 
-import {
-  AiChatMessage,
-  AiOption,
-  AiChatRole,
-  KeyStorePref,
-  OpenAiInitParams,
-} from "@/types/ai";
+import { AiChatMessage, AiOption, AiChatRole, KeyStorePref } from "@/types/ai";
 import { useState } from "react";
-import {
-  FIRST_MESSAGE,
-  getAiOptionBaseUrl,
-  SYSTEM_PROMPT,
-} from "@/constants/aiSettings";
+import { FIRST_MESSAGE } from "@/constants/aiSettings";
 import { cloudPromptAi } from "@/actions/prompting";
-import OpenAi from "openai";
 
 interface useAiChatProps {
   userId: string;
@@ -76,46 +65,24 @@ export const useAiChat = ({
       ]);
       setPrompt("");
 
-      if (storePref === KeyStorePref.CLOUD) {
-        const { success, message, data } = await cloudPromptAi({
-          userId,
-          aiOption,
-          aiModel,
-          chatMessages,
-        });
-
-        reply = data;
-
-        if (!success) throw new Error(message);
-      } else {
-        if (!apiKey) {
-          throw new Error("No API Key set");
-        }
-
-        let aiInitParams: OpenAiInitParams = {
-          apiKey,
-        };
-        if (aiOption !== AiOption.OpenAi) {
-          aiInitParams = {
-            ...aiInitParams,
-            baseURL: getAiOptionBaseUrl(aiOption),
-          };
-        }
-        const openai = new OpenAi(aiInitParams);
-
-        const completion = await openai.chat.completions.create({
-          model: aiModel,
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            ...aiChatHistory,
-          ],
-        });
-
-        reply = completion.choices[0].message.content || "";
+      if (!apiKey && storePref !== KeyStorePref.CLOUD) {
+        throw new Error("No API Key set");
       }
-      if (!reply) {
-        throw new Error("Reply of length 0 received");
-      }
+
+      const {
+        success,
+        message,
+        data: reply,
+      } = await cloudPromptAi({
+        userId,
+        aiOption,
+        aiModel,
+        apiKey: apiKey || "",
+        chatMessages,
+      });
+
+      if (!success) throw new Error(message);
+
       setAiChatHistory((prev) => [
         ...prev,
         {
