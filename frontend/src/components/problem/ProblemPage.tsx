@@ -120,12 +120,10 @@ const ProblemPage = ({ title }: { title: string }) => {
                   withHandle
                   className="bg-slate-400 dark:bg-black"
                 />
-                <CollapsiblePanel
+                <ResizablePanel
                   defaultSize={50}
-                  className="mt-0.5 bg-background rounded-lg px-4 pt-2"
-                  collapsedText="AI Chatbot"
-                  collapseThreshold={15}
-                  collapsedSize={5}
+                  minSize={20}
+                  className="mb-0.5 bg-background rounded-lg p-4"
                 >
                   <AiChat
                     userId={user?.id || ""}
@@ -135,7 +133,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                       judge0ToMonacoMap[problemStates.languageId] || "python"
                     }
                   />
-                </CollapsiblePanel>
+                </ResizablePanel>
               </ResizablePanelGroup>
             </ResizablePanel>
 

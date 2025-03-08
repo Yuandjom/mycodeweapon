@@ -76,7 +76,7 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
   });
 
   return (
-    <div className="flex flex-col h-full gap-2">
+    <div className="flex flex-col h-full w-full gap-2 relative">
       {/* Prompt context flags */}
       <div className="flex gap-4 items-center pl-2">
         <p className="text-sm font-semibold pr-1">Chat Contexts:</p>
@@ -112,11 +112,12 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0">
+      {/* Chat messages container with proper overflow handling */}
+      <div className="flex-1 min-h-0 w-full overflow-hidden">
         <ChatMessages aiOption={defaultAiOption} messages={aiChatHistory} />
       </div>
 
-      <div className="p-4 border-t">
+      <div className="p-4 border-t w-full">
         {isPrompting && (
           <div className="flex items-center gap-2 mb-2">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -126,7 +127,7 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
           </div>
         )}
 
-        <div className="flex gap-2 items-center relative">
+        <div className="flex gap-2 items-center w-full">
           <div className="relative flex-1">
             <Textarea
               onChange={(e) => setPrompt(e.target.value)}
@@ -228,7 +229,7 @@ const AiSettingsModal = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {displayAiOption(defaultAiOption)}'s' Settings
+            {displayAiOption(defaultAiOption)}'s Settings
           </DialogTitle>
           <span className="text-sm text-muted-foreground">
             Change to another model{" "}

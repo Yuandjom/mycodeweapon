@@ -52,7 +52,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
 
   return (
     <ScrollArea className="h-full w-full pr-4">
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 p-4 w-full">
         {messages.map((message, index) => {
           const isAi = message.role === AiChatRole.Ai;
           const content = processMessageContent(message);
@@ -60,14 +60,17 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
           return (
             <motion.div
               key={`aichat-${index}`}
-              className={cn("flex", isAi ? "justify-start" : "justify-end")}
+              className={cn(
+                "flex w-full",
+                isAi ? "justify-start" : "justify-end"
+              )}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
             >
               <div
                 className={cn(
-                  "max-w-[80%] px-4 py-3 rounded-lg",
+                  "max-w-[85%] px-4 py-3 rounded-lg break-words",
                   isAi
                     ? "bg-blue-200/30 dark:bg-blue-900/30 text-foreground rounded-tl-none border border-blue-300 dark:border-blue-800"
                     : "bg-green-200/30 dark:bg-green-900/30 text-foreground rounded-br-none border border-green-300 dark:border-green-800"
@@ -149,6 +152,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                               fontSize: "0.875rem",
                               padding: "1rem",
                               lineHeight: 1.5,
+                              maxWidth: "100%", // Limit code block width
+                              overflowX: "auto", // Allow horizontal scrolling within code blocks
                             }}
                             wrapLines={true}
                             wrapLongLines={true}

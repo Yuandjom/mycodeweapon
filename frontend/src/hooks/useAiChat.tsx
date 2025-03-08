@@ -1,7 +1,7 @@
 "use client";
 
 import { AiChatMessage, AiOption, AiChatRole, KeyStorePref } from "@/types/ai";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FIRST_MESSAGE } from "@/constants/aiSettings";
 import { cloudPromptAi } from "@/actions/prompting";
 
@@ -41,8 +41,39 @@ export const useAiChat = ({
     { role: AiChatRole.Ai, content: FIRST_MESSAGE },
   ]);
 
-  const [includeCode, setIncludeCode] = useState<boolean>(false);
+  const [includeCode, setIncludeCode] = useState<boolean>(true);
   const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+
+  useEffect(() => {
+    const convertImageToBase64 = async () => {
+      if (!questionImage || !includeQuestionImg) {
+        setImageBase64(null);
+        return;
+      }
+
+      try {
+        const reader = new FileReader();
+
+        const base64Promise = new Promise<string>((resolve, reject) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result);
+          };
+          reader.onerror = reject;
+        });
+
+        reader.readAsDataURL(questionImage);
+        const base64Data = await base64Promise;
+        setImageBase64(base64Data);
+      } catch (err) {
+        console.error("[useAiChat] Image Conversion Error:", err);
+        setImageBase64(null);
+      }
+    };
+
+    convertImageToBase64();
+  }, [questionImage, includeQuestionImg]);
 
   const submitPrompt = async () => {
     try {
@@ -82,6 +113,8 @@ export const useAiChat = ({
         aiModel,
         apiKey: apiKey || "",
         chatMessages,
+        codeContext: includeCode ? { code, language } : null,
+        imageBase64: includeQuestionImg ? imageBase64 : null,
       });
 
       if (!success) throw new Error(message);
