@@ -8,7 +8,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 
 type SelectOption = {
@@ -22,6 +21,7 @@ export interface SettingFormField {
   type: string;
   placeholder?: string;
   value: string;
+  displayValue?: (val: string) => string;
   handleUpdate: (val: any) => void;
   disabled: boolean;
 
@@ -89,7 +89,11 @@ const renderField = (field: SettingFormField) => {
         onValueChange={(value) => field.handleUpdate(value)}
         disabled={field.disabled}
       >
-        <SelectTrigger>{field.value || field.placeholder}</SelectTrigger>
+        <SelectTrigger>
+          {field.displayValue
+            ? field.displayValue(field.value) || field.placeholder
+            : field.value || field.placeholder}
+        </SelectTrigger>
         <SelectContent>
           {field.selectOptions?.map((opt, i) => (
             <SelectItem key={`select-${i}-${opt.label}`} value={opt.value}>

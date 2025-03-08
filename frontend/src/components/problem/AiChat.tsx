@@ -4,11 +4,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, SettingsIcon, SendIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { useApiKey } from "@/providers/ai-provider";
 import { AiOption, KeyStorePref } from "@/types/ai";
-import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
+import {
+  AI_OPTIONS_AND_MODELS,
+  displayAiOption,
+  displayAiModel,
+} from "@/constants/aiSettings";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +35,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAiChat } from "@/hooks/useAiChat";
 import { SimpleResponse } from "@/types/global";
 import Link from "next/link";
-import { displayAiOption } from "@/hooks/useAiSettings";
 import ChatMessages from "./ChatMessages";
 
 interface AiChatProps {
@@ -247,18 +250,17 @@ const AiSettingsModal = ({
                 {displayAiOption(defaultAiOption)} Model:
               </Label>
               <Select
-                value={modelOption}
-                defaultValue={modelOption}
+                value={defaultAiModel}
                 onValueChange={(value: string) => setModelOption(value)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>{modelOption}</SelectValue>
+                  {displayAiModel(defaultAiModel)}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {AI_OPTIONS_AND_MODELS[defaultAiOption].map((model, i) => (
                       <SelectItem key={`ai_model-${i}`} value={model}>
-                        {model}
+                        {displayAiModel(model)}
                       </SelectItem>
                     ))}
                   </SelectGroup>

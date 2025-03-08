@@ -2,7 +2,11 @@
 
 import { AiOption, KeyStorePref } from "@/types/ai";
 import { AI_CONFIG_TABLE, getAiConfigTable } from "@/constants/supabase";
-import { SYSTEM_PROMPT, AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
+import {
+  SYSTEM_PROMPT,
+  AI_OPTIONS_AND_MODELS,
+  displayAiOption,
+} from "@/constants/aiSettings";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
@@ -14,22 +18,6 @@ interface AiConfigDetails {
   defaultModel: string;
   apiKey: string;
 }
-
-export const displayAiOption = (aiChoice: AiOption) => {
-  switch (aiChoice) {
-    case AiOption.Gemini:
-      return "Gemini";
-    case AiOption.OpenAi:
-      return "OpenAI";
-    case AiOption.DeepSeek:
-      return "DeepSeek";
-    case AiOption.Claude:
-      return "Claude";
-    case AiOption.Perplexity:
-      return "Perplexity";
-  }
-  return "";
-};
 
 export const STORAGE_OPTIONS = [
   { label: "Local Storage", value: KeyStorePref.LOCAL },

@@ -97,3 +97,51 @@ export const DEFAULT_ERROR_MESSAGE: string =
 export const getAiOptionBaseUrl = (aiOption: AiOption): string => {
   return BASE_URLS[aiOption];
 };
+
+export const AI_MODELS_DISPLAY = [
+  { model: "gemini-1.5-pro", display: "Gemini 1.5 Pro" },
+  { model: "gemini-1.5-flash", display: "Gemini 1.5 Flash" },
+  { model: "gemini-2.0-flash", display: "Gemini 2.0 Flash" },
+  { model: "gemini-2.0-flash-lite", display: "Gemini 2.0 Flash-Lite" },
+  { model: "o1", display: "GPT o1" },
+  { model: "o1-mini", display: "GPT o1-mini" },
+  { model: "o3-mini", display: "GPT o3-mini" },
+  { model: "gpt-4o", display: "GPT 4o" },
+  { model: "gpt-4o-mini", display: "GPT 4o-mini" },
+  { model: "gpt-4-turbo", display: "GPT 4-turbo" },
+  { model: "deepseek-chat", display: "DeepSeek V3" },
+  { model: "deepseek-reasoner", display: "DeepSeek R1" },
+  { model: "claude-3-7-sonnet-20250219", display: "Claude 3.7 Sonnet" },
+  { model: "claude-3-5-sonnet-20240620", display: "Claude 3.5 Sonnet" },
+  { model: "claude-3-opus-20240229", display: "Claude 3 Opus" },
+  { model: "claude-3-sonnet-20240229", display: "Claude 3 Sonnet" },
+  { model: "claude-3-haiku-20240307", display: "Claude 3 Haiku" },
+  { model: "sonar", display: "Sonar" },
+  { model: "sonar-pro", display: "Sonar Pro" },
+  { model: "sonar-reasoning", display: "Sonar Reasoning" },
+  { model: "sonar-reasoning-pro", display: "Sonar Reasoning Pro" },
+  { model: "sonar-deep-research", display: "Sonar Deep Research" },
+];
+
+export const displayAiModel = (aiModel: string): string => {
+  const display = AI_MODELS_DISPLAY.find((item) => item.model === aiModel);
+
+  return display ? display.display : aiModel;
+};
+
+export const displayAiOption = (aiChoice: AiOption): string => {
+  switch (aiChoice) {
+    case AiOption.Gemini:
+      return "Gemini";
+    case AiOption.OpenAi:
+      return "OpenAI";
+    case AiOption.DeepSeek:
+      return "DeepSeek";
+    case AiOption.Claude:
+      return "Claude";
+    case AiOption.Perplexity:
+      return "Perplexity";
+    default:
+      return "";
+  }
+};

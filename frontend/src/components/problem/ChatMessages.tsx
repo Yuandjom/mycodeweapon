@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AiChatMessage, AiChatRole, AiOption } from "@/types/ai";
-import { displayAiOption } from "@/hooks/useAiSettings";
+import { displayAiOption } from "@/constants/aiSettings";
 import ReactMarkdown from "react-markdown";
 import { Code, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { SettingForm, SettingFormField } from "@/components/utils/SettingForm";
 import { AiOption, KeyStorePref } from "@/types/ai";
-import { displayAiOption, STORAGE_OPTIONS } from "@/hooks/useAiSettings";
+import { STORAGE_OPTIONS } from "@/hooks/useAiSettings";
+import { displayAiOption } from "@/constants/aiSettings";
 
 interface AiSettingsFormProps {
   aiOption: AiOption;

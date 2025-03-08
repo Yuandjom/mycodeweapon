@@ -1,9 +1,12 @@
 "use client";
 
 import { AiOption } from "@/types/ai";
-import { AI_OPTIONS_AND_MODELS } from "@/constants/aiSettings";
+import {
+  AI_OPTIONS_AND_MODELS,
+  displayAiOption,
+  displayAiModel,
+} from "@/constants/aiSettings";
 import { SettingForm, SettingFormField } from "@/components/utils/SettingForm";
-import { displayAiOption } from "@/hooks/useAiSettings";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
@@ -34,7 +37,7 @@ const AiConfigSettingForm = ({
   const aiModelSelections = AI_OPTIONS_AND_MODELS[defaultAiOption].map(
     (mod) => ({
       value: mod,
-      label: mod,
+      label: displayAiModel(mod),
     })
   );
 
@@ -60,6 +63,7 @@ const AiConfigSettingForm = ({
       type: "select",
       placeholder: "Select AI Model",
       value: defaultAiModel,
+      displayValue: displayAiModel,
       handleUpdate: updateDefaultAiModel,
       disabled: isSaving,
       selectOptions: aiModelSelections,
