@@ -45,7 +45,6 @@ export const useAiChat = ({
   const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
 
   const submitPrompt = async () => {
-    let reply = "";
     try {
       setIsPrompting(true);
       const cachedPrompt: string = prompt;
@@ -64,6 +63,10 @@ export const useAiChat = ({
         },
       ]);
       setPrompt("");
+
+      if (storePref === KeyStorePref.LOCAL) {
+        apiKey = localStorage.getItem(`${aiOption}-key`);
+      }
 
       if (!apiKey && storePref !== KeyStorePref.CLOUD) {
         throw new Error("No API Key set");
@@ -92,6 +95,13 @@ export const useAiChat = ({
       ]);
     } catch (err) {
       console.log("[submitPrompt] error: ", err);
+      setAiChatHistory((prev) => [
+        ...prev,
+        {
+          role: AiChatRole.Ai,
+          content: "Sorry I am busy at the moment, please try again later!",
+        },
+      ]);
     } finally {
       setIsPrompting(false);
     }

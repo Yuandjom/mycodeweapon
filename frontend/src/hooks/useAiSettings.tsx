@@ -159,7 +159,10 @@ export const useAiSettings = (user: User | null) => {
         const { error } = await cloudStoreApiKey(userId, apiKey, tableName);
         if (error) throw error;
       } else if (storePref === KeyStorePref.LOCAL && apiKey.length > 0) {
-        // store in local, delete prev stored key if exist
+        // store in local storage
+        localStorage.setItem(`${aiChoice}-key`, apiKey);
+
+        // delete prev stored key if exist but not default ai model
         const { error } = await supabase.from(tableName).upsert({
           userId,
           apiKey: "",
@@ -226,7 +229,6 @@ export const useAiSettings = (user: User | null) => {
     }));
   };
 
-  // used by AiChat modal only
   // TODO: add save key
   const saveAiChatDefaultSettings = async (
     defaultAiOption: AiOption,

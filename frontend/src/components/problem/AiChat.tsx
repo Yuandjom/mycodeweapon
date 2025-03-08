@@ -46,7 +46,6 @@ interface AiChatProps {
 
 const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
   const {
-    prePrompt,
     defaultAiOption,
     defaultAiModel,
     apiKey,
