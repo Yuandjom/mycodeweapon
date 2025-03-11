@@ -1,9 +1,15 @@
 "use server";
-import { AiOption, OpenAiInitParams, AiChatMessage } from "@/types/ai";
+import {
+  AiOption,
+  OpenAiInitParams,
+  AiChatMessage,
+  AiChatRole,
+} from "@/types/ai";
 import { SYSTEM_PROMPT, getAiOptionBaseUrl } from "@/constants/aiSettings";
 import { fetchDecryptedApiKey } from "@/app/actions/apiKeys";
 import OpenAi from "openai";
 import { SimpleDataResponse } from "@/types/global";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 interface userCode {
   code: string;
@@ -15,7 +21,7 @@ interface cloudPromptAiProps {
   aiOption: AiOption;
   aiModel: string;
   apiKey: string;
-  chatMessages: AiChatMessage[];
+  chatMessages: ChatCompletionMessageParam[];
   codeContext: userCode | null;
   imageBase64: string | null;
 }
@@ -38,35 +44,50 @@ export const cloudPromptAi = async ({
     // Prepare messages array with system prompt
     const systemMessage = [SYSTEM_PROMPT];
 
-    // Include any code context at the beginning if provided
-    if (codeContext) {
-      systemMessage.push(
-        `The user is working with the following code in ${codeContext.language}:\n\`\`\`${codeContext.language}\n${codeContext.code}\n\`\`\``
-      );
-    }
-
-    if (imageBase64) {
-      systemMessage.push(
-        `The user is working with the following question provided as an image (formatted for base64 only for you): ${imageBase64}`
-      );
-    }
-
-    let aiInitParams: OpenAiInitParams = {
-      apiKey,
+    const contextContent: ChatCompletionMessageParam = {
+      role: AiChatRole.User,
+      content: [
+        {
+          type: "text",
+          text: "Attached are my question image and code (if none received, ignore this message).",
+        },
+      ],
     };
-    if (aiOption !== AiOption.OpenAi) {
-      aiInitParams = {
-        ...aiInitParams,
-        baseURL: getAiOptionBaseUrl(aiOption),
-      };
+
+    // Attach the image if it's the first user message
+    if (imageBase64) {
+      contextContent.content.push({
+        type: "image_url",
+        image_url: { url: `data:image/png;base64,${imageBase64}` },
+      });
     }
+
+    // Attach the code snippet correctly
+    if (codeContext) {
+      contextContent.content.push({
+        type: "text",
+        text: `This is my code:\n\`\`\`${codeContext.language}\n${codeContext.code}\n\`\`\``,
+      });
+    }
+
+    const sendMessages: ChatCompletionMessageParam[] = [
+      { role: AiChatRole.System, content: systemMessage.join("\n\n\n") },
+      ...chatMessages.slice(1),
+    ];
+
+    if (imageBase64 || codeContext) {
+      sendMessages.push(contextContent);
+    }
+
+    let aiInitParams: OpenAiInitParams = { apiKey };
+    if (aiOption !== AiOption.OpenAi) {
+      aiInitParams.baseURL = getAiOptionBaseUrl(aiOption);
+    }
+
     const openai = new OpenAi(aiInitParams);
     const response = await openai.chat.completions.create({
       model: aiModel,
-      messages: [
-        { role: "system", content: systemMessage.join("\n\n\n") },
-        ...chatMessages.slice(1),
-      ],
+      messages: sendMessages,
     });
 
     const reply = response.choices[0].message.content;

@@ -4,6 +4,7 @@ import { AiChatMessage, AiOption, AiChatRole, KeyStorePref } from "@/types/ai";
 import { useState, useEffect } from "react";
 import { FIRST_MESSAGE } from "@/constants/aiSettings";
 import { cloudPromptAi } from "@/actions/prompting";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 interface useAiChatProps {
   userId: string;
@@ -37,9 +38,9 @@ export const useAiChat = ({
   const [prompt, setPrompt] = useState<string>("");
   const [isPrompting, setIsPrompting] = useState<boolean>(false);
 
-  const [aiChatHistory, setAiChatHistory] = useState<AiChatMessage[]>([
-    { role: AiChatRole.Ai, content: FIRST_MESSAGE },
-  ]);
+  const [aiChatHistory, setAiChatHistory] = useState<
+    ChatCompletionMessageParam[]
+  >([{ role: AiChatRole.Ai, content: FIRST_MESSAGE }]);
 
   const [includeCode, setIncludeCode] = useState<boolean>(true);
   const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
@@ -57,8 +58,12 @@ export const useAiChat = ({
 
         const base64Promise = new Promise<string>((resolve, reject) => {
           reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result);
+            let result = reader.result as string;
+            const cleanBase64 = result
+              .replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
+              .trim();
+
+            resolve(cleanBase64);
           };
           reader.onerror = reject;
         });
@@ -79,7 +84,7 @@ export const useAiChat = ({
     try {
       setIsPrompting(true);
       const cachedPrompt: string = prompt;
-      const chatMessages = [
+      const chatMessages: ChatCompletionMessageParam[] = [
         ...aiChatHistory,
         {
           role: AiChatRole.User,

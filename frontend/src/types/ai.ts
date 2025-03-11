@@ -1,9 +1,9 @@
 export enum AiOption {
   OpenAi = "OPENAI",
   Gemini = "GEMINI",
-  DeepSeek = "DEEPSEEK",
+  // DeepSeek = "DEEPSEEK",
   Claude = "CLAUDE",
-  Perplexity = "PERPLEXITY",
+  // Perplexity = "PERPLEXITY",
 }
 
 export enum KeyStorePref {
@@ -21,9 +21,11 @@ export enum AiChatRole {
   System = "system",
   User = "user",
   Ai = "assistant",
+  Image = "image_url",
 }
 
 export type AiChatMessage = {
   role: AiChatRole;
   content: string;
+  image_url?: any;
 };

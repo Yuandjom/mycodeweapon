@@ -15,10 +15,11 @@ import {
   oneLight,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
+import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 interface ChatMessagesProps {
   aiOption: AiOption;
-  messages: AiChatMessage[];
+  messages: ChatCompletionMessageParam[];
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
@@ -31,7 +32,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
   }, [messages]);
 
   // Function to clean message text and handle different content types
-  const processMessageContent = (message: AiChatMessage) => {
+  const processMessageContent = (message: ChatCompletionMessageParam) => {
     // Handle different types of content (string or multimodal array)
     if (typeof message.content === "string") {
       return message.content.replace(/\\n/g, "\n").trim();

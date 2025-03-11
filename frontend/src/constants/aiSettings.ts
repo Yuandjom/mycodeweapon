@@ -8,7 +8,7 @@ export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
     "gemini-2.0-flash-lite",
   ],
   OPENAI: ["o1", "o1-mini", "o3-mini", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-  DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
+  // DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
   CLAUDE: [
     "claude-3-7-sonnet-20250219",
     "claude-3-5-sonnet-20240620",
@@ -16,21 +16,21 @@ export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
     "claude-3-sonnet-20240229",
     "claude-3-haiku-20240307",
   ],
-  PERPLEXITY: [
-    "sonar",
-    "sonar-pro",
-    "sonar-reasoning",
-    "sonar-reasoning-pro",
-    "sonar-deep-research",
-  ],
+  // PERPLEXITY: [
+  //   "sonar",
+  //   "sonar-pro",
+  //   "sonar-reasoning",
+  //   "sonar-reasoning-pro",
+  //   "sonar-deep-research",
+  // ],
 };
 
 export const BASE_URLS: Record<AiOption, string> = {
   GEMINI: "https://generativelanguage.googleapis.com/v1beta/openai/",
   OPENAI: "",
-  DEEPSEEK: "https://api.deepseek.com/v1",
+  // DEEPSEEK: "https://api.deepseek.com/v1",
   CLAUDE: "https://api.anthropic.com/v1/",
-  PERPLEXITY: "https://api.perplexity.ai",
+  // PERPLEXITY: "https://api.perplexity.ai",
 };
 
 export const DEFAULT_AI_MODEL: string = "GEMINI";
@@ -128,12 +128,12 @@ export const displayAiOption = (aiChoice: AiOption): string => {
       return "Gemini";
     case AiOption.OpenAi:
       return "OpenAI";
-    case AiOption.DeepSeek:
-      return "DeepSeek";
     case AiOption.Claude:
       return "Claude";
-    case AiOption.Perplexity:
-      return "Perplexity";
+    // case AiOption.DeepSeek:
+    //   return "DeepSeek";
+    // case AiOption.Perplexity:
+    //   return "Perplexity";
     default:
       return "";
   }
