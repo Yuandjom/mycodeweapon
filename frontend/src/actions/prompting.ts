@@ -9,7 +9,10 @@ import { SYSTEM_PROMPT, getAiOptionBaseUrl } from "@/constants/aiSettings";
 import { fetchDecryptedApiKey } from "@/app/actions/apiKeys";
 import OpenAi from "openai";
 import { SimpleDataResponse } from "@/types/global";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import {
+  ChatCompletionMessageParam,
+  ChatCompletionContentPart,
+} from "openai/resources/index.mjs";
 
 interface userCode {
   code: string;
@@ -56,7 +59,7 @@ export const cloudPromptAi = async ({
 
     // Attach the image if it's the first user message
     if (imageBase64) {
-      contextContent.content.push({
+      (contextContent.content as ChatCompletionContentPart[]).push({
         type: "image_url",
         image_url: { url: `data:image/png;base64,${imageBase64}` },
       });
@@ -64,7 +67,7 @@ export const cloudPromptAi = async ({
 
     // Attach the code snippet correctly
     if (codeContext) {
-      contextContent.content.push({
+      (contextContent.content as ChatCompletionContentPart[]).push({
         type: "text",
         text: `This is my code:\n\`\`\`${codeContext.language}\n${codeContext.code}\n\`\`\``,
       });

@@ -62,12 +62,12 @@ export const getAiConfigTable = (aiChoice: AiOption): string => {
       return GEMINI_CONFIG_TABLE;
     case AiOption.OpenAi:
       return OPENAI_CONFIG_TABLE;
-    case AiOption.DeepSeek:
-      return DEEPSEEK_CONFIG_TABLE;
     case AiOption.Claude:
       return CLAUDE_CONFIG_TABLE;
-    case AiOption.Perplexity:
-      return PERPLEXITY_CONFIG_TABLE;
+    // case AiOption.DeepSeek:
+    //   return DEEPSEEK_CONFIG_TABLE;
+    // case AiOption.Perplexity:
+    //   return PERPLEXITY_CONFIG_TABLE;
   }
   return "";
 };
