@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { ProblemState } from "@/types/problem";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { PROBLEMS_TABLE } from "@/constants/supabase";
+import { PROBLEM_IMAGE_BUCKET, PROBLEMS_TABLE } from "@/constants/supabase";
+import { SimpleResponse } from "@/types/global";
 
 export const useProblemsTable = (user: User | null) => {
   const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
@@ -32,9 +33,6 @@ export const useProblemsTable = (user: User | null) => {
           throw error;
         }
 
-        console.log("[useProblemsTable] fetchData:");
-        console.log(data);
-
         setProblemsData(data);
       } catch (err) {
         setLoadDataError(
@@ -48,9 +46,48 @@ export const useProblemsTable = (user: User | null) => {
     fetchData();
   }, [user]);
 
+  const deleteProblem = async (
+    problemData: ProblemState
+  ): Promise<SimpleResponse> => {
+    try {
+      const supabase = createClient();
+      const { error: error1 } = await supabase
+        .from(PROBLEMS_TABLE)
+        .delete()
+        .eq("id", problemData.id);
+
+      if (error1) {
+        throw new Error(`Error in deletion in table: ${error1}`);
+      }
+
+      // if there is image data, delete it
+      if (problemData.imageUrl) {
+        const { error: error2 } = await supabase.storage
+          .from(PROBLEM_IMAGE_BUCKET)
+          .remove([problemData.userId, problemData.id]);
+
+        if (error2) {
+          throw new Error(`Error in deletion in object storage: ${error2}`);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      return {
+        success: false,
+        message: `Issue deleting ${problemData.title}, please try again later!`,
+      };
+    }
+
+    return {
+      success: true,
+      message: `Successfully deleted ${problemData.title}`,
+    };
+  };
+
   return {
     isLoadingData,
     loadDataError,
     problemsData,
+    deleteProblem,
   };
 };

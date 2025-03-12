@@ -51,17 +51,21 @@ import {
 
 import Link from "next/link";
 import { STATUSES_STYLE } from "@/components/table/problem_column";
+import { SimpleResponse } from "@/types/global";
+import { ProblemState } from "@/types/problem";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   columnSizes?: Record<string, string>;
+  deleteRow: (problemData: ProblemState) => Promise<SimpleResponse>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   columnSizes,
+  deleteRow,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);

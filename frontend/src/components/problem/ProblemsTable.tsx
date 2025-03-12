@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  problem_columns,
+  getProblemColumns,
   COLUMN_SIZES,
 } from "@/components/table/problem_column";
 import { DataTable } from "@/components/ui/data-table";
@@ -18,13 +18,16 @@ export default function ProblemsTable() {
     return;
   }
 
-  const { problemsData } = useProblemsTable(user);
+  const { problemsData, deleteProblem } = useProblemsTable(user);
+
+  const problem_columns = getProblemColumns(deleteProblem);
 
   return (
     <DataTable
       columns={problem_columns}
       data={problemsData}
       columnSizes={COLUMN_SIZES}
+      deleteRow={deleteProblem}
     />
   );
 }

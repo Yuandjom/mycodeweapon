@@ -9,7 +9,7 @@ import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/utils/timestamp";
 
 export const useProblem = (title: string, user: User | null) => {
   const DEFAULT_PROBLEM_STATE: ProblemState = {
-    problemId: "-1",
+    id: "-1",
     userId: user?.id || "-",
     title: "untitled",
     status: ProblemStatus.InProgress,
@@ -116,7 +116,7 @@ export const useProblem = (title: string, user: User | null) => {
         }
 
         updateProblemStates({
-          problemId: data.id,
+          id: data.id,
           title: data.title,
           status: data.status,
           code: data.code,
@@ -163,7 +163,7 @@ export const useProblem = (title: string, user: User | null) => {
 
   const setCode = (code: string) => {
     updateProblemStates({ code });
-    saveCodeLocally(problemStates.problemId, code);
+    saveCodeLocally(problemStates.id, code);
   };
 
   const setLanguageId = (languageId: string) => {
@@ -179,12 +179,12 @@ export const useProblem = (title: string, user: User | null) => {
     );
 
     // save code locally
-    saveCodeLocally(problemStates.problemId, problemStates.code);
+    saveCodeLocally(problemStates.id, problemStates.code);
 
     try {
       const supabase = createClient();
 
-      let problemId: string = problemStates.problemId;
+      let problemId: string = problemStates.id;
 
       const toInsertData = {
         title: problemStates.title,
@@ -196,9 +196,6 @@ export const useProblem = (title: string, user: User | null) => {
 
       // new problem to insert
       if (problemId === "-1") {
-        console.log("[useProblem] fresh insert");
-        console.log(toInsertData);
-
         const { data, error: supaError } = await supabase
           .from(PROBLEMS_TABLE)
           .insert(toInsertData)
@@ -210,17 +207,14 @@ export const useProblem = (title: string, user: User | null) => {
         }
 
         problemId = data.id;
-        updateProblemStates({ problemId: data.id });
+        updateProblemStates({ id: data.id });
 
         // update previously inserted problem
       } else {
-        console.log("[useProblem] update");
-        console.log(toInsertData);
-
         const { data, error: supaError } = await supabase
           .from(PROBLEMS_TABLE)
           .update(toInsertData)
-          .eq("id", problemStates.problemId);
+          .eq("id", problemStates.id);
 
         if (supaError) {
           throw supaError;
@@ -243,8 +237,6 @@ export const useProblem = (title: string, user: User | null) => {
 
       // handle image upload to storage if any
       if (problemStates.questionImage) {
-        console.log("[useProblem] saveProblem() - Saving to storage bucket");
-
         const fileExt = problemStates.questionImage.name.split(".").pop();
 
         const fileStorePath = `${problemStates.userId}/${problemId}.${fileExt}`;

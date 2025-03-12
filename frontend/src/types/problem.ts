@@ -5,7 +5,7 @@ export enum ProblemStatus {
 }
 
 export interface ProblemState {
-  problemId: string;
+  id: string;
   userId: string;
   title: string;
   status: ProblemStatus;
