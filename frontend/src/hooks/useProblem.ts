@@ -6,6 +6,7 @@ import { User } from "@supabase/supabase-js";
 import { ProblemState, ProblemStatus } from "@/types/problem";
 import { PROBLEMS_TABLE, PROBLEM_IMAGE_BUCKET } from "@/constants/supabase";
 import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/utils/timestamp";
+import { SimpleResponse } from "@/types/global";
 
 export const useProblem = (title: string, user: User | null) => {
   const DEFAULT_PROBLEM_STATE: ProblemState = {
@@ -149,8 +150,46 @@ export const useProblem = (title: string, user: User | null) => {
     setIsLoading(false);
   }, [title, user]);
 
-  const setTitle = (title: string) => {
+  const isDuplicateTitle = async (title: string): Promise<boolean> => {
+    const supabase = createClient();
+
+    const { data: userProblems, error } = await supabase
+      .from(PROBLEMS_TABLE)
+      .select("title")
+      .eq("userId", user?.id);
+
+    if (error) {
+      return true;
+    }
+    if (userProblems) {
+      return userProblems.some((uP) => {
+        const isMatch = uP.title === title;
+        if (isMatch) {
+          console.log(`found match of ${uP.title} === ${title}`);
+        }
+        return isMatch;
+      });
+    }
+
+    return false;
+  };
+
+  const setTitle = async (title: string): Promise<SimpleResponse> => {
+    const isDuplicate = await isDuplicateTitle(title);
+
+    if (isDuplicate) {
+      return {
+        success: false,
+        message: "Title is duplicated",
+      };
+    }
+
     updateProblemStates({ title: title.trim().toLowerCase() });
+
+    return {
+      success: true,
+      message: "",
+    };
   };
 
   const setStatus = (status: ProblemStatus) => {

@@ -15,11 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { STATUSES_STYLE } from "@/components/table/problem_column";
 import { MAXIMUM_IMAGE_SIZE_KB } from "@/constants/supabase";
+import { SimpleResponse } from "@/types/global";
 
 interface QuestionEditorProps {
   imageUrl: string | null;
   title: string;
-  setTitle: (title: string) => void;
+  setTitle: (title: string) => Promise<SimpleResponse>;
   status: ProblemStatus;
   setStatus: (status: ProblemStatus) => void;
   image: File | null;
@@ -49,9 +50,18 @@ const QuestionEditor = ({
     setPreview(imageUrl || "");
   }, [imageUrl]);
 
-  const handleTitleSave = () => {
-    setTitle(tempTitle.trim());
-    setIsEditingTitle(false);
+  const handleTitleSave = async () => {
+    const { success, message } = await setTitle(tempTitle.trim());
+
+    if (!success) {
+      toast({
+        title: "Invalid Title",
+        description:
+          "Ensure title do not contain special characters or is unique!",
+      });
+    } else {
+      setIsEditingTitle(false);
+    }
   };
 
   const handleImageUpload = useCallback(
@@ -138,7 +148,9 @@ const QuestionEditor = ({
           <DropdownMenuTrigger asChild>
             <Button
               variant="secondary"
-              className={`${STATUSES_STYLE.find((s) => s.value == status)?.css} rounded-lg`}
+              className={`${
+                STATUSES_STYLE.find((s) => s.value == status)?.css
+              } rounded-lg`}
             >
               {(() => {
                 const currentStatus = STATUSES_STYLE.find(
@@ -206,7 +218,11 @@ const ImageUploadSection = ({
 
   return (
     <div
-      className={`flex-grow min-h-0 space-y-2 ${preview ? "" : "rounded-lg transition-colors border-2 border-dashed group border-muted-foreground hover:border-primary"}`}
+      className={`flex-grow min-h-0 space-y-2 ${
+        preview
+          ? ""
+          : "rounded-lg transition-colors border-2 border-dashed group border-muted-foreground hover:border-primary"
+      }`}
     >
       <div
         className={cn(
