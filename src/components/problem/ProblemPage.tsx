@@ -89,13 +89,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                   minSize={20}
                   className="mb-0.5 bg-background rounded-lg p-4"
                 >
-                  <QuestionEditor
-                    title={problemStates.title}
-                    description={problemStates.description}
-                    hints={problemStates.hints}
-                    status={problemStates.status}
-                    setStatus={setStatus}
-                  />
+                  <QuestionEditor problemStates={problemStates} />
                 </ResizablePanel>
                 <ResizableHandle
                   withHandle

@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, BookOpen, Code, Lightbulb, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ProblemState } from "@/types/problem";
 
 interface TestCase {
   input: string;
@@ -21,9 +22,11 @@ interface ExtractedQuestion {
 }
 
 export default function QuestionEditor({
+  problemStates,
   onQuestionExtracted,
 }: {
   onQuestionExtracted?: (data: ExtractedQuestion) => void;
+  problemStates: ProblemState;
 }) {
   const { toast } = useToast();
 
