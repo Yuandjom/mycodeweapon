@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { ProblemState, ProblemStatus } from "@/types/problem";
 import { convertIsoTimeToUnix, getCurrentUTCTime } from "@/utils/timestamp";
@@ -18,14 +18,6 @@ export const useProblem = (title: string, user: User | null) => {
     hints: "",
     updated_at: "",
   };
-
-  // for updating user details when user are loaded asynchronously
-  useEffect(() => {
-    if (user) {
-      updateProblemStates({ userId: user.id });
-      console.log(`[useProblem] updated userId: ${user.id}`);
-    }
-  }, [user]);
 
   const [problemStates, setProblemStates] = useState<ProblemState>(
     DEFAULT_PROBLEM_STATE
