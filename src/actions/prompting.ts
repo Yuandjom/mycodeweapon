@@ -1,10 +1,5 @@
 "use server";
-import {
-  AiOption,
-  OpenAiInitParams,
-  AiChatMessage,
-  AiChatRole,
-} from "@/types/ai";
+import { AiOption, OpenAiInitParams, AiChatRole } from "@/types/ai";
 import { SYSTEM_PROMPT, getAiOptionBaseUrl } from "@/constants/aiSettings";
 import { fetchDecryptedApiKey } from "@/app/actions/apiKeys";
 import OpenAi from "openai";

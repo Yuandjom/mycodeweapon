@@ -1,5 +1,19 @@
 import { AiOption } from "@/types/ai";
 
+export const AI_OPTION_STORAGE: string = "DEFAULT_AI_OPTION";
+export const AI_MODEL_STORAGE: string = "DEFAULT_AI_MODEL";
+
+export const DEFAULT_AI_OPTION: AiOption = AiOption.Gemini;
+export const DEFAULT_AI_MODEL: string = "gemini-2.0-flash";
+
+export const AI_OPTIONS_KEY_STORAGE: Record<AiOption, string> = {
+  GEMINI: "GEMINI_API_KEY",
+  OPENAI: "OPENAI_API_KEY",
+  DEEPSEEK: "DEEPSEEK_API_KEY",
+  CLAUDE: "CLAUDE_API_KEY",
+  PERPLEXITY: "PERPLEXITY_API_KEY",
+};
+
 export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
   GEMINI: [
     "gemini-1.5-pro",
@@ -8,7 +22,7 @@ export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
     "gemini-2.0-flash-lite",
   ],
   OPENAI: ["o1", "o1-mini", "o3-mini", "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-  // DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
+  DEEPSEEK: ["deepseek-chat", "deepseek-reasoner"],
   CLAUDE: [
     "claude-3-7-sonnet-20250219",
     "claude-3-5-sonnet-20240620",
@@ -16,24 +30,22 @@ export const AI_OPTIONS_AND_MODELS: Record<AiOption, string[]> = {
     "claude-3-sonnet-20240229",
     "claude-3-haiku-20240307",
   ],
-  // PERPLEXITY: [
-  //   "sonar",
-  //   "sonar-pro",
-  //   "sonar-reasoning",
-  //   "sonar-reasoning-pro",
-  //   "sonar-deep-research",
-  // ],
+  PERPLEXITY: [
+    "sonar",
+    "sonar-pro",
+    "sonar-reasoning",
+    "sonar-reasoning-pro",
+    "sonar-deep-research",
+  ],
 };
 
 export const BASE_URLS: Record<AiOption, string> = {
   GEMINI: "https://generativelanguage.googleapis.com/v1beta/openai/",
   OPENAI: "",
-  // DEEPSEEK: "https://api.deepseek.com/v1",
+  DEEPSEEK: "https://api.deepseek.com/v1",
   CLAUDE: "https://api.anthropic.com/v1/",
-  // PERPLEXITY: "https://api.perplexity.ai",
+  PERPLEXITY: "https://api.perplexity.ai",
 };
-
-export const DEFAULT_AI_MODEL: string = "GEMINI";
 
 export const SYSTEM_PROMPT: string = `You are an AI coding assistant for a user working on programming challenges. You may receive questions that may include an image of a programming problem and/or the user's code written in various languages.
 
@@ -130,10 +142,10 @@ export const displayAiOption = (aiChoice: AiOption): string => {
       return "OpenAI";
     case AiOption.Claude:
       return "Claude";
-    // case AiOption.DeepSeek:
-    //   return "DeepSeek";
-    // case AiOption.Perplexity:
-    //   return "Perplexity";
+    case AiOption.DeepSeek:
+      return "DeepSeek";
+    case AiOption.Perplexity:
+      return "Perplexity";
     default:
       return "";
   }

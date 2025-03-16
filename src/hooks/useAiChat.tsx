@@ -2,7 +2,7 @@
 
 import { AiChatMessage, AiOption, AiChatRole, KeyStorePref } from "@/types/ai";
 import { useState, useEffect } from "react";
-import { FIRST_MESSAGE } from "@/constants/aiSettings";
+import { FIRST_MESSAGE, AI_OPTIONS_KEY_STORAGE } from "@/constants/aiSettings";
 import { cloudPromptAi } from "@/actions/prompting";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
@@ -14,8 +14,6 @@ interface useAiChatProps {
   language: string;
   aiOption: AiOption;
   aiModel: string;
-  storePref: KeyStorePref;
-  apiKey: string | null;
 }
 
 export interface promptAiParams {
@@ -39,8 +37,6 @@ export const useAiChat = ({
   language,
   aiOption,
   aiModel,
-  storePref,
-  apiKey,
 }: useAiChatProps) => {
   const [prompt, setPrompt] = useState<string>("");
   const [isPrompting, setIsPrompting] = useState<boolean>(false);
@@ -77,13 +73,7 @@ export const useAiChat = ({
       ]);
       setPrompt("");
 
-      if (storePref === KeyStorePref.LOCAL) {
-        apiKey = localStorage.getItem(`${aiOption}-key`);
-      }
-
-      if (!apiKey && storePref !== KeyStorePref.CLOUD) {
-        throw new Error("No API Key set");
-      }
+      const apiKey = localStorage.getItem(AI_OPTIONS_KEY_STORAGE[aiOption]);
 
       const {
         success,
