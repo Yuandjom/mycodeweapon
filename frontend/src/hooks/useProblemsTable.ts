@@ -59,17 +59,6 @@ export const useProblemsTable = (user: User | null) => {
       if (error1) {
         throw new Error(`Error in deletion in table: ${error1}`);
       }
-
-      // if there is image data, delete it
-      if (problemData.imageUrl) {
-        const { error: error2 } = await supabase.storage
-          .from(PROBLEM_IMAGE_BUCKET)
-          .remove([problemData.userId, problemData.id]);
-
-        if (error2) {
-          throw new Error(`Error in deletion in object storage: ${error2}`);
-        }
-      }
     } catch (err) {
       console.log(err);
       return {

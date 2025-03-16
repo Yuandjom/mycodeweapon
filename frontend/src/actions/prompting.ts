@@ -13,6 +13,7 @@ import {
   ChatCompletionMessageParam,
   ChatCompletionContentPart,
 } from "openai/resources/index.mjs";
+import { ProblemContext } from "@/hooks/useAiChat";
 
 interface userCode {
   code: string;
@@ -25,18 +26,18 @@ interface cloudPromptAiProps {
   aiModel: string;
   apiKey: string;
   chatMessages: ChatCompletionMessageParam[];
+  probContext: ProblemContext | null;
   codeContext: userCode | null;
-  imageBase64: string | null;
 }
 
 export const cloudPromptAi = async ({
   userId,
+  probContext,
   aiOption,
   aiModel,
   apiKey,
   chatMessages,
   codeContext,
-  imageBase64,
 }: cloudPromptAiProps): Promise<SimpleDataResponse<string>> => {
   try {
     if (!apiKey) {
@@ -52,16 +53,15 @@ export const cloudPromptAi = async ({
       content: [
         {
           type: "text",
-          text: "Attached are my question image and code (if none received, ignore this message).",
+          text: "Attached is my question and code (if none received, ignore this message).",
         },
       ],
     };
 
-    // Attach the image if it's the first user message
-    if (imageBase64) {
+    if (probContext) {
       (contextContent.content as ChatCompletionContentPart[]).push({
-        type: "image_url",
-        image_url: { url: `data:image/png;base64,${imageBase64}` },
+        type: "text",
+        text: `This is my problem title:${probContext.title}\nThis is my problem description${probContext.description}\n\`\`\``,
       });
     }
 
@@ -78,7 +78,7 @@ export const cloudPromptAi = async ({
       ...chatMessages.slice(1),
     ];
 
-    if (imageBase64 || codeContext) {
+    if (codeContext) {
       sendMessages.push(contextContent);
     }
 

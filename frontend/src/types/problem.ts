@@ -7,13 +7,12 @@ export enum ProblemStatus {
 export interface ProblemState {
   id: string;
   userId: string;
-  title: string;
   status: ProblemStatus;
   code: string;
   languageId: string;
-  questionImage: File | null;
-  imageUrl: string | null;
-  imagePreview: string;
+  title: string;
+  description: string;
+  hints: string;
   updated_at: string; // supabase `timestampz` serialised to string in ISO 8601 eg "2025-02-14T10:00:00.000Z"
 }
 

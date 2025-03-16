@@ -36,15 +36,17 @@ import { useAiChat } from "@/hooks/useAiChat";
 import { SimpleResponse } from "@/types/global";
 import Link from "next/link";
 import ChatMessages from "./ChatMessages";
+import { ProblemState } from "@/types/problem";
+import { judge0ToMonacoMap } from "@/constants/judge0";
 
 interface AiChatProps {
   userId: string;
-  questionImage: File | null;
-  code: string;
-  language: string;
+  problemStates: ProblemState;
 }
 
-const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
+const AiChat = ({ userId, problemStates }: AiChatProps) => {
+  const language = judge0ToMonacoMap[problemStates.languageId] || "python";
+
   const {
     defaultAiOption,
     defaultAiModel,
@@ -61,15 +63,16 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
     isPrompting,
     includeCode,
     setIncludeCode,
-    includeQuestionImg,
-    setIncludeQuestionImg,
+    includeProblem,
+    setIncludeProblem,
     submitPrompt,
   } = useAiChat({
     userId,
     aiOption: defaultAiOption,
     aiModel: defaultAiModel,
-    questionImage,
-    code,
+    title: problemStates.title,
+    description: problemStates.description,
+    code: problemStates.code,
     language,
     storePref: keyPref,
     apiKey: apiKey,
@@ -83,8 +86,8 @@ const AiChat = ({ userId, questionImage, code, language }: AiChatProps) => {
         <div className="flex items-center gap-2">
           <Checkbox
             id="includeQuesImg"
-            checked={includeQuestionImg}
-            onCheckedChange={() => setIncludeQuestionImg((prev) => !prev)}
+            checked={includeProblem}
+            onCheckedChange={() => setIncludeProblem((prev) => !prev)}
           />
           <Label htmlFor="includeQuesImg" className="text-sm">
             Question Img

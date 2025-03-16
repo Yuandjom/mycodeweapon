@@ -16,26 +16,22 @@ import { useProblem } from "@/hooks/useProblem";
 import { useJudge0 } from "@/hooks/useJudge0";
 import { Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { judge0ToMonacoMap } from "@/constants/judge0";
 
 const ProblemPage = ({ title }: { title: string }) => {
-  const router = useRouter();
   const { user, authLoading } = useAuth();
 
   // problem dependencies
-  // const { title } = use(params)
   const {
     problemStates,
     setTitle,
+    setDescription,
+    setHints,
     setStatus,
-    setQuestionImage,
     setCode,
     setLanguageId,
-    saveProblem,
     resetProblem,
     isLoading,
-    isSaving,
     error,
   } = useProblem(title, user);
 
@@ -51,19 +47,6 @@ const ProblemPage = ({ title }: { title: string }) => {
     codeMemoryUsed,
     codeTimeUsed,
   } = useJudge0();
-
-  // Wrap saveProblem to update URL after successful save
-  const handleSaveProblem = async () => {
-    try {
-      await saveProblem();
-      const newTitle = problemStates.title.replace(/ /g, "-");
-      if (newTitle !== title) {
-        router.push(`/problem/${newTitle}`);
-      }
-    } catch (err) {
-      console.error("Error saving problem:", err);
-    }
-  };
 
   // TODO: different error types - right now they are all clustered together in this one variable
   if (error) {
@@ -108,12 +91,10 @@ const ProblemPage = ({ title }: { title: string }) => {
                 >
                   <QuestionEditor
                     title={problemStates.title}
-                    setTitle={setTitle}
+                    description={problemStates.description}
+                    hints={problemStates.hints}
                     status={problemStates.status}
                     setStatus={setStatus}
-                    imageUrl={problemStates.imageUrl}
-                    image={problemStates.questionImage}
-                    setImage={setQuestionImage}
                   />
                 </ResizablePanel>
                 <ResizableHandle
@@ -127,11 +108,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                 >
                   <AiChat
                     userId={user?.id || ""}
-                    questionImage={problemStates.questionImage}
-                    code={problemStates.code}
-                    language={
-                      judge0ToMonacoMap[problemStates.languageId] || "python"
-                    }
+                    problemStates={problemStates}
                   />
                 </ResizablePanel>
               </ResizablePanelGroup>
@@ -159,8 +136,6 @@ const ProblemPage = ({ title }: { title: string }) => {
                     onCodeChange={setCode}
                     onSubmitCode={submitCode}
                     isSubmitting={isSubmitting}
-                    onSaveProblem={handleSaveProblem}
-                    isSaving={isSaving}
                   />
                 </ResizablePanel>
                 <ResizableHandle

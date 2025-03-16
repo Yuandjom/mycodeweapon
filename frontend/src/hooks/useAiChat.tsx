@@ -8,7 +8,8 @@ import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 interface useAiChatProps {
   userId: string;
-  questionImage: File | null;
+  title: string;
+  description: string;
   code: string;
   language: string;
   aiOption: AiOption;
@@ -25,9 +26,15 @@ export interface promptAiParams {
   includeQuestionImg: boolean;
 }
 
+export interface ProblemContext {
+  title: string;
+  description: string;
+}
+
 export const useAiChat = ({
   userId,
-  questionImage,
+  title,
+  description,
   code,
   language,
   aiOption,
@@ -43,42 +50,12 @@ export const useAiChat = ({
   >([{ role: AiChatRole.Ai, content: FIRST_MESSAGE }]);
 
   const [includeCode, setIncludeCode] = useState<boolean>(true);
-  const [includeQuestionImg, setIncludeQuestionImg] = useState<boolean>(true);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [includeProblem, setIncludeProblem] = useState<boolean>(true);
 
-  useEffect(() => {
-    const convertImageToBase64 = async () => {
-      if (!questionImage || !includeQuestionImg) {
-        setImageBase64(null);
-        return;
-      }
-
-      try {
-        const reader = new FileReader();
-
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => {
-            let result = reader.result as string;
-            const cleanBase64 = result
-              .replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
-              .trim();
-
-            resolve(cleanBase64);
-          };
-          reader.onerror = reject;
-        });
-
-        reader.readAsDataURL(questionImage);
-        const base64Data = await base64Promise;
-        setImageBase64(base64Data);
-      } catch (err) {
-        console.error("[useAiChat] Image Conversion Error:", err);
-        setImageBase64(null);
-      }
-    };
-
-    convertImageToBase64();
-  }, [questionImage, includeQuestionImg]);
+  const probContext: ProblemContext = {
+    title,
+    description,
+  };
 
   const submitPrompt = async () => {
     try {
@@ -114,12 +91,12 @@ export const useAiChat = ({
         data: reply,
       } = await cloudPromptAi({
         userId,
+        probContext: includeProblem ? probContext : null,
         aiOption,
         aiModel,
         apiKey: apiKey || "",
         chatMessages,
         codeContext: includeCode ? { code, language } : null,
-        imageBase64: includeQuestionImg ? imageBase64 : null,
       });
 
       if (!success) throw new Error(message);
@@ -150,8 +127,8 @@ export const useAiChat = ({
     prompt,
     includeCode,
     setIncludeCode,
-    includeQuestionImg,
-    setIncludeQuestionImg,
+    includeProblem,
+    setIncludeProblem,
     setPrompt,
     isPrompting,
     submitPrompt,

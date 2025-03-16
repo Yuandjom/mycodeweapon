@@ -18,8 +18,6 @@ type Props = {
   onCodeChange: (value: string) => void;
   onSubmitCode: ({ source_code, language_id }: submitCodeParams) => void;
   isSubmitting: boolean;
-  onSaveProblem: () => void;
-  isSaving: boolean;
 };
 
 const CodeEditor = (props: Props) => {
@@ -67,22 +65,6 @@ const CodeEditor = (props: Props) => {
               )}
               <span className="font-semibold text-green-200">
                 {props.isSubmitting ? "Running..." : "Run"}
-              </span>
-            </div>
-          </Button>
-          <Button
-            onClick={props.onSaveProblem}
-            className="bg-blue-800 hover:bg-blue-800/80 px-4"
-            disabled={props.isSaving}
-          >
-            <div className="flex_center gap-1.5">
-              {props.isSaving ? (
-                <Loader2 className="text-blue-200 h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="text-blue-200 h-4 w-4" />
-              )}
-              <span className="font-semibold text-blue-200">
-                {props.isSaving ? "Saving..." : "Save"}
               </span>
             </div>
           </Button>
