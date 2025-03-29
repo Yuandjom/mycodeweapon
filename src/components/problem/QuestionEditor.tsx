@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, BookOpen, Code, Lightbulb, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProblemState } from "@/types/problem";
+import { Progress } from "@/components/ui/progress";
 
 interface TestCase {
   input: string;
@@ -21,6 +22,7 @@ interface ExtractedQuestion {
   examples: TestCase[];
   hints: string[];
   constraints?: string[];
+  _showHints?: boolean;
 }
 
 export default function QuestionEditor({
@@ -38,28 +40,50 @@ export default function QuestionEditor({
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
-  const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+  const [isValidUrl, setIsValidUrl] = useState<boolean>(true);
+
+  // URL validation effect
+  useEffect(() => {
+    if (url.trim() === "") {
+      setIsValidUrl(true);
+      return;
+    }
+    setIsValidUrl(url.includes("leetcode.com/problems/"));
+  }, [url]);
 
   const extractQuestion = async () => {
     if (!url.trim() || !url.includes("leetcode.com/problems/")) {
-      toast({ title: "Please enter a valid LeetCode problem URL" });
+      toast({
+        title: "Invalid URL",
+        description: "Please enter a valid LeetCode problem URL",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsLoading(true);
-    setShowProgressBar(true);
-    setProgress(0);
+    setProgress(10); // Start with some initial progress
 
-    // Simulate progress animation
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          return 95;
-        }
-        return prev + 5;
-      });
-    }, 500);
+    // More natural progress simulation with variable speeds
+    const simulateProgress = () => {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          // Slower at beginning and end, faster in middle
+          if (prev < 30) return prev + 2;
+          if (prev < 60) return prev + 4;
+          if (prev < 85) return prev + 2;
+          if (prev >= 85) {
+            clearInterval(interval);
+            return 90; // Cap at 90% until actual completion
+          }
+          return prev;
+        });
+      }, 200);
+
+      return interval;
+    };
+
+    const progressInterval = simulateProgress();
 
     try {
       const response = await fetch(
@@ -67,6 +91,10 @@ export default function QuestionEditor({
           process.env.NEXT_PUBLIC_API_BASE_URL
         }/leetcode/scrape?url=${encodeURIComponent(url)}`
       );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
 
       const data = await response.json();
 
@@ -78,73 +106,129 @@ export default function QuestionEditor({
         constraints: data.constraints,
       };
 
-      setExtractedData(mapped);
-      onQuestionExtracted(data.title, data.description);
-
-      toast({ title: "Question extracted successfully!" });
-    } catch (err) {
-      toast({ title: "Failed to extract question" });
-    } finally {
       setProgress(100);
+      clearInterval(progressInterval);
+
+      // Small delay to show the 100% progress state before hiding
       setTimeout(() => {
+        setExtractedData(mapped);
+        onQuestionExtracted(data.title, data.description);
         setIsLoading(false);
-        setShowProgressBar(false);
-        setProgress(0);
-      }, 1000);
+      }, 500);
+
+      toast({
+        title: "Success!",
+        description: "Question extracted successfully",
+        variant: "default",
+      });
+    } catch (err) {
+      clearInterval(progressInterval);
+      toast({
+        title: "Extraction failed",
+        description:
+          "Could not extract the question. Please check the URL and try again.",
+        variant: "destructive",
+      });
+      setProgress(0);
+      setIsLoading(false);
     }
+  };
+
+  const toggleHints = () => {
+    setExtractedData((prev) =>
+      prev
+        ? {
+            ...prev,
+            _showHints: !prev._showHints,
+          }
+        : prev
+    );
   };
 
   return (
     <div className="w-full h-full flex flex-col">
-      {!extractedData && (
-        <>
-          <div className="space-y-2 mb-4">
+      {!extractedData ? (
+        <div className="space-y-4 mb-6">
+          <div className="space-y-2">
             <p className="text-sm text-muted-foreground text-center">
               Enter a LeetCode problem URL to extract the question details.
             </p>
           </div>
 
-          <div className="flex gap-2 mb-4">
-            <Input
-              placeholder="https://leetcode.com/problems/example-problem/"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button onClick={extractQuestion} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Extracting
-                </>
-              ) : (
-                <>
-                  <Link className="mr-2 h-4 w-4" />
-                  Extract
-                </>
-              )}
-            </Button>
-            {showProgressBar && (
-              <div className="w-full flex flex-col items-center mt-4 gap-2">
-                <div className="w-full h-2 bg-gray-300 rounded">
-                  <div
-                    className="h-full bg-blue-500 rounded transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="https://leetcode.com/problems/example-problem/"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className={`flex-1 transition-all ${
+                  !isValidUrl && url.trim() !== ""
+                    ? "border-red-400 focus-visible:ring-red-400"
+                    : ""
+                }`}
+                disabled={isLoading}
+              />
+              <Button
+                onClick={extractQuestion}
+                disabled={isLoading || (url.trim() !== "" && !isValidUrl)}
+                className="transition-all"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Extracting
+                  </>
+                ) : (
+                  <>
+                    <Link className="mr-2 h-4 w-4" />
+                    Extract
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {!isValidUrl && url.trim() !== "" && (
+              <p className="text-xs text-red-400 pl-1">
+                Please enter a valid LeetCode URL (e.g.,
+                https://leetcode.com/problems/two-sum/)
+              </p>
+            )}
+
+            {isLoading && (
+              <div className="w-full space-y-2 mt-2 transition-all">
+                <Progress value={progress} className="h-2 w-full" />
+                <p className="text-xs text-center text-muted-foreground">
+                  {progress < 40
+                    ? "Fetching problem..."
+                    : progress < 75
+                    ? "Parsing content..."
+                    : progress < 95
+                    ? "Preparing data..."
+                    : "Almost done..."}
+                </p>
               </div>
             )}
           </div>
-        </>
-      )}
+        </div>
+      ) : null}
 
       {extractedData ? (
         <ScrollArea className="flex-1 px-1 -mx-1">
           <div className="space-y-6">
             <div>
-              <h1 className="text-xl font-bold">{extractedData.title}</h1>
-              <p className="text-sm text-muted-foreground">LeetCode Problem</p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h1 className="text-xl font-bold">{extractedData.title}</h1>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setExtractedData(null)}
+                  className="mt-1 transition-colors bg-transparent hover:bg-destructive"
+                >
+                  Reset
+                </Button>
+              </div>
             </div>
 
             <Separator />
@@ -211,6 +295,7 @@ export default function QuestionEditor({
                 ))}
               </div>
             </div>
+
             {extractedData.constraints &&
               extractedData.constraints.length > 0 && (
                 <>
@@ -241,30 +326,12 @@ export default function QuestionEditor({
                   </h3>
 
                   <div className="mb-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setExtractedData((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                hints: prev.hints.length > 0 ? prev.hints : [],
-                                _showHints: !("_showHints" in prev)
-                                  ? true
-                                  : !(prev as any)._showHints,
-                              }
-                            : prev
-                        )
-                      }
-                    >
-                      {!(extractedData as any)._showHints
-                        ? "Show Hints"
-                        : "Hide Hints"}
+                    <Button size="sm" variant="outline" onClick={toggleHints}>
+                      {!extractedData._showHints ? "Show Hints" : "Hide Hints"}
                     </Button>
                   </div>
 
-                  {(extractedData as any)._showHints && (
+                  {extractedData._showHints && (
                     <ul className="space-y-2 list-disc list-inside text-sm pl-1">
                       {extractedData.hints.map((hint, idx) => (
                         <li key={idx} className="text-sm">
@@ -276,16 +343,6 @@ export default function QuestionEditor({
                 </div>
               </>
             )}
-
-            <div className="pb-4 pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setExtractedData(null)}
-              >
-                Reset
-              </Button>
-            </div>
           </div>
         </ScrollArea>
       ) : (

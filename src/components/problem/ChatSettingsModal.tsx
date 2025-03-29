@@ -87,7 +87,7 @@ export function ChatSettingsModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[550px] min-h-[600px] flex flex-col justify-start items-start">
         <DialogHeader>
           <DialogTitle>AI Model Settings</DialogTitle>
         </DialogHeader>
@@ -95,6 +95,7 @@ export function ChatSettingsModal({
         <Tabs
           defaultValue={activeTab}
           onValueChange={(value) => setActiveTab(value as AiOption)}
+          className="flex-auto h-full w-full"
         >
           <TabsList className="grid grid-cols-5 mb-4">
             {Object.values(AiOption).map((provider) => (
@@ -145,8 +146,12 @@ export function ChatSettingsModal({
           ))}
         </Tabs>
 
-        <div className="flex justify-end pt-4">
-          <Button onClick={handleSaveSettings} disabled={isSaving}>
+        <div className="flex w-full">
+          <Button
+            onClick={handleSaveSettings}
+            disabled={isSaving}
+            className="ml-auto"
+          >
             {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

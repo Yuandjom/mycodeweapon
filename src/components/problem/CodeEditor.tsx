@@ -54,7 +54,7 @@ const CodeEditor = (props: Props) => {
         <div className="flex justify-end items-center w-full gap-3">
           <Button
             onClick={handleCodeSubmit}
-            className="bg-green-800 hover:bg-green-800/80 px-4"
+            className="bg-green-800 hover:bg-green-800/80 px-4 rounded-lg"
             disabled={props.isSubmitting}
           >
             <div className="flex_center gap-1.5">
