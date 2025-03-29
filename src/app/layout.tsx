@@ -8,8 +8,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | My Code Weapon",
-    default: "My Code Weapon",
+    template: "%s | BetterLeetCode",
+    default: "BetterLeetCode",
   },
 };
 

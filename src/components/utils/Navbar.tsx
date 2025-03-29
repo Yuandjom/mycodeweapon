@@ -31,10 +31,6 @@ export const Navbar = () => {
       name: "Problems",
       link: "/problem",
     },
-    // {
-    //   name: "Docs",
-    //   link: "/docs",
-    // },
   ];
 
   const handleSignOut = async () => {
@@ -132,15 +128,6 @@ export const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              // <Button
-              //   variant="default"
-              //   size="sm"
-              //   asChild
-              // >
-              //   <Link href="/signin">
-              //     Sign in
-              //   </Link>
-              // </Button>
               <AnimatedButton>
                 <Link href="/signin">
                   <span className="text-sm md:text-base">Get Started!</span>
