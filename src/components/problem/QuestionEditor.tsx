@@ -20,6 +20,7 @@ interface ExtractedQuestion {
   description: string;
   examples: TestCase[];
   hints: string[];
+  constraints?: string[];
 }
 
 export default function QuestionEditor({
@@ -58,11 +59,11 @@ export default function QuestionEditor({
         }
         return prev + 5;
       });
-    }, 200);
+    }, 500);
 
     try {
       const response = await fetch(
-        `http://localhost:8000/leetcode/scrape?url=${encodeURIComponent(url)}`
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/leetcode/scrape?url=${encodeURIComponent(url)}`
       );
 
       const data = await response.json();
@@ -72,6 +73,7 @@ export default function QuestionEditor({
         description: data.description,
         examples: data.examples,
         hints: data.hints,
+        constraints: data.constraints,
       };
 
       setExtractedData(mapped);
@@ -197,6 +199,23 @@ export default function QuestionEditor({
               ))}
               </div>
             </div>
+            {extractedData.constraints && extractedData.constraints.length > 0 && (
+              <>
+                <Separator />
+
+                <div>
+                  <h3 className="text-base font-semibold mb-2 flex items-center">
+                    <Code className="mr-2 h-4 w-4" />
+                    Constraints
+                  </h3>
+                  <ul className="list-disc list-inside text-sm pl-1">
+                    {extractedData.constraints.map((constraint, idx) => (
+                      <li key={idx}>{constraint}</li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            )}
 
             {extractedData.hints && extractedData.hints.length > 0 && (
               <>
