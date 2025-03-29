@@ -123,11 +123,11 @@ export default function QuestionEditor({
                 Description
               </h3>
               <div className="text-sm rounded-md p-1">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: extractedData.description,
-                  }}
-                />
+                <div className="space-y-1">
+                  {extractedData.description.split("\n").map((line, idx) => (
+                    <p key={idx}>{line}</p>
+                  ))}
+                </div>
               </div>
             </div>
 
