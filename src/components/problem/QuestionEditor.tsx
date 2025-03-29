@@ -36,41 +36,60 @@ export default function QuestionEditor({
     null
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
 
   const extractQuestion = async () => {
     if (!url.trim() || !url.includes("leetcode.com/problems/")) {
       toast({ title: "Please enter a valid LeetCode problem URL" });
       return;
     }
-  
+
     setIsLoading(true);
-  
+    setShowProgressBar(true);
+    setProgress(0);
+
+    // Simulate progress animation
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval);
+          return 95;
+        }
+        return prev + 5;
+      });
+    }, 200);
+
     try {
       const response = await fetch(
         `http://localhost:8000/leetcode/scrape?url=${encodeURIComponent(url)}`
       );
-  
+
       const data = await response.json();
-  
+
       const mapped: ExtractedQuestion = {
         title: data.title,
         description: data.description,
         examples: data.examples,
         hints: data.hints,
       };
-  
+
       setExtractedData(mapped);
-      if (onQuestionExtracted) {
-        onQuestionExtracted(mapped);
-      }
-  
+      if (onQuestionExtracted) onQuestionExtracted(mapped);
+
       toast({ title: "Question extracted successfully!" });
     } catch (err) {
       toast({ title: "Failed to extract question" });
     } finally {
-      setIsLoading(false);
+      setProgress(100);
+      setTimeout(() => {
+        setIsLoading(false);
+        setShowProgressBar(false);
+        setProgress(0);
+      }, 1000);
     }
   };
+
   
   return (
     <div className="w-full h-full flex flex-col">
@@ -103,6 +122,16 @@ export default function QuestionEditor({
                 </>
               )}
             </Button>
+            {showProgressBar && (
+              <div className="w-full flex flex-col items-center mt-4 gap-2">
+                <div className="w-full h-2 bg-gray-300 rounded">
+                  <div
+                    className="h-full bg-blue-500 rounded transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
