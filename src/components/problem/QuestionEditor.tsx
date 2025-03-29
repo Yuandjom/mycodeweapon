@@ -12,6 +12,7 @@ import { ProblemState } from "@/types/problem";
 interface TestCase {
   input: string;
   output: string;
+  explanation?: string;
 }
 
 interface ExtractedQuestion {
@@ -138,34 +139,33 @@ export default function QuestionEditor({
                 Examples
               </h3>
               <div className="space-y-4">
-                {extractedData.examples.map((example, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-md border p-3 bg-secondary/30"
-                  >
-                    <p className="font-medium text-sm mb-2">
-                      Example {idx + 1}
-                    </p>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground">
-                          Input:
-                        </p>
-                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
-                          {example.input}
-                        </pre>
-                      </div>
-                      <div>
-                        <p className="text-xs font-medium text-muted-foreground">
-                          Output:
-                        </p>
-                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
-                          {example.output}
-                        </pre>
-                      </div>
+              {extractedData.examples.map((example, idx) => (
+                <div key={idx} className="rounded-md border p-3 bg-secondary/30">
+                  <p className="font-medium text-sm mb-2">Example {idx + 1}</p>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Input:</p>
+                      <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                        {example.input}
+                      </pre>
                     </div>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Output:</p>
+                      <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                        {example.output}
+                      </pre>
+                    </div>
+                    {example.explanation && (
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground">Explanation:</p>
+                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                          {example.explanation}
+                        </pre>
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
+              ))}
               </div>
             </div>
 
