@@ -103,7 +103,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                   {isAi ? (
                     <span className="text-purple-500 dark:text-purple-300 flex items-center">
                       <Zap size={14} className="mr-1 animate-pulse" />
-                      {displayAiOption(aiOption)}
+                      AI
                     </span>
                   ) : (
                     <span className="text-teal-500 dark:text-teal-300">

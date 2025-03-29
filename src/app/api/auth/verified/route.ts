@@ -12,5 +12,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/signup", request.url));
   }
 
-  return NextResponse.redirect(new URL("/problem", request.url));
+  return NextResponse.redirect(new URL("/editor", request.url));
 }

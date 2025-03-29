@@ -18,16 +18,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { LogOut, User2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 import AnimatedButton from "@/components/ui/animated-button";
-import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
-  const router = useRouter();
   const [hovered, setHovered] = useState<number | null>(null);
   const { user, authLoading, signOut } = useAuth();
   const { toast } = useToast();
-  const pathname = usePathname();
 
   const handleSignOut = async () => {
     try {
@@ -47,7 +43,7 @@ export const Navbar = () => {
       className="w-full flex flex-row bg-background items-center justify-between py-2 mx-auto px-4 z-[60] inset-x-0"
     >
       <Logo withText />
-      {pathname === "/" && user && (
+      {/* {pathname === "/" && user && (
         <div className="flex flex-row flex-1 items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
           <Button
             variant="ghost"
@@ -58,7 +54,7 @@ export const Navbar = () => {
             </Link>
           </Button>
         </div>
-      )}
+      )} */}
       <div className="flex items-center gap-2">
         <LightDarkToggle />
         {!authLoading && (

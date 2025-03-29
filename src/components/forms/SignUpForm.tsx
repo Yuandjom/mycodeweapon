@@ -25,7 +25,7 @@ const SignUpForm = () => {
   }
 
   if (user) {
-    router.push("/problem");
+    router.push("/editor");
   }
 
   const fields = [
@@ -81,7 +81,7 @@ const SignUpForm = () => {
       if (result.data?.message?.includes("verification")) {
         toast({ title: result.data.message });
       } else {
-        router.push("/problem");
+        router.push("/editor");
       }
     } catch (err) {
       console.error("Signup error:", err);

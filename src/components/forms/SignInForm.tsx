@@ -74,7 +74,7 @@ const SignInForm = () => {
       toast({ title: "Signed in successfully!" });
 
       const redirectPage = searchParams.get("next");
-      router.push(redirectPage || "/problem");
+      router.push(redirectPage || "/editor");
     } catch (err) {
       setDisplayError(
         err instanceof Error ? err.message : "An unexpected error occurred"
