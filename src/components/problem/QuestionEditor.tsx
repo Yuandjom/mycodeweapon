@@ -178,16 +178,42 @@ export default function QuestionEditor({
                     <Lightbulb className="mr-2 h-4 w-4" />
                     Hints
                   </h3>
-                  <ul className="space-y-2 list-disc list-inside text-sm pl-1">
-                    {extractedData.hints.map((hint, idx) => (
-                      <li key={idx} className="text-sm">
-                        {hint}
-                      </li>
-                    ))}
-                  </ul>
+
+                  <div className="mb-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setExtractedData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                hints: prev.hints.length > 0 ? prev.hints : [],
+                                _showHints: !("_showHints" in prev)
+                                  ? true
+                                  : !(prev as any)._showHints,
+                              }
+                            : prev
+                        )
+                      }
+                    >
+                      {!(extractedData as any)._showHints ? "Show Hints" : "Hide Hints"}
+                    </Button>
+                  </div>
+
+                  {(extractedData as any)._showHints && (
+                    <ul className="space-y-2 list-disc list-inside text-sm pl-1">
+                      {extractedData.hints.map((hint, idx) => (
+                        <li key={idx} className="text-sm">
+                          {hint}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </>
             )}
+
 
             <div className="pb-4 pt-2">
               <Button
