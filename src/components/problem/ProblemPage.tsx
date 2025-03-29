@@ -66,6 +66,11 @@ const ProblemPage = ({ title }: { title: string }) => {
     );
   }
 
+  const onQuestionExtracted = (title: string, description: string) => {
+    setTitle(title);
+    setDescription(description);
+  };
+
   return (
     <Suspense fallback={<LoadingContent />}>
       {authLoading || isLoading ? (
@@ -89,7 +94,10 @@ const ProblemPage = ({ title }: { title: string }) => {
                   minSize={20}
                   className="mb-0.5 bg-background rounded-lg p-4"
                 >
-                  <QuestionEditor problemStates={problemStates} />
+                  <QuestionEditor
+                    problemStates={problemStates}
+                    onQuestionExtracted={onQuestionExtracted}
+                  />
                 </ResizablePanel>
                 <ResizableHandle
                   withHandle

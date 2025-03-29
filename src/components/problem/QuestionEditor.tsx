@@ -27,7 +27,7 @@ export default function QuestionEditor({
   problemStates,
   onQuestionExtracted,
 }: {
-  onQuestionExtracted?: (data: ExtractedQuestion) => void;
+  onQuestionExtracted: (title: string, description: string) => void;
   problemStates: ProblemState;
 }) {
   const { toast } = useToast();
@@ -63,7 +63,9 @@ export default function QuestionEditor({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/leetcode/scrape?url=${encodeURIComponent(url)}`
+        `${
+          process.env.NEXT_PUBLIC_API_BASE_URL
+        }/leetcode/scrape?url=${encodeURIComponent(url)}`
       );
 
       const data = await response.json();
@@ -77,7 +79,7 @@ export default function QuestionEditor({
       };
 
       setExtractedData(mapped);
-      if (onQuestionExtracted) onQuestionExtracted(mapped);
+      onQuestionExtracted(data.title, data.description);
 
       toast({ title: "Question extracted successfully!" });
     } catch (err) {
@@ -92,7 +94,6 @@ export default function QuestionEditor({
     }
   };
 
-  
   return (
     <div className="w-full h-full flex flex-col">
       {!extractedData && (
@@ -170,52 +171,64 @@ export default function QuestionEditor({
                 Examples
               </h3>
               <div className="space-y-4">
-              {extractedData.examples.map((example, idx) => (
-                <div key={idx} className="rounded-md border p-3 bg-secondary/30">
-                  <p className="font-medium text-sm mb-2">Example {idx + 1}</p>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground">Input:</p>
-                      <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
-                        {example.input}
-                      </pre>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-muted-foreground">Output:</p>
-                      <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
-                        {example.output}
-                      </pre>
-                    </div>
-                    {example.explanation && (
+                {extractedData.examples.map((example, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-md border p-3 bg-secondary/30"
+                  >
+                    <p className="font-medium text-sm mb-2">
+                      Example {idx + 1}
+                    </p>
+                    <div className="space-y-3">
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground">Explanation:</p>
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Input:
+                        </p>
                         <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
-                          {example.explanation}
+                          {example.input}
                         </pre>
                       </div>
-                    )}
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground">
+                          Output:
+                        </p>
+                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                          {example.output}
+                        </pre>
+                      </div>
+                      {example.explanation && (
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground">
+                            Explanation:
+                          </p>
+                          <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                            {example.explanation}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
               </div>
             </div>
-            {extractedData.constraints && extractedData.constraints.length > 0 && (
-              <>
-                <Separator />
+            {extractedData.constraints &&
+              extractedData.constraints.length > 0 && (
+                <>
+                  <Separator />
 
-                <div>
-                  <h3 className="text-base font-semibold mb-2 flex items-center">
-                    <Code className="mr-2 h-4 w-4" />
-                    Constraints
-                  </h3>
-                  <ul className="list-disc list-inside text-sm pl-1">
-                    {extractedData.constraints.map((constraint, idx) => (
-                      <li key={idx}>{constraint}</li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            )}
+                  <div>
+                    <h3 className="text-base font-semibold mb-2 flex items-center">
+                      <Code className="mr-2 h-4 w-4" />
+                      Constraints
+                    </h3>
+                    <ul className="list-disc list-inside text-sm pl-1">
+                      {extractedData.constraints.map((constraint, idx) => (
+                        <li key={idx}>{constraint}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
 
             {extractedData.hints && extractedData.hints.length > 0 && (
               <>
@@ -245,7 +258,9 @@ export default function QuestionEditor({
                         )
                       }
                     >
-                      {!(extractedData as any)._showHints ? "Show Hints" : "Hide Hints"}
+                      {!(extractedData as any)._showHints
+                        ? "Show Hints"
+                        : "Hide Hints"}
                     </Button>
                   </div>
 
@@ -261,7 +276,6 @@ export default function QuestionEditor({
                 </div>
               </>
             )}
-
 
             <div className="pb-4 pt-2">
               <Button
