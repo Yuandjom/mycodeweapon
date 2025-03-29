@@ -1,13 +1,9 @@
 import Editor from "@monaco-editor/react";
-import { Play, Loader2, Code, Clock } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Combobox } from "@/components/ui/combobox";
-import { Button } from "@/components/ui/button";
 import { AvailLanguage } from "@/types/judge0";
 import { judge0ToMonacoMap } from "@/constants/judge0";
 import { submitCodeParams } from "@/hooks/useJudge0";
-import Timer from "@/components/utils/Timer";
-import { cn } from "@/lib/utils";
 
 type Props = {
   languages: AvailLanguage[];
@@ -19,6 +15,7 @@ type Props = {
   onCodeChange: (value: string) => void;
   onSubmitCode: ({ source_code, language_id }: submitCodeParams) => void;
   isSubmitting: boolean;
+  showHeader?: boolean; // Optional prop to control header visibility
 };
 
 const CodeEditor = (props: Props) => {
@@ -30,67 +27,11 @@ const CodeEditor = (props: Props) => {
     }
   };
 
-  const handleCodeSubmit = async () => {
-    await props.onSubmitCode({
-      source_code: props.code,
-      language_id: props.languageId,
-    });
-  };
-
   return (
     <div className="w-full h-full flex flex-col">
       <div className="border border-teal-500/20 rounded-md overflow-hidden relative shadow-md shadow-teal-500/10 h-full">
-        {/* Integrated header bar with controls */}
-        <div className="w-full bg-gradient-to-r from-teal-600 to-green-600 flex items-center justify-between px-3 py-2">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center">
-              <Code className="h-4 w-4 text-white/90 mr-2" />
-              <div className="w-48">
-                <Combobox
-                  keyword={"language"}
-                  selections={props.languages.map((lang) => {
-                    return { value: lang.id, label: lang.name };
-                  })}
-                  defaultValue={props.languageId}
-                  onSelectChange={props.onLanguageIdChange}
-                  className="border-white/20 focus-within:ring-white/30 backdrop-blur-sm bg-white/10 text-white hover:bg-transparent"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 px-3 py-1 rounded-md border border-white/20 backdrop-blur-sm bg-white/10">
-              <Clock className="h-3.5 w-3.5 text-white/80" />
-              <Timer className="text-white/90 font-mono text-xs" />
-            </div>
-          </div>
-
-          <div>
-            <Button
-              onClick={handleCodeSubmit}
-              className={cn(
-                "h-8 transition-all border-none shadow-md shadow-green-600/30 rounded px-3 py-1 group relative overflow-hidden",
-                props.isSubmitting
-                  ? "bg-slate-700/80"
-                  : "bg-green-400/25 hover:bg-green-300/50"
-              )}
-              disabled={props.isSubmitting}
-            >
-              <div className="flex items-center gap-1.5 relative z-10">
-                {props.isSubmitting ? (
-                  <Loader2 className="text-white h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <Play className="text-white h-3.5 w-3.5 group-hover:scale-110 transition-transform" />
-                )}
-                <span className="font-medium text-white text-sm">
-                  {props.isSubmitting ? "Running..." : "Run"}
-                </span>
-              </div>
-            </Button>
-          </div>
-        </div>
-
         {/* Editor wrapper with decorative elements */}
-        <div className="relative h-[calc(100%-2.5rem)]">
+        <div className="relative h-full">
           <Editor
             height="100%"
             defaultLanguage={judge0ToMonacoMap[props.languageId]}

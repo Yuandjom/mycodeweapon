@@ -54,7 +54,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={`${"w-[200px] justify-between"} ${className}`}
+          className={`${"justify-between"} ${className}`}
         >
           {label
             ? selections.find((s) => s.label === label)?.label

@@ -16,6 +16,12 @@ import { useProblem } from "@/hooks/useProblem";
 import { useJudge0 } from "@/hooks/useJudge0";
 import { Suspense } from "react";
 import Link from "next/link";
+import { Combobox } from "@/components/ui/combobox";
+import { Button } from "@/components/ui/button";
+import { Play, Loader2, Code, Clock } from "lucide-react";
+import Timer from "@/components/utils/Timer";
+import { cn } from "@/lib/utils";
+import { judge0ToMonacoMap } from "@/constants/judge0";
 
 const ProblemPage = ({ title }: { title: string }) => {
   const { user, authLoading } = useAuth();
@@ -70,99 +76,167 @@ const ProblemPage = ({ title }: { title: string }) => {
     setDescription(description);
   };
 
+  const handleCodeSubmit = async () => {
+    await submitCode({
+      source_code: problemStates.code,
+      language_id: problemStates.languageId,
+    });
+  };
+
   return (
     <Suspense fallback={<LoadingContent />}>
       {authLoading || isLoading ? (
         <LoadingContent />
       ) : (
-        <div className="h-full w-full bg-slate-800/70 dark:bg-black/90 border-t-4 border-teal-500/50 dark:border-teal-700/50 px-1 pb-0.5 backdrop-blur-sm">
+        <div className="h-full w-full flex flex-col bg-slate-800/70 dark:bg-black/90 border-teal-500/50 dark:border-teal-700/50 backdrop-blur-sm">
+          {/* Global Header/Navbar - Moved from CodeEditor */}
+          <div className="w-full bg-background border-b border-border flex items-center justify-between px-4 py-3 shadow-md">
+            {/* Left - Title */}
+            <div className="flex-1 flex items-center">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-teal-500 to-green-500 bg-clip-text text-transparent capitalize">
+                {problemStates.title}
+              </h1>
+            </div>
+
+            {/* Middle - Timer */}
+            <div className="flex-1 flex justify-center">
+              <div className="flex items-center gap-2 px-3 py-1 rounded-md border border-border backdrop-blur-sm bg-secondary/70">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <Timer className="text-foreground font-mono text-xs" />
+              </div>
+            </div>
+
+            {/* Right - Language Selector and Run Button */}
+            <div className="flex-1 flex items-center justify-end gap-4">
+              <div className="flex items-center">
+                <Combobox
+                  keyword={"language"}
+                  selections={languages.map((lang) => {
+                    return { value: lang.id, label: lang.name };
+                  })}
+                  defaultValue={problemStates.languageId}
+                  onSelectChange={setLanguageId}
+                  className="border-border focus-within:ring-ring bg-secondary/70 text-foreground hover:bg-accent/50"
+                />
+              </div>
+
+              <Button
+                onClick={handleCodeSubmit}
+                className={cn(
+                  "h-9 transition-all border border-border shadow-md rounded px-4 py-1 group relative",
+                  isSubmitting
+                    ? "bg-muted text-muted-foreground"
+                    : "bg-accent hover:bg-accent/80 text-accent-foreground"
+                )}
+                disabled={isSubmitting}
+              >
+                <div className="flex items-center gap-1.5 relative z-10">
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Play className="h-4 w-4 transition-transform" />
+                  )}
+                  <span className="font-medium text-sm">
+                    {isSubmitting ? "Running..." : "Run"}
+                  </span>
+                </div>
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile warning */}
           <div className="flex_center md:hidden bg-gradient-to-r from-teal-700 to-green-700 w-full rounded-b-lg shadow-lg">
             <p className="text-white font-bold py-2">
               Use larger screens for code execution features!
             </p>
           </div>
-          <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel
-              defaultSize={40}
-              minSize={27}
-              className="mr-0.5 bg-slate-800/70 dark:bg-black/90"
-            >
-              <ResizablePanelGroup direction="vertical">
-                <ResizablePanel
-                  defaultSize={50}
-                  minSize={20}
-                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-teal-700/20 shadow-md shadow-teal-500/10"
-                >
-                  <QuestionEditor
-                    problemStates={problemStates}
-                    onQuestionExtracted={onQuestionExtracted}
-                  />
-                </ResizablePanel>
-                <ResizableHandle
-                  withHandle
-                  className="bg-slate-800/70 dark:bg-black/90 after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
-                />
-                <ResizablePanel
-                  defaultSize={50}
-                  minSize={20}
-                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
-                >
-                  <AiChat
-                    userId={user?.id || ""}
-                    problemStates={problemStates}
-                  />
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </ResizablePanel>
 
-            <ResizableHandle
-              withHandle
-              className="bg-slate-800/70 dark:bg-black/90 hidden md:flex after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
-            />
+          {/* Main content area */}
+          <div className="flex-1 overflow-hidden px-1 pb-0.5">
+            <ResizablePanelGroup direction="horizontal" className="h-full">
+              <ResizablePanel
+                defaultSize={40}
+                minSize={27}
+                className="mr-0.5 bg-slate-800/70 dark:bg-black/90"
+              >
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel
+                    defaultSize={50}
+                    minSize={20}
+                    className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-teal-700/20 shadow-md shadow-teal-500/10"
+                  >
+                    <QuestionEditor
+                      problemStates={problemStates}
+                      onQuestionExtracted={onQuestionExtracted}
+                    />
+                  </ResizablePanel>
+                  <ResizableHandle
+                    withHandle
+                    className="bg-slate-800/70 dark:bg-black/90 after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
+                  />
+                  <ResizablePanel
+                    defaultSize={50}
+                    minSize={20}
+                    className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
+                  >
+                    <AiChat
+                      userId={user?.id || ""}
+                      problemStates={problemStates}
+                    />
+                  </ResizablePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
 
-            <ResizablePanel
-              defaultSize={60}
-              className="ml-0.5 bg-slate-800/70 dark:bg-black/90 hidden md:flex"
-            >
-              <ResizablePanelGroup direction="vertical">
-                <ResizablePanel
-                  defaultSize={75}
-                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg border border-teal-500/20 shadow-md shadow-teal-500/10"
-                >
-                  <CodeEditor
-                    languages={languages}
-                    languageId={problemStates.languageId}
-                    onLanguageIdChange={setLanguageId}
-                    code={problemStates.code}
-                    onCodeChange={setCode}
-                    onSubmitCode={submitCode}
-                    isSubmitting={isSubmitting}
+              <ResizableHandle
+                withHandle
+                className="bg-slate-800/70 dark:bg-black/90 hidden md:flex after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
+              />
+
+              <ResizablePanel
+                defaultSize={60}
+                className="ml-0.5 bg-slate-800/70 dark:bg-black/90 hidden md:flex"
+              >
+                <ResizablePanelGroup direction="vertical">
+                  <ResizablePanel
+                    defaultSize={75}
+                    className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg border border-teal-500/20 shadow-md shadow-teal-500/10"
+                  >
+                    <CodeEditor
+                      languages={languages}
+                      languageId={problemStates.languageId}
+                      onLanguageIdChange={setLanguageId}
+                      code={problemStates.code}
+                      onCodeChange={setCode}
+                      onSubmitCode={submitCode}
+                      isSubmitting={isSubmitting}
+                      showHeader={false} // New prop to hide the header in CodeEditor
+                    />
+                  </ResizablePanel>
+                  <ResizableHandle
+                    withHandle
+                    className="bg-slate-800/70 dark:bg-black/90 after:bg-green-700 after:shadow-md after:shadow-green-500/20"
                   />
-                </ResizablePanel>
-                <ResizableHandle
-                  withHandle
-                  className="bg-slate-800/70 dark:bg-black/90 after:bg-green-700 after:shadow-md after:shadow-green-500/20"
-                />
-                <CollapsiblePanel
-                  defaultSize={25}
-                  className="mt-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
-                  collapsedText="Code Output"
-                  collapseThreshold={15}
-                  collapsedSize={5}
-                >
-                  <CodeOutput
-                    judge0Error={judge0Error}
-                    isSubmitting={isSubmitting}
-                    codeOutput={codeOutput}
-                    codeErrorId={codeErrorId}
-                    codeErrorDesc={codeErrorDesc}
-                    codeMemoryUsed={codeMemoryUsed}
-                    codeTimeUsed={codeTimeUsed}
-                  />
-                </CollapsiblePanel>
-              </ResizablePanelGroup>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+                  <CollapsiblePanel
+                    defaultSize={25}
+                    className="mt-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
+                    collapsedText="Code Output"
+                    collapseThreshold={15}
+                    collapsedSize={5}
+                  >
+                    <CodeOutput
+                      judge0Error={judge0Error}
+                      isSubmitting={isSubmitting}
+                      codeOutput={codeOutput}
+                      codeErrorId={codeErrorId}
+                      codeErrorDesc={codeErrorDesc}
+                      codeMemoryUsed={codeMemoryUsed}
+                      codeTimeUsed={codeTimeUsed}
+                    />
+                  </CollapsiblePanel>
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
         </div>
       )}
     </Suspense>

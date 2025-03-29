@@ -327,26 +327,6 @@ export default function QuestionEditor({
         <ScrollArea className="flex-1 px-1 -mx-1">
           <div className="space-y-4">
             <div>
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-teal-500 to-green-500 bg-clip-text text-transparent">
-                    {extractedData.title}
-                  </h1>
-                </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setExtractedData(null)}
-                  className="mt-1 transition-colors bg-transparent hover:bg-destructive text-red-500 border border-red-500/40"
-                >
-                  Reset
-                </Button>
-              </div>
-            </div>
-
-            <Separator className="bg-gradient-to-r from-teal-500/40 to-green-500/40 h-[1px]" />
-
-            <div>
               <h3 className="text-base font-semibold mb-2 flex items-center text-teal-600 dark:text-teal-400">
                 <BookOpen className="mr-2 h-4 w-4" />
                 Description

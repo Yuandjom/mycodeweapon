@@ -46,10 +46,7 @@ const Timer = ({ className }: { className?: string }) => {
       <div className="flex items-center ml-2">
         <div
           className={cn(
-            "h-6 w-6 cursor-pointer rounded-md flex items-center justify-center transition-colors",
-            isTiming
-              ? "text-green-600 hover:bg-green-500/10 dark:text-green-400 dark:hover:bg-green-500/20"
-              : "text-teal-600 hover:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20"
+            "h-6 w-6 cursor-pointer rounded-md flex items-center justify-center transition-colors hover:bg-background/80"
           )}
           onClick={isTiming ? pauseTimer : startTimer}
         >
@@ -57,7 +54,7 @@ const Timer = ({ className }: { className?: string }) => {
         </div>
 
         <div
-          className="h-6 w-6 text-teal-600 hover:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20 cursor-pointer rounded-md flex items-center justify-center transition-colors"
+          className="h-6 w-6 cursor-pointer rounded-md flex items-center justify-center transition-colors hover:bg-background/80"
           onClick={resetTimer}
         >
           <RotateCcw size={14} />
