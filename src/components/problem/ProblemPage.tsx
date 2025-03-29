@@ -6,6 +6,7 @@ import QuestionEditor from "@/components/problem/QuestionEditor";
 import AiChat from "@/components/problem/AiChat";
 import LoadingContent from "@/components/problem/LoadingContent";
 import CollapsiblePanel from "@/components/utils/CollapsiblePanel";
+import LightDarkToggle from "@/components/utils/LightDarkToggle";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -88,9 +89,9 @@ const ProblemPage = ({ title }: { title: string }) => {
       {authLoading || isLoading ? (
         <LoadingContent />
       ) : (
-        <div className="h-full w-full flex flex-col bg-slate-800/70 dark:bg-black/90 border-teal-500/50 dark:border-teal-700/50 backdrop-blur-sm">
+        <div className="h-full w-full flex flex-col bg-teal-500/70 dark:bg-teal-500/90 border border-teal-500/30 dark:border-teal-700/30 rounded-lg overflow-hidden shadow-lg shadow-teal-500/10 dark:shadow-teal-700/10 backdrop-blur-sm">
           {/* Global Header/Navbar - Moved from CodeEditor */}
-          <div className="w-full bg-background border-b border-border flex items-center justify-between px-4 py-3 shadow-md">
+          <div className="w-full bg-background/95 border-b border-teal-500/30 dark:border-teal-700/30 flex items-center justify-between px-4 py-3 shadow-md shadow-teal-500/10 dark:shadow-teal-700/10">
             {/* Left - Title */}
             <div className="flex-1 flex items-center">
               <h1 className="text-xl font-bold bg-gradient-to-r from-teal-500 to-green-500 bg-clip-text text-transparent capitalize">
@@ -100,8 +101,8 @@ const ProblemPage = ({ title }: { title: string }) => {
 
             {/* Middle - Timer */}
             <div className="flex-1 flex justify-center">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-md border border-border backdrop-blur-sm bg-secondary/70">
-                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <div className="flex items-center gap-2 px-3 py-1 rounded-md border border-teal-500/30 dark:border-teal-700/30 backdrop-blur-sm bg-secondary/70">
+                <Clock className="h-3.5 w-3.5 text-teal-500/80 dark:text-teal-400/80" />
                 <Timer className="text-foreground font-mono text-xs" />
               </div>
             </div>
@@ -116,17 +117,17 @@ const ProblemPage = ({ title }: { title: string }) => {
                   })}
                   defaultValue={problemStates.languageId}
                   onSelectChange={setLanguageId}
-                  className="border-border focus-within:ring-ring bg-secondary/70 text-foreground hover:bg-accent/50"
+                  className="border-teal-500/30 dark:border-teal-700/30 focus-within:ring-teal-500 dark:focus-within:ring-teal-400 bg-secondary/70 text-foreground hover:bg-accent/50"
                 />
               </div>
 
               <Button
                 onClick={handleCodeSubmit}
                 className={cn(
-                  "h-9 transition-all border border-border shadow-md rounded px-4 py-1 group relative",
+                  "h-9 transition-all border shadow-md rounded px-4 py-1 group relative",
                   isSubmitting
-                    ? "bg-muted text-muted-foreground"
-                    : "bg-accent hover:bg-accent/80 text-accent-foreground"
+                    ? "bg-muted text-muted-foreground border-teal-500/20 dark:border-teal-700/20"
+                    : "bg-gradient-to-r from-teal-500/90 to-green-500/90 hover:from-teal-600/90 hover:to-green-600/90 text-white border-transparent shadow-teal-500/20 dark:shadow-teal-700/20"
                 )}
                 disabled={isSubmitting}
               >
@@ -141,6 +142,7 @@ const ProblemPage = ({ title }: { title: string }) => {
                   </span>
                 </div>
               </Button>
+              <LightDarkToggle />
             </div>
           </div>
 
@@ -152,8 +154,11 @@ const ProblemPage = ({ title }: { title: string }) => {
           </div>
 
           {/* Main content area */}
-          <div className="flex-1 overflow-hidden px-1 pb-0.5">
-            <ResizablePanelGroup direction="horizontal" className="h-full">
+          <div className="flex-1 overflow-hidden p-1.5 bg-slate-800/80 dark:bg-black/80">
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="h-full rounded-lg overflow-hidden border border-teal-500/20 dark:border-teal-700/20"
+            >
               <ResizablePanel
                 defaultSize={40}
                 minSize={27}
