@@ -36,7 +36,7 @@ const LanguageSupport = () => {
           We Support
         </h2>
         <h3 className="text-xl md:text-3xl lg:text-4xl font-semibold text-muted-foreground text-center">
-          {hoveredLanguage || "your favourite languages!"}
+          {hoveredLanguage || "your most loved languages!"}
         </h3>
       </div>
 

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { AuthProvider } from "@/providers/auth-provider";
-import { Navbar } from "@/components/utils/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
@@ -33,10 +32,7 @@ export default function RootLayout({
             defaultTheme="dark"
             disableTransitionOnChange
           >
-            <main className="flex flex-col w-full h-screen">
-              <Navbar />
-              <div className="w-full h-full">{children}</div>
-            </main>
+            <main className="flex flex-col w-full h-screen">{children}</main>
           </ThemeProvider>
         </AuthProvider>
         <Toaster />

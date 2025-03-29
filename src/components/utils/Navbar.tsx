@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import AnimatedButton from "@/components/ui/animated-button";
@@ -53,7 +53,7 @@ export const Navbar = () => {
             variant="ghost"
             className="text-primary relative px-4 py-2 hover:text-primary/80"
           >
-            <Link href="/problem/new" className="font-semibold">
+            <Link href="/editor" className="font-semibold">
               Get Started
             </Link>
           </Button>
@@ -80,7 +80,7 @@ export const Navbar = () => {
                         className="rounded-full"
                       />
                     ) : (
-                      <User className="h-5 w-5" />
+                      <User2 className="h-5 w-5" />
                     )}
                   </Button>
                 </DropdownMenuTrigger>
@@ -93,21 +93,9 @@ export const Navbar = () => {
                       <p className="font-semibold leading-none">
                         {user.user_metadata.username || user.email}
                       </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => {
-                      router.push("/profile/settings");
-                    }}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={handleSignOut}

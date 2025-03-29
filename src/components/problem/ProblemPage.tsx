@@ -16,7 +16,6 @@ import { useProblem } from "@/hooks/useProblem";
 import { useJudge0 } from "@/hooks/useJudge0";
 import { Suspense } from "react";
 import Link from "next/link";
-import { judge0ToMonacoMap } from "@/constants/judge0";
 
 const ProblemPage = ({ title }: { title: string }) => {
   const { user, authLoading } = useAuth();

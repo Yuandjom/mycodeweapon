@@ -9,6 +9,14 @@ import { Loader2, BookOpen, Code, Lightbulb, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProblemState } from "@/types/problem";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface TestCase {
   input: string;
@@ -25,6 +33,14 @@ interface ExtractedQuestion {
   _showHints?: boolean;
 }
 
+interface Platform {
+  id: string;
+  name: string;
+  urlPattern: string;
+  placeholder: string;
+  isAvailable: boolean;
+}
+
 export default function QuestionEditor({
   problemStates,
   onQuestionExtracted,
@@ -34,6 +50,31 @@ export default function QuestionEditor({
 }) {
   const { toast } = useToast();
 
+  const platforms: Platform[] = [
+    {
+      id: "leetcode",
+      name: "LeetCode",
+      urlPattern: "leetcode.com/problems/",
+      placeholder: "https://leetcode.com/problems/example-problem/",
+      isAvailable: true,
+    },
+    {
+      id: "codewars",
+      name: "CodeWars",
+      urlPattern: "codewars.com/kata/",
+      placeholder: "https://www.codewars.com/kata/example-problem",
+      isAvailable: false,
+    },
+    {
+      id: "codemonkey",
+      name: "CodeMonkey",
+      urlPattern: "codemonkey.com/challenges/",
+      placeholder: "https://www.codemonkey.com/challenges/example-problem",
+      isAvailable: false,
+    },
+  ];
+
+  const [selectedPlatform, setSelectedPlatform] = useState<string>("leetcode");
   const [url, setUrl] = useState<string>("");
   const [extractedData, setExtractedData] = useState<ExtractedQuestion | null>(
     null
@@ -42,20 +83,28 @@ export default function QuestionEditor({
   const [progress, setProgress] = useState<number>(0);
   const [isValidUrl, setIsValidUrl] = useState<boolean>(true);
 
+  const currentPlatform = platforms.find((p) => p.id === selectedPlatform);
+
   // URL validation effect
   useEffect(() => {
     if (url.trim() === "") {
       setIsValidUrl(true);
       return;
     }
-    setIsValidUrl(url.includes("leetcode.com/problems/"));
-  }, [url]);
+
+    if (!currentPlatform) {
+      setIsValidUrl(false);
+      return;
+    }
+
+    setIsValidUrl(url.includes(currentPlatform.urlPattern));
+  }, [url, currentPlatform]);
 
   const extractQuestion = async () => {
-    if (!url.trim() || !url.includes("leetcode.com/problems/")) {
+    if (!url.trim() || !url.includes(currentPlatform?.urlPattern || "")) {
       toast({
         title: "Invalid URL",
-        description: "Please enter a valid LeetCode problem URL",
+        description: `Please enter a valid ${currentPlatform?.name} problem URL`,
         variant: "destructive",
       });
       return;
@@ -86,10 +135,19 @@ export default function QuestionEditor({
     const progressInterval = simulateProgress();
 
     try {
+      // Only LeetCode is supported for now, but this structure makes it easy to add more platforms
+      let endpoint = "";
+
+      if (selectedPlatform === "leetcode") {
+        endpoint = `/leetcode/scrape`;
+      } else {
+        throw new Error("Platform not supported yet");
+      }
+
       const response = await fetch(
         `${
           process.env.NEXT_PUBLIC_API_BASE_URL
-        }/leetcode/scrape?url=${encodeURIComponent(url)}`
+        }${endpoint}?url=${encodeURIComponent(url)}`
       );
 
       if (!response.ok) {
@@ -145,20 +203,55 @@ export default function QuestionEditor({
     );
   };
 
+  const handleChangePlatform = (value: string) => {
+    setSelectedPlatform(value);
+    setUrl("");
+    setIsValidUrl(true);
+  };
+
   return (
     <div className="w-full h-full flex flex-col">
       {!extractedData ? (
         <div className="space-y-4 mb-6">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground text-center">
-              Enter a LeetCode problem URL to extract the question details.
-            </p>
-          </div>
-
           <div className="space-y-3">
+            <div className="w-full">
+              <Select
+                value={selectedPlatform}
+                onValueChange={handleChangePlatform}
+                disabled={isLoading}
+              >
+                <SelectTrigger className="w-full mb-3">
+                  <SelectValue placeholder="Select a platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {platforms.map((platform) => (
+                    <SelectItem
+                      key={platform.id}
+                      value={platform.id}
+                      disabled={!platform.isAvailable}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span>{platform.name}</span>
+                        {!platform.isAvailable && (
+                          <Badge
+                            variant="outline"
+                            className="ml-2 bg-yellow-700 rounded-full"
+                          >
+                            Coming Soon
+                          </Badge>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="flex items-center gap-2">
               <Input
-                placeholder="https://leetcode.com/problems/example-problem/"
+                placeholder={
+                  currentPlatform?.placeholder || "Enter problem URL"
+                }
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 className={`flex-1 transition-all ${
@@ -166,11 +259,15 @@ export default function QuestionEditor({
                     ? "border-red-400 focus-visible:ring-red-400"
                     : ""
                 }`}
-                disabled={isLoading}
+                disabled={isLoading || !currentPlatform?.isAvailable}
               />
               <Button
                 onClick={extractQuestion}
-                disabled={isLoading || (url.trim() !== "" && !isValidUrl)}
+                disabled={
+                  isLoading ||
+                  (url.trim() !== "" && !isValidUrl) ||
+                  !currentPlatform?.isAvailable
+                }
                 className="transition-all"
               >
                 {isLoading ? (
@@ -189,8 +286,8 @@ export default function QuestionEditor({
 
             {!isValidUrl && url.trim() !== "" && (
               <p className="text-xs text-red-400 pl-1">
-                Please enter a valid LeetCode URL (e.g.,
-                https://leetcode.com/problems/two-sum/)
+                Please enter a valid {currentPlatform?.name} URL (e.g.,
+                {currentPlatform?.placeholder})
               </p>
             )}
 
@@ -214,7 +311,7 @@ export default function QuestionEditor({
 
       {extractedData ? (
         <ScrollArea className="flex-1 px-1 -mx-1">
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <div className="flex justify-between items-start">
                 <div>
@@ -348,7 +445,8 @@ export default function QuestionEditor({
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <p className="text-sm">
-            Enter a LeetCode URL and click "Extract" to view problem details
+            Select a platform, enter a problem URL, and click "Extract" to view
+            problem details
           </p>
         </div>
       )}
