@@ -10,15 +10,14 @@ export default function Hero() {
     <div className="relative w-full overflow-hidden bg-background">
       <div className="relative flex flex-col items-center justify-center overflow-hidden px-8 pb-4 md:px-8">
         <div className="relative mt-20 flex flex-col items-center justify-center">
-          <FeaturedImages />
           <h1 className="mb-8 relative mx-auto mt-4 max-w-6xl text-center text-3xl font-bold tracking-tight text-zinc-700 md:text-4xl lg:text-7xl dark:text-white">
             Ace your coding interviews with{" "}
-            <p className="relative z-10 bg-gradient-to-b from-indigo-700 to-indigo-600 bg-clip-text text-transparent pb-3">
+            <p className="relative z-10 bg-gradient-to-b from-teal-600 to-green-600 bg-clip-text text-transparent pb-3">
               AI-powered problem solving
               <span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="inline-block h-14 w-14 stroke-indigo-500 stroke-[1px]"
+                  className="inline-block h-14 w-14 stroke-green-500 stroke-[1px]"
                   width="24"
                   height="24"
                   viewBox="0 0 24 24"
@@ -83,56 +82,3 @@ export default function Hero() {
     </div>
   );
 }
-
-export const FeaturedImages = ({
-  className,
-  containerClassName,
-}: {
-  textClassName?: string;
-  className?: string;
-  showStars?: boolean;
-  containerClassName?: string;
-}) => {
-  const images = [
-    {
-      name: "John Lim Ziyang",
-      src: "/creators/john.jpeg",
-    },
-    {
-      name: "Lim Jia Earn",
-      src: "/creators/jiaearn.jpeg",
-    },
-  ];
-  return (
-    <div className={cn("flex flex-col items-center", containerClassName)}>
-      <div
-        className={cn(
-          "mb-2 flex flex-col items-center justify-center sm:flex-row",
-          className
-        )}
-      >
-        <div className="mb-4 flex flex-row items-center sm:mb-0">
-          {images.map((image, idx) => (
-            <div className="group relative -mr-4" key={image.name}>
-              <div>
-                <motion.div
-                  whileHover={{ scale: 1.05, zIndex: 30 }}
-                  transition={{ duration: 0.2 }}
-                  className="relative overflow-hidden rounded-full border-2 border-neutral-200"
-                >
-                  <Image
-                    height={100}
-                    width={100}
-                    src={image.src}
-                    alt={image.name}
-                    className="h-8 w-8 object-cover object-top md:h-14 md:w-14"
-                  />
-                </motion.div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
