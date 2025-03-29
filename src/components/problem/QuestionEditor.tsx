@@ -41,41 +41,36 @@ export default function QuestionEditor({
       toast({ title: "Please enter a valid LeetCode problem URL" });
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     try {
-      setTimeout(() => {
-        const mockData: ExtractedQuestion = {
-          title: "Sample Problem",
-          description:
-            "This is a placeholder description. Replace with your actual scraping logic.",
-          examples: [
-            { input: "nums = [2,7,11,15], target = 9", output: "[0,1]" },
-            { input: "nums = [3,2,4], target = 6", output: "[1,2]" },
-          ],
-          hints: [
-            "Think about using a hash map",
-            "Two-pass solution is straightforward",
-          ],
-        };
-
-        setExtractedData(mockData);
-        if (onQuestionExtracted) {
-          onQuestionExtracted(mockData);
-        }
-        toast({ title: "Question extracted successfully!" });
-        setIsLoading(false);
-      }, 1500);
-
-      // Replace the above with your actual implementation
+      const response = await fetch(
+        `http://localhost:8000/leetcode/scrape?url=${encodeURIComponent(url)}`
+      );
+  
+      const data = await response.json();
+  
+      const mapped: ExtractedQuestion = {
+        title: data.title,
+        description: data.description,
+        examples: data.examples,
+        hints: data.hints,
+      };
+  
+      setExtractedData(mapped);
+      if (onQuestionExtracted) {
+        onQuestionExtracted(mapped);
+      }
+  
+      toast({ title: "Question extracted successfully!" });
     } catch (err) {
       toast({ title: "Failed to extract question" });
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <div className="w-full h-full flex flex-col">
       {!extractedData && (
