@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -12,29 +12,40 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-
+} from "@/components/ui/popover";
 
 export type comboBoxSelection = {
-    value: string,
-    label: string,
-}
+  value: string;
+  label: string;
+};
 
-export function Combobox({defaultValue, keyword, selections, onSelectChange} : {defaultValue?: string, keyword: string, selections: comboBoxSelection[], onSelectChange: (value: string) => void;}) {
-  const [open, setOpen] = React.useState(false)
-  const [label, setLabel] = React.useState("")
+export function Combobox({
+  defaultValue,
+  keyword,
+  selections,
+  onSelectChange,
+  className,
+}: {
+  defaultValue?: string;
+  keyword: string;
+  selections: comboBoxSelection[];
+  onSelectChange: (value: string) => void;
+  className?: string;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [label, setLabel] = React.useState("");
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     if (defaultValue) {
-      const defaultSelection = selections.find(s => s.value == defaultValue)
-      setLabel(defaultSelection?.label || "")
+      const defaultSelection = selections.find((s) => s.value == defaultValue);
+      setLabel(defaultSelection?.label || "");
     }
-  }, [selections])
+  }, [selections]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -43,7 +54,7 @@ export function Combobox({defaultValue, keyword, selections, onSelectChange} : {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className={`${"w-[200px] justify-between"} ${className}`}
         >
           {label
             ? selections.find((s) => s.label === label)?.label
@@ -53,7 +64,7 @@ export function Combobox({defaultValue, keyword, selections, onSelectChange} : {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={`Search ${keyword}...`}/>
+          <CommandInput placeholder={`Search ${keyword}...`} />
           <CommandList>
             <CommandEmpty>No language found.</CommandEmpty>
             <CommandGroup>
@@ -63,8 +74,8 @@ export function Combobox({defaultValue, keyword, selections, onSelectChange} : {
                   value={s.value}
                   onSelect={(currentValue) => {
                     onSelectChange(s.value);
-                    setLabel(currentValue === label ? "" : currentValue)
-                    setOpen(false)
+                    setLabel(currentValue === label ? "" : currentValue);
+                    setOpen(false);
                   }}
                 >
                   {s.label}
@@ -81,5 +92,5 @@ export function Combobox({defaultValue, keyword, selections, onSelectChange} : {
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

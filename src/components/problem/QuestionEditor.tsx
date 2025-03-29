@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, BookOpen, Code, Lightbulb, Link } from "lucide-react";
+import { Loader2, BookOpen, Code, Lightbulb, Link, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProblemState } from "@/types/problem";
 import { Progress } from "@/components/ui/progress";
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface TestCase {
   input: string;
@@ -220,22 +221,27 @@ export default function QuestionEditor({
                 onValueChange={handleChangePlatform}
                 disabled={isLoading}
               >
-                <SelectTrigger className="w-full mb-3">
+                <SelectTrigger className="w-full mb-3 border-teal-500/30 bg-background/80 backdrop-blur-sm focus:ring-teal-500/40">
                   <SelectValue placeholder="Select a platform" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="border-teal-500/30 backdrop-blur-sm bg-background/90">
                   {platforms.map((platform) => (
                     <SelectItem
                       key={platform.id}
                       value={platform.id}
                       disabled={!platform.isAvailable}
+                      className={
+                        platform.isAvailable
+                          ? "text-foreground hover:bg-teal-500/10 focus:bg-teal-500/10"
+                          : "text-muted-foreground"
+                      }
                     >
                       <div className="flex items-center justify-between w-full">
                         <span>{platform.name}</span>
                         {!platform.isAvailable && (
                           <Badge
                             variant="outline"
-                            className="ml-2 bg-yellow-700 rounded-full"
+                            className="ml-2 bg-gradient-to-r from-teal-700 to-green-700 text-white border-none rounded-full shadow-sm"
                           >
                             Coming Soon
                           </Badge>
@@ -254,7 +260,7 @@ export default function QuestionEditor({
                 }
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className={`flex-1 transition-all ${
+                className={`flex-1 transition-all border-teal-500/30 focus-visible:ring-teal-500/40 backdrop-blur-sm ${
                   !isValidUrl && url.trim() !== ""
                     ? "border-red-400 focus-visible:ring-red-400"
                     : ""
@@ -268,7 +274,7 @@ export default function QuestionEditor({
                   (url.trim() !== "" && !isValidUrl) ||
                   !currentPlatform?.isAvailable
                 }
-                className="transition-all"
+                className="transition-all bg-gradient-to-r from-teal-600 to-green-600 hover:from-teal-500 hover:to-green-500 text-white border-none shadow-md shadow-teal-500/20"
               >
                 {isLoading ? (
                   <>
@@ -277,7 +283,7 @@ export default function QuestionEditor({
                   </>
                 ) : (
                   <>
-                    <Link className="mr-2 h-4 w-4" />
+                    <Zap className="mr-2 h-4 w-4" />
                     Extract
                   </>
                 )}
@@ -293,7 +299,15 @@ export default function QuestionEditor({
 
             {isLoading && (
               <div className="w-full space-y-2 mt-2 transition-all">
-                <Progress value={progress} className="h-2 w-full" />
+                <Progress
+                  value={progress}
+                  className="h-2 w-full bg-green-200 dark:bg-green-800"
+                >
+                  <div
+                    className="h-full bg-gradient-to-r from-teal-500 to-green-500 rounded-full"
+                    style={{ width: `${progress}%` }}
+                  />
+                </Progress>
                 <p className="text-xs text-center text-muted-foreground">
                   {progress < 40
                     ? "Fetching problem..."
@@ -315,23 +329,25 @@ export default function QuestionEditor({
             <div>
               <div className="flex justify-between items-start">
                 <div>
-                  <h1 className="text-xl font-bold">{extractedData.title}</h1>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-teal-500 to-green-500 bg-clip-text text-transparent">
+                    {extractedData.title}
+                  </h1>
                 </div>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => setExtractedData(null)}
-                  className="mt-1 transition-colors bg-transparent hover:bg-destructive"
+                  className="mt-1 transition-colors bg-transparent hover:bg-destructive text-red-500 border border-red-500/40"
                 >
                   Reset
                 </Button>
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-gradient-to-r from-teal-500/40 to-green-500/40 h-[1px]" />
 
             <div>
-              <h3 className="text-base font-semibold mb-2 flex items-center">
+              <h3 className="text-base font-semibold mb-2 flex items-center text-teal-600 dark:text-teal-400">
                 <BookOpen className="mr-2 h-4 w-4" />
                 Description
               </h3>
@@ -344,10 +360,10 @@ export default function QuestionEditor({
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-gradient-to-r from-teal-500/40 to-green-500/40 h-[1px]" />
 
             <div>
-              <h3 className="text-base font-semibold mb-3 flex items-center">
+              <h3 className="text-base font-semibold mb-3 flex items-center text-green-600 dark:text-green-400">
                 <Code className="mr-2 h-4 w-4" />
                 Examples
               </h3>
@@ -355,9 +371,9 @@ export default function QuestionEditor({
                 {extractedData.examples.map((example, idx) => (
                   <div
                     key={idx}
-                    className="rounded-md border p-3 bg-secondary/30"
+                    className="rounded-md border border-teal-500/20 p-3 bg-secondary/10 backdrop-blur-sm shadow-sm"
                   >
-                    <p className="font-medium text-sm mb-2">
+                    <p className="font-medium text-sm mb-2 text-teal-600 dark:text-teal-400">
                       Example {idx + 1}
                     </p>
                     <div className="space-y-3">
@@ -365,7 +381,7 @@ export default function QuestionEditor({
                         <p className="text-xs font-medium text-muted-foreground">
                           Input:
                         </p>
-                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                        <pre className="bg-background/80 backdrop-blur-sm p-2 rounded-md text-sm mt-1 overflow-x-auto border border-teal-500/10">
                           {example.input}
                         </pre>
                       </div>
@@ -373,7 +389,7 @@ export default function QuestionEditor({
                         <p className="text-xs font-medium text-muted-foreground">
                           Output:
                         </p>
-                        <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                        <pre className="bg-background/80 backdrop-blur-sm p-2 rounded-md text-sm mt-1 overflow-x-auto border border-green-500/10">
                           {example.output}
                         </pre>
                       </div>
@@ -382,7 +398,7 @@ export default function QuestionEditor({
                           <p className="text-xs font-medium text-muted-foreground">
                             Explanation:
                           </p>
-                          <pre className="bg-background p-2 rounded-md text-sm mt-1 overflow-x-auto border">
+                          <pre className="bg-background/80 backdrop-blur-sm p-2 rounded-md text-sm mt-1 overflow-x-auto border border-teal-500/10">
                             {example.explanation}
                           </pre>
                         </div>
@@ -396,16 +412,18 @@ export default function QuestionEditor({
             {extractedData.constraints &&
               extractedData.constraints.length > 0 && (
                 <>
-                  <Separator />
+                  <Separator className="bg-gradient-to-r from-green-500/40 to-teal-500/40 h-[1px]" />
 
                   <div>
-                    <h3 className="text-base font-semibold mb-2 flex items-center">
+                    <h3 className="text-base font-semibold mb-2 flex items-center text-teal-600 dark:text-teal-400">
                       <Code className="mr-2 h-4 w-4" />
                       Constraints
                     </h3>
                     <ul className="list-disc list-inside text-sm pl-1">
                       {extractedData.constraints.map((constraint, idx) => (
-                        <li key={idx}>{constraint}</li>
+                        <li key={idx} className="text-foreground">
+                          {constraint}
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -414,16 +432,21 @@ export default function QuestionEditor({
 
             {extractedData.hints && extractedData.hints.length > 0 && (
               <>
-                <Separator />
+                <Separator className="bg-gradient-to-r from-teal-500/40 to-green-500/40 h-[1px]" />
 
                 <div>
-                  <h3 className="text-base font-semibold mb-2 flex items-center">
+                  <h3 className="text-base font-semibold mb-2 flex items-center text-green-600 dark:text-green-400">
                     <Lightbulb className="mr-2 h-4 w-4" />
                     Hints
                   </h3>
 
                   <div className="mb-2">
-                    <Button size="sm" variant="outline" onClick={toggleHints}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={toggleHints}
+                      className="border-teal-500/30 text-teal-600 hover:bg-teal-500/10 hover:text-teal-700 dark:text-teal-400"
+                    >
                       {!extractedData._showHints ? "Show Hints" : "Hide Hints"}
                     </Button>
                   </div>
@@ -431,7 +454,7 @@ export default function QuestionEditor({
                   {extractedData._showHints && (
                     <ul className="space-y-2 list-disc list-inside text-sm pl-1">
                       {extractedData.hints.map((hint, idx) => (
-                        <li key={idx} className="text-sm">
+                        <li key={idx} className="text-sm text-foreground">
                           {hint}
                         </li>
                       ))}
@@ -444,10 +467,15 @@ export default function QuestionEditor({
         </ScrollArea>
       ) : (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
-          <p className="text-sm">
-            Select a platform, enter a problem URL, and click "Extract" to view
-            problem details
-          </p>
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-teal-500/10 mb-2">
+              <Zap className="h-6 w-6 text-teal-500" />
+            </div>
+            <p className="text-sm">
+              Select a platform, enter a problem URL, and click "Extract" to
+              view problem details
+            </p>
+          </div>
         </div>
       )}
     </div>

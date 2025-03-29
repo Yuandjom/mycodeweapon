@@ -1,9 +1,10 @@
 "use client";
 
-import { Play, Pause, RotateCcw, AlarmClock } from "lucide-react";
+import { Play, Pause, RotateCcw, Clock } from "lucide-react";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
-const Timer = () => {
+const Timer = ({ className }: { className?: string }) => {
   const [seconds, setSeconds] = useState<number>(0);
   const [isTiming, setIsTiming] = useState<boolean>(false);
 
@@ -35,24 +36,28 @@ const Timer = () => {
   };
 
   return (
-    <div className="flex_center px-2 py-0.5 bg-secondary text-secondary-foreground rounded-md">
-      <div className="flex items-center gap-2 px-2 flex-auto">
-        <AlarmClock size={18} />
-        <span className="font-mono text-sm font-medium">
-          {formatTime(seconds)}
-        </span>
-      </div>
+    <div
+      className={cn("flex items-center justify-between rounded-md", className)}
+    >
+      <span className="font-mono text-sm font-medium">
+        {formatTime(seconds)}
+      </span>
 
-      <div className="flex items-center">
+      <div className="flex items-center ml-2">
         <div
-          className="h-8 w-8 hover:bg-secondary-foreground/10 cursor-pointer rounded-md flex_center"
+          className={cn(
+            "h-6 w-6 cursor-pointer rounded-md flex items-center justify-center transition-colors",
+            isTiming
+              ? "text-green-600 hover:bg-green-500/10 dark:text-green-400 dark:hover:bg-green-500/20"
+              : "text-teal-600 hover:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20"
+          )}
           onClick={isTiming ? pauseTimer : startTimer}
         >
           {isTiming ? <Pause size={14} /> : <Play size={14} />}
         </div>
 
         <div
-          className="h-8 w-8 hover:bg-secondary-foreground/10 cursor-pointer rounded-md flex_center"
+          className="h-6 w-6 text-teal-600 hover:bg-teal-500/10 dark:text-teal-400 dark:hover:bg-teal-500/20 cursor-pointer rounded-md flex items-center justify-center transition-colors"
           onClick={resetTimer}
         >
           <RotateCcw size={14} />

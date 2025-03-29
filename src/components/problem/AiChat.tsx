@@ -99,7 +99,7 @@ const AiChat = ({ userId, problemStates }: AiChatProps) => {
       {/* Prompt context flags */}
       <div className="flex gap-2 items-center">
         <ChatSettingsModal openModal={openModal} />
-        <p className="text-sm font-semibold pr-1">Chat Contexts:</p>
+        {/* <p className="text-sm font-semibold pr-1">Chat Contexts:</p>
         <div className="flex items-center gap-2">
           <Checkbox
             id="includeProblem"
@@ -119,7 +119,7 @@ const AiChat = ({ userId, problemStates }: AiChatProps) => {
           <Label htmlFor="includeCode" className="text-sm">
             Code
           </Label>
-        </div>
+        </div> */}
 
         <div className="flex-1 flex justify-end">
           <ModelSelector

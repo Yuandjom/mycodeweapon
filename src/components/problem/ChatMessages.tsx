@@ -2,17 +2,17 @@
 
 import { useRef, useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AiChatMessage, AiChatRole, AiOption } from "@/types/ai";
+import { AiChatRole, AiOption } from "@/types/ai";
 import { displayAiOption } from "@/constants/aiSettings";
 import ReactMarkdown from "react-markdown";
-import { Code, Copy, Check } from "lucide-react";
+import { Code, Copy, Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   vscDarkPlus,
-  oneLight,
+  atomDark,
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useTheme } from "next-themes";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
@@ -24,8 +24,8 @@ interface ChatMessagesProps {
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-
   const { theme } = useTheme();
+  const [copied, setCopied] = useState<boolean>(false);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,7 +42,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
     return message.content;
   };
 
-  const [copied, setCopied] = useState<boolean>(false);
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopied(true);
@@ -51,9 +50,22 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
     }, 2000);
   };
 
+  // Chat message animation variants
+  const messageVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
-    <ScrollArea className="h-full w-full pr-4">
-      <div className="space-y-4 p-4 w-full">
+    <ScrollArea className="h-full w-full pr-4 ">
+      <div className="space-y-5 p-4 w-full">
         {messages.map((message, index) => {
           const isAi = message.role === AiChatRole.Ai;
           const content = processMessageContent(message);
@@ -65,25 +77,36 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                 "flex w-full",
                 isAi ? "justify-start" : "justify-end"
               )}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              initial="hidden"
+              animate="visible"
+              variants={messageVariants}
             >
               <div
                 className={cn(
-                  "max-w-[85%] px-4 py-3 rounded-lg break-words",
+                  "max-w-[85%] px-5 py-4 rounded-lg break-words backdrop-blur-sm relative overflow-hidden",
                   isAi
-                    ? "bg-blue-200/30 dark:bg-blue-900/30 text-foreground rounded-tl-none border border-blue-300 dark:border-blue-800"
-                    : "bg-green-200/30 dark:bg-green-900/30 text-foreground rounded-br-none border border-green-300 dark:border-green-800"
+                    ? "bg-gradient-to-br from-purple-500/20 to-indigo-700/20 text-foreground rounded-tl-none border border-purple-500/30 dark:border-purple-600/40 shadow-lg shadow-purple-500/10"
+                    : "bg-gradient-to-br from-teal-400/20 to-green-600/20 text-foreground rounded-br-none border border-teal-400/30 dark:border-teal-500/40 shadow-lg shadow-teal-500/10"
                 )}
               >
-                <div className="flex items-center gap-2 mb-1 text-xs font-medium">
+                {/* Decorative elements for high-tech look */}
+                <div
+                  className={cn(
+                    "absolute top-0 left-0 w-full h-1",
+                    isAi
+                      ? "bg-gradient-to-r from-purple-600 to-indigo-600"
+                      : "bg-gradient-to-r from-teal-400 to-green-600"
+                  )}
+                />
+
+                <div className="flex items-center gap-2 mb-2 text-xs font-medium">
                   {isAi ? (
-                    <span className="text-blue-700 dark:text-blue-400">
+                    <span className="text-purple-500 dark:text-purple-300 flex items-center">
+                      <Zap size={14} className="mr-1 animate-pulse" />
                       {displayAiOption(aiOption)}
                     </span>
                   ) : (
-                    <span className="text-green-700 dark:text-green-400">
+                    <span className="text-teal-500 dark:text-teal-300">
                       You
                     </span>
                   )}
@@ -94,8 +117,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                   className={cn(
                     "prose prose-sm max-w-none break-words dark:prose-invert",
                     "prose-headings:font-semibold prose-headings:text-foreground",
-                    "prose-p:my-1 prose-p:text-current",
-                    "prose-a:text-blue-600 dark:prose-a:text-blue-400",
+                    "prose-p:my-1.5 prose-p:text-current",
+                    isAi
+                      ? "prose-a:text-purple-500 dark:prose-a:text-purple-300"
+                      : "prose-a:text-teal-500 dark:prose-a:text-teal-300",
                     "prose-code:text-foreground",
                     "prose-ol:my-2 prose-ul:my-2",
                     "prose-li:my-0.5",
@@ -119,42 +144,42 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                             codeContent.includes("return")));
 
                       return !inline && (match || isPseudocode) ? (
-                        <div className="rounded-md overflow-hidden my-3 border border-border">
+                        <div className="rounded-md overflow-hidden my-3 border border-purple-500/30 dark:border-purple-400/30">
                           {/* Language label */}
-                          <div className="flex justify-between items-center gap-1 px-2 py-2 text-xs font-medium bg-gray-100 dark:bg-gray-800 border-b border-border">
-                            <div className="flex_center gap-2">
-                              <Code size={16} />
-                              <span>{language || "pseudocode"}</span>
+                          <div className="flex justify-between items-center gap-1 px-3 py-2 text-xs font-medium bg-gray-900 dark:bg-gray-900 border-b border-purple-500/30">
+                            <div className="flex items-center gap-2">
+                              <Code size={16} className="text-purple-400" />
+                              <span className="text-teal-300">
+                                {language || "pseudocode"}
+                              </span>
                             </div>
                             <div className="flex justify-end items-center">
                               <Button
                                 variant="ghost"
                                 onClick={() => handleCopyCode(codeContent)}
-                                className="m-0 p-1 h-4 w-4 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                                className="m-0 p-1 h-6 w-6 hover:bg-purple-500/20 dark:hover:bg-purple-500/30 rounded-full transition-colors"
                                 size="sm"
                               >
                                 {copied ? (
-                                  <Check
-                                    size={11}
-                                    className="text-green-400 border rounded-full border-green-300 p-0.5"
-                                  />
+                                  <Check size={14} className="text-green-400" />
                                 ) : (
-                                  <Copy size={6} />
+                                  <Copy size={14} className="text-purple-300" />
                                 )}
                               </Button>
                             </div>
                           </div>
                           <SyntaxHighlighter
                             language={language}
-                            style={theme === "dark" ? vscDarkPlus : oneLight}
+                            style={atomDark}
                             customStyle={{
                               margin: 0,
                               borderRadius: 0,
                               fontSize: "0.875rem",
                               padding: "1rem",
                               lineHeight: 1.5,
-                              maxWidth: "100%", // Limit code block width
-                              overflowX: "auto", // Allow horizontal scrolling within code blocks
+                              maxWidth: "100%",
+                              overflowX: "auto",
+                              backgroundColor: "#161b22", // Deeper dark for code blocks
                             }}
                             wrapLines={true}
                             wrapLongLines={true}
@@ -165,7 +190,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                         </div>
                       ) : (
                         <span
-                          className="px-1.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-800/30 font-mono text-sm inline-block"
+                          className={cn(
+                            "px-1.5 py-0.5 rounded-md font-mono text-sm inline-block",
+                            isAi
+                              ? "bg-purple-500/10 border border-purple-500/20"
+                              : "bg-teal-500/10 border border-teal-500/20"
+                          )}
                           {...props}
                         >
                           {codeContent.replace(/`/g, "")}
@@ -178,21 +208,30 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ aiOption, messages }) => {
                     },
                     // Style headings
                     h1: ({ children }) => (
-                      <h1 className="text-xl font-bold my-3 pb-1 border-b">
+                      <h1 className="text-xl font-bold my-3 pb-1 border-b border-purple-500/30">
                         {children}
                       </h1>
                     ),
                     h2: ({ children }) => (
-                      <h2 className="text-lg font-bold my-2 pb-0.5">
+                      <h2 className="text-lg font-bold my-2 pb-0.5 text-teal-500 dark:text-teal-300">
                         {children}
                       </h2>
                     ),
                     h3: ({ children }) => (
-                      <h3 className="text-base font-bold my-2">{children}</h3>
+                      <h3 className="text-base font-bold my-2 text-purple-500 dark:text-purple-300">
+                        {children}
+                      </h3>
                     ),
                     // Style blockquotes for hints/tips
                     blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-blue-500 pl-4 py-1 my-2 bg-blue-50/30 dark:bg-blue-900/20 rounded-r-md">
+                      <blockquote
+                        className={cn(
+                          "border-l-4 pl-4 py-1 my-2 rounded-r-md",
+                          isAi
+                            ? "border-purple-500 bg-purple-500/10 dark:bg-purple-900/20"
+                            : "border-teal-500 bg-teal-500/10 dark:bg-teal-900/20"
+                        )}
+                      >
                         {children}
                       </blockquote>
                     ),

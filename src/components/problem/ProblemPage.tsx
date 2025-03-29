@@ -54,7 +54,7 @@ const ProblemPage = ({ title }: { title: string }) => {
         <p>No problem titled: {title} found</p>
         <div>
           <Link
-            className="underline text-blue-600 hover:text-blue-700"
+            className="underline text-teal-600 hover:text-teal-700 font-medium"
             href="/problem/new"
             onClick={resetProblem}
           >
@@ -75,9 +75,9 @@ const ProblemPage = ({ title }: { title: string }) => {
       {authLoading || isLoading ? (
         <LoadingContent />
       ) : (
-        <div className="h-full w-full bg-slate-400 dark:bg-black border-t-4 border-slate-400 dark:border-black px-1 pb-0.5">
-          <div className="flex_center md:hidden bg-yellow-700 w-full">
-            <p className="text-yellow-300 font-bold">
+        <div className="h-full w-full bg-slate-800/70 dark:bg-black/90 border-t-4 border-teal-500/50 dark:border-teal-700/50 px-1 pb-0.5 backdrop-blur-sm">
+          <div className="flex_center md:hidden bg-gradient-to-r from-teal-700 to-green-700 w-full rounded-b-lg shadow-lg">
+            <p className="text-white font-bold py-2">
               Use larger screens for code execution features!
             </p>
           </div>
@@ -85,13 +85,13 @@ const ProblemPage = ({ title }: { title: string }) => {
             <ResizablePanel
               defaultSize={40}
               minSize={27}
-              className="mr-0.5 bg-slate-400 dark:bg-black"
+              className="mr-0.5 bg-slate-800/70 dark:bg-black/90"
             >
               <ResizablePanelGroup direction="vertical">
                 <ResizablePanel
                   defaultSize={50}
                   minSize={20}
-                  className="mb-0.5 bg-background rounded-lg p-4"
+                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-teal-700/20 shadow-md shadow-teal-500/10"
                 >
                   <QuestionEditor
                     problemStates={problemStates}
@@ -100,12 +100,12 @@ const ProblemPage = ({ title }: { title: string }) => {
                 </ResizablePanel>
                 <ResizableHandle
                   withHandle
-                  className="bg-slate-400 dark:bg-black"
+                  className="bg-slate-800/70 dark:bg-black/90 after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
                 />
                 <ResizablePanel
                   defaultSize={50}
                   minSize={20}
-                  className="mb-0.5 bg-background rounded-lg p-4"
+                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
                 >
                   <AiChat
                     userId={user?.id || ""}
@@ -117,17 +117,17 @@ const ProblemPage = ({ title }: { title: string }) => {
 
             <ResizableHandle
               withHandle
-              className="bg-slate-400 dark:bg-black hidden md:flex"
+              className="bg-slate-800/70 dark:bg-black/90 hidden md:flex after:bg-teal-700 after:shadow-md after:shadow-teal-500/20"
             />
 
             <ResizablePanel
               defaultSize={60}
-              className="ml-0.5 bg-slate-400 dark:bg-black hidden md:flex"
+              className="ml-0.5 bg-slate-800/70 dark:bg-black/90 hidden md:flex"
             >
               <ResizablePanelGroup direction="vertical">
                 <ResizablePanel
                   defaultSize={75}
-                  className="mb-0.5 bg-background rounded-lg p-4"
+                  className="mb-0.5 bg-background/95 backdrop-blur-sm rounded-lg border border-teal-500/20 shadow-md shadow-teal-500/10"
                 >
                   <CodeEditor
                     languages={languages}
@@ -141,11 +141,11 @@ const ProblemPage = ({ title }: { title: string }) => {
                 </ResizablePanel>
                 <ResizableHandle
                   withHandle
-                  className="bg-slate-400 dark:bg-black"
+                  className="bg-slate-800/70 dark:bg-black/90 after:bg-green-700 after:shadow-md after:shadow-green-500/20"
                 />
                 <CollapsiblePanel
                   defaultSize={25}
-                  className="mt-0.5 bg-background rounded-lg p-4"
+                  className="mt-0.5 bg-background/95 backdrop-blur-sm rounded-lg p-4 border border-green-500/20 shadow-md shadow-green-500/10"
                   collapsedText="Code Output"
                   collapseThreshold={15}
                   collapsedSize={5}

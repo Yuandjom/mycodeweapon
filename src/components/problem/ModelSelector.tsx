@@ -73,7 +73,7 @@ export default function ModelSelector({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className=""
+          className="border-teal-500/30 focus-within:ring-teal-500/40 backdrop-blur-sm"
         >
           {getDisplayValue()}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
