@@ -26,12 +26,6 @@ export const Navbar = () => {
   const [hovered, setHovered] = useState<number | null>(null);
   const { user, authLoading, signOut } = useAuth();
   const { toast } = useToast();
-  const navItems = [
-    {
-      name: "Problems",
-      link: "/problem",
-    },
-  ];
 
   const handleSignOut = async () => {
     try {
@@ -52,90 +46,15 @@ export const Navbar = () => {
     >
       <Logo withText />
       <div className="flex flex-row flex-1 items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
-        {navItems.map((navItem: any, idx: number) => (
-          <Link
-            onMouseEnter={() => setHovered(idx)}
-            className="text-primary relative px-4 py-2 hover:text-primary/80"
-            key={`link=${idx}`}
-            href={navItem.link}
-          >
-            {hovered === idx && (
-              <motion.div
-                layoutId="hovered"
-                className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
-              />
-            )}
-            <span className="relative z-20 font-semibold">{navItem.name}</span>
-          </Link>
-        ))}
+        <Button
+          variant="ghost"
+          className="text-primary rounded-full relative px-4 py-2 hover:text-primary/80"
+        >
+          <Link href="/problem/new">Get Started</Link>
+        </Button>
       </div>
       <div className="flex items-center gap-2">
         <LightDarkToggle />
-        {!authLoading && (
-          <>
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="w-10 h-10 bg-background hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    {user.user_metadata.avatar_url ? (
-                      <Image
-                        src={user.user_metadata.avatar_url}
-                        alt="User avatar"
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                    ) : (
-                      <User className="h-5 w-5" />
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 rounded-lg shadow-xl border-2 border-border z-101"
-                >
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1 p-2">
-                      <p className="font-semibold leading-none">
-                        {user.user_metadata.username || user.email}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => {
-                      router.push("/profile/settings");
-                    }}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <AnimatedButton>
-                <Link href="/signin">
-                  <span className="text-sm md:text-base">Get Started!</span>
-                </Link>
-              </AnimatedButton>
-            )}
-          </>
-        )}
       </div>
     </motion.div>
   );
